@@ -1,0 +1,16 @@
+//
+//  Localizable.swift
+//  
+//
+//  Created by Gal Yedidovich on 22/10/2020.
+//
+
+
+"zeroBytes" = "0 Bytes";
+"oneByte" = "1 Byte";
+"bytes" = "Bytes";
+"kb" = "KB";
+"mb" = "MB";
+"gb" = "GB";
+"tb" = "TB";
+"pb" = "PB";
