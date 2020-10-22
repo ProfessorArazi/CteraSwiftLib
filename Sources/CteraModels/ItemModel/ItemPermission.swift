@@ -10,14 +10,10 @@ public enum ItemPermission: String, Codable {
 	
 	var prettyString: String {
 		switch self {
-		case .PreviewOnly:
-			return ".permissionPreviewOnly"
-		case .ReadOnly:
-			return ".permissionReadOnly"
-		case .ReadWrite:
-			return ".permissionReadWrite"
-		default:
-			return ".permissionDenied"
+		case .PreviewOnly:	return .permissionPreviewOnly
+		case .ReadOnly:		return .permissionReadOnly
+		case .ReadWrite:	return .permissionReadWrite
+		default:			return .permissionDenied
 		}
 	}
 	

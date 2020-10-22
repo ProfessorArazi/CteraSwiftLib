@@ -81,7 +81,7 @@ public struct CacheItem: Codable {
 		guard let compareLastModified = item.lastModified else { return true }
 		
 		guard let lastModified = self.item.lastModified else { //relevant only to uploaded files
-			self.item.set(lastModified: compareLastModified)
+			self.item.lastModified = compareLastModified
 			return true
 		}
 		

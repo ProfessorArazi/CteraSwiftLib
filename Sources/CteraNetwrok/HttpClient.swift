@@ -604,14 +604,7 @@ enum HttpClient {
 			.set(contentType: .xml)
 			.set(body: StringFormatter.buildXml(from: request.toJson()))
 		
-		func parseFolder(from data: Data) throws -> FolderInfo {
-			var folder: FolderInfo = try .from(json: data)
-			folder.items = folder.items.map { $0.updatedPrettyTime() }
-			
-			return folder
-		}
-		
-		handle(request: req, parseFolder, handler: handler)
+		handle(request: req, FolderInfo.from(json:), handler: handler)
 	}
 	
 	private static func sendCredentials(handler: @escaping (Response<Any?>) -> ()) {

@@ -5,8 +5,7 @@
 //  Created by Gal Yedidovich on 22/10/2020.
 //
 
-import Foundation
-public struct FolderInfo: Equatable, Codable {
+public struct FolderInfo: Codable, Equatable {
 	public var items: [ItemInfo]
 	public var folderItem: ItemInfo! = ItemInfo()
 	public var errorType: String?

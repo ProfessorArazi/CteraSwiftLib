@@ -25,6 +25,13 @@ public extension String {
 	static let tb = "tb".localizedModule
 	static let pb = "pb".localizedModule
 	
+	//MARK: - formatted times
+	static let lessThanMinuteAgo = "lessThanMinuteAgo".localized
+	static let oneMinuteAgo = "oneMinuteAgo".localized
+	static let minutesAgo = "minutesAgo".localized
+	static let todayAt = "todayAt".localized
+	static let yesterdayAt = "yesterdayAt".localized
+	
 	//MARK: - Permissions
 	static let permissionPreviewOnly = "permissionPreviewOnly".localizedModule
 	static let permissionReadOnly = "permissionReadOnly".localizedModule
