@@ -9,21 +9,21 @@ import Foundation
 import BasicExtensions
 import StorageExtensions
 
-class FetchRequest {
+public struct FetchRequest {
 	static var includeDeleted = Prefs.standard.bool(key: .SHOW_DELETED)
 	static var sortAscending = Prefs.standard.bool(key: .SORT_ASCENDING, fallback: true)
 	
-	private(set) var path: String
-	private(set) var cachePath: String? = nil
-	private(set) var folderType = "Personal"
-	private(set) var passPhrase: String? = nil
-	private(set) var depth: String = "1"
-	private(set) var userPassword: String? = nil
-	private(set) var query: String? = nil
-	private(set) var withCache = true
-	private(set) var includeShared = false
-	private(set) var navigationPane = false
-	private(set) var startIndex = 0
+	var path: String
+	var cachePath: String? = nil
+	var folderType = "Personal"
+	var passPhrase: String? = nil
+	var depth: String = "1"
+	var userPassword: String? = nil
+	var query: String? = nil
+	var withCache = true
+	var includeShared = false
+	var navigationPane = false
+	var startIndex = 0
 	
 	init(path: String) {
 		self.path = path
@@ -51,58 +51,68 @@ class FetchRequest {
 		return JsonObject().put(key: "type", "user-defined").put(key: "name", "fetchResources").put(key: "param", param);
 	}
 	
-	func set(cachePath: String) -> FetchRequest {
-		self.cachePath = cachePath
+	func with(cachePath: String) -> FetchRequest {
+		var copy = self
+		copy.cachePath = cachePath
+		return copy
+	}
+	
+	func with(folderType: String) -> FetchRequest {
+		var copy = self
+		copy.folderType = folderType
+		return copy
+	}
+	
+	func with(passPhrase: String) -> FetchRequest {
+		var copy = self
+		copy.passPhrase = passPhrase
+		return copy
+	}
+	
+	func with(depth: String) -> FetchRequest {
+		var copy = self
+		copy.depth = depth
+		return copy
+	}
+	
+	func with(userPassword: String) -> FetchRequest {
+		var copy = self
+		copy.userPassword = userPassword
+		return copy
+	}
+	
+	func with(query: String) -> FetchRequest {
+		var copy = self
+		copy.query = query
+		return copy
+	}
+	
+	func with(withCache: Bool) -> FetchRequest {
+		var copy = self
+		copy.withCache = withCache
+		return copy
+	}
+	
+	func with(includeShared: Bool) -> FetchRequest {
+		var copy = self
+		copy.includeShared = includeShared
+		return copy
+	}
+	
+	func with(startIndex: Int) -> FetchRequest {
+		var copy = self
+		copy.startIndex = startIndex
 		return self
 	}
 	
-	func set(folderType: String) -> FetchRequest {
-		self.folderType = folderType
-		return self
-	}
-	
-	func set(passPhrase: String) -> FetchRequest {
-		self.passPhrase = passPhrase
-		return self
-	}
-	
-	func set(depth: String) -> FetchRequest {
-		self.depth = depth
-		return self
-	}
-	
-	func set(userPassword: String) -> FetchRequest {
-		self.userPassword = userPassword
-		return self
-	}
-	
-	func set(query: String) -> FetchRequest {
-		self.query = query
-		return self
-	}
-	
-	func set(withCache: Bool) -> FetchRequest {
-		self.withCache = withCache
-		return self
-	}
-	
-	func set(includeShared: Bool) -> FetchRequest {
-		self.includeShared = includeShared
-		return self
-	}
-	
-	func set(startIndex: Int) -> FetchRequest {
-		self.startIndex = startIndex
-		return self
-	}
-	
-	func set(navigationPane: Bool) -> FetchRequest {
-		self.navigationPane = navigationPane
+	func with(navigationPane: Bool) -> FetchRequest {
+		var copy = self
+		copy.navigationPane = navigationPane
 		return self
 	}
 }
 
-enum SortMethod: String, CaseIterable {
+public enum SortMethod: String, CaseIterable {
 	case Name = "name", Size = "size", Modified = "lastmodified"
 	
 	///Gets and sets the current SortMethod stored in Prefs.standard

@@ -12,13 +12,14 @@ import CteraModels
 import CteraUtil
 import CteraCache
 
-enum HttpClient {
+public enum HttpClient {
 	private static let SERVICES_PORTAL_API = "ServicesPortal/api?format=jsonext"
 	private static let TAG = String(describing: HttpClient.self)
-	private(set) static var serverAddress, deviceId, sharedSecret: String!
-	private(set) static var isPortalReadOnly = false
-	static var hasConnection = true
-	static var onConnectionChanged: [(Bool)->()] = []
+	
+	public static var serverAddress, deviceId, sharedSecret: String!
+	public static var isPortalReadOnly = false
+	public static var hasConnection = true
+	public static var onConnectionChanged: [(Bool)->()] = []
 	public static var thumbnailDelegate: ThumbnailDelegate?
 	
 	private static let session = URLSession(configuration: URLSessionConfiguration.default, delegate: Session(), delegateQueue: nil)
@@ -37,17 +38,11 @@ enum HttpClient {
 	}()
 	
 	//MARK: Public API
-	static let SERVICE_WEBDAV = "/ServicesPortal/webdav"
+	public static let SERVICE_WEBDAV = "/ServicesPortal/webdav"
 	
-	static func set(deviceId id: String?) { deviceId = id }
+	public static func set(portalReadOnly mode: Bool) { isPortalReadOnly = mode }
 	
-	static func set(sharedSecret secret: String?) { sharedSecret = secret }
-	
-	static func set(serverAddress address: String?) { serverAddress = address }
-	
-	static func set(portalReadOnly mode: Bool) { isPortalReadOnly = mode }
-	
-	static func set(hasConnection connection: Bool) {
+	public static func set(hasConnection connection: Bool) {
 		guard hasConnection != connection else { return } //prevent multiple events for same status
 		
 		hasConnection = connection
@@ -55,14 +50,14 @@ enum HttpClient {
 		for observer in onConnectionChanged { observer(connection) }
 	}
 	
-	static func requestPublicInfo(address: String, handler: @escaping (Response<JsonObject>) -> ()) {
+	public static func requestPublicInfo(address: String, handler: @escaping (Response<JsonObject>) -> ()) {
 		Console.log(tag: Self.TAG, msg: #function)
 		serverAddress = address
 		let req = URLRequest(url: URL(string: "https://\(address)/ServicesPortal/public/publicInfo?format=jsonext")!)
 		handle(request: req, JsonObject.init(from:), handler: handler)
 	}
 	
-	static func login(_ user: String? = nil, _ pass: String? = nil, activationCode code: String? = nil, deviceID: String, deviceName: String, handler: @escaping (Response<JsonObject>) -> ()) {
+	public static func login(_ user: String? = nil, _ pass: String? = nil, activationCode code: String? = nil, deviceID: String, deviceName: String, handler: @escaping (Response<JsonObject>) -> ()) {
 		Console.log(tag: Self.TAG, msg: #function)
 		let req = URLRequest(to: serverAddress, "ServicesPortal/public/users\(user != nil ? "/\(user!)" : "")?format=jsonext")
 			.set(method: .POST)
@@ -75,13 +70,13 @@ enum HttpClient {
 		handle(request: req, middleware, handler: handler)
 	}
 	
-	static func logout() {
+	public static func logout() {
 		Console.log(tag: Self.TAG, msg: #function)
 		let req = URLRequest(to: serverAddress, "ServicesPortal/api/logout").set(method: .POST)
 		handle(request: req, handler: nil)
 	}
 	
-	static func fullLogin(handler: @escaping (Response<Data?>) -> ()) {
+	public static func fullLogin(handler: @escaping (Response<Data?>) -> ()) {
 		Console.log(tag: Self.TAG, msg: #function)
 		sendCredentials { response in
 			switch response {
@@ -93,7 +88,7 @@ enum HttpClient {
 		}
 	}
 	
-	static func sendUpdateMobileInfo(deviceID: String, deviceName: String) {
+	public static func sendUpdateMobileInfo(deviceID: String, deviceName: String) {
 		Console.log(tag: Self.TAG, msg: #function)
 		let req = URLRequest(to: serverAddress, "ServicesPortal/api/objs/\(deviceId!)?format=jsonext")
 			.set(method: .POST)
@@ -109,7 +104,7 @@ enum HttpClient {
 		}.resume()
 	}
 	
-	static func fetchFolder(_ request: FetchRequest, handler: @escaping (Response<FolderInfo>) -> ()) {
+	public static func fetchFolder(_ request: FetchRequest, handler: @escaping (Response<FolderInfo>) -> ()) {
 		Console.log(tag: Self.TAG, msg: #function)
 		let cachePath = request.cachePath ?? request.path
 		
@@ -136,12 +131,12 @@ enum HttpClient {
 		})
 	}
 	
-	static func searchFolder(_ request: FetchRequest, handler: @escaping (Response<FolderInfo>) -> ()) {
+	public static func searchFolder(_ request: FetchRequest, handler: @escaping (Response<FolderInfo>) -> ()) {
 		Console.log(tag: Self.TAG, msg: #function)
 		requestFolder(request, handler: handler)
 	}
 	
-	static func createFolder(at path: String, name: String, handler: @escaping (Response<Data>) -> ()) {
+	public static func createFolder(at path: String, name: String, handler: @escaping (Response<Data>) -> ()) {
 		Console.log(tag: Self.TAG, msg: #function)
 		let req = URLRequest(to: serverAddress, SERVICES_PORTAL_API)
 			.set(method: .POST)
@@ -151,7 +146,7 @@ enum HttpClient {
 		handle(request: req, handler: handler)
 	}
 	
-	static func requestFile(for item: ItemInfo, autoDeleteTempFile: Bool = false, config: @escaping (ProgressTask)->(), handler: @escaping (Response<URL>) -> ()) {
+	public static func requestFile(for item: ItemInfo, autoDeleteTempFile: Bool = false, config: @escaping (ProgressTask)->(), handler: @escaping (Response<URL>) -> ()) {
 		Console.log(tag: TAG, msg: "\(#function), \(item.name)")
 		let fm = FileManager.default
 		
@@ -232,7 +227,7 @@ enum HttpClient {
 		}
 	}
 	
-	static func requestPreviewSession(for item: ItemInfo, handler: @escaping (Response<String>) -> ()) {
+	public static func requestPreviewSession(for item: ItemInfo, handler: @escaping (Response<String>) -> ()) {
 		Console.log(tag: TAG, msg: "\(#function), \(item.name)")
 		
 		let path = item.path.dropFirst()
@@ -245,13 +240,13 @@ enum HttpClient {
 		handle(request: req, middleware, handler: handler)
 	}
 	
-	static func requestPreview(page: Int, viewingSession: String, handler: @escaping (Response<Data>) -> ()) {
+	public static func requestPreview(page: Int, viewingSession: String, handler: @escaping (Response<Data>) -> ()) {
 		let req = URLRequest(to: serverAddress, "ServicesPortal/pcc/Page/q/\(page)?DocumentID=u\(viewingSession)&Scale=1&ContentType=png")
 		
 		handle(request: req, handler: handler)
 	}
 	
-	static func requestPreviewPageCount(viewingSession: String, handler: @escaping (Response<Int>) -> ()) {
+	public static func requestPreviewPageCount(viewingSession: String, handler: @escaping (Response<Int>) -> ()) {
 		let req = URLRequest(to: serverAddress, "ServicesPortal/pcc/Document/q/Attributes?DocumentID=u\(viewingSession)&DesiredPageCountConfidence=50")
 		
 		let middleware = { (d: Data) -> Int in
@@ -262,7 +257,7 @@ enum HttpClient {
 		handle(request: req, middleware, handler: handler)
 	}
 	
-	static func verifySession(completion: @escaping ()->()) {
+	public static func verifySession(completion: @escaping ()->()) {
 		Console.log(tag: TAG, msg: "\(#function)")
 		let req = URLRequest(to: serverAddress, "ServicesPortal/api/currentTime?format=jsonext")
 		
@@ -275,7 +270,7 @@ enum HttpClient {
 		}
 	}
 	
-	static func uploadRequest(_ fileUrl: URL, to itemPath: String,
+	public static func uploadRequest(_ fileUrl: URL, to itemPath: String,
 							  onStart: @escaping (URLSessionUploadTask)->() = { $0.resume() },
 							  handler: @escaping ()->()) {
 		Console.log(tag: Self.TAG, msg: #function)
@@ -337,7 +332,7 @@ enum HttpClient {
 		}
 	}
 	
-	static func requestLastModified(for items: [ItemInfo], handler: @escaping (Response<[JsonObject]>)->()) {
+	public static func requestLastModified(for items: [ItemInfo], handler: @escaping (Response<[JsonObject]>)->()) {
 		Console.log(tag: TAG, msg: "\(#function), items: \(items.map { $0.name })")
 		let req = URLRequest(to: serverAddress, "ServicesPortal/api/\(SessionInfo.userRef!)?format=jsonext")
 			.set(method: .POST)
@@ -350,34 +345,34 @@ enum HttpClient {
 		}, handler: handler)
 	}
 	
-	static func rename(item: ItemInfo, to newName: String, handler: @escaping (Response<(String, SrcDestData)>) -> ()) {
+	public static func rename(item: ItemInfo, to newName: String, handler: @escaping (Response<(String, SrcDestData)>) -> ()) {
 		Console.log(tag: Self.TAG, msg: #function)
 		let newPath = item.parentPath + "/" + newName
 		let data = SrcDestData(action: "moveResources", pairs: [(src: item.path, dest: newPath)])
 		srcDestRequest(data: data, handler: handler)
 	}
 	
-	static func delete(items: [ItemInfo], handler: @escaping (Response<(String, SrcDestData)>) -> ()) {
+	public static func delete(items: [ItemInfo], handler: @escaping (Response<(String, SrcDestData)>) -> ()) {
 		Console.log(tag: TAG, msg: #function)
 		let paths = items.map { item in (src: item.path, dest: "") }
 		let data = SrcDestData(action: "deleteResources", pairs: paths)
 		srcDestRequest(data: data, handler: handler)
 	}
 	
-	static func restore(items: [ItemInfo], handler: @escaping (Response<(String, SrcDestData)>) -> ()) {
+	public static func restore(items: [ItemInfo], handler: @escaping (Response<(String, SrcDestData)>) -> ()) {
 		Console.log(tag: TAG, msg: #function)
 		let paths = items.map { item in (src: item.path, dest: item.parentPath) }
 		let data = SrcDestData(action: "restoreResources", pairs: paths)
 		srcDestRequest(data: data, handler: handler)
 	}
 	
-	static func restoreVersionedItem(item: ItemInfo, handler: @escaping (Response<(String, SrcDestData)>) -> ()) {
+	public static func restoreVersionedItem(item: ItemInfo, handler: @escaping (Response<(String, SrcDestData)>) -> ()) {
 		Console.log(tag: TAG, msg: #function)
 		let data = SrcDestData(action: "restoreResources", pairs: [(src: item.path, dest: "")])
 		srcDestRequest(data: data, handler: handler)
 	}
 	
-	static func copyMove(isCopy: Bool, items: [ItemInfo], folderPath: String, handler: @escaping (Response<(String, SrcDestData)>) -> ()) {
+	public static func copyMove(isCopy: Bool, items: [ItemInfo], folderPath: String, handler: @escaping (Response<(String, SrcDestData)>) -> ()) {
 		Console.log(tag: TAG, msg: #function)
 		let paths = items.map { item in (src: item.path, dest: folderPath + "/" + item.name) }
 		let data = SrcDestData(action: (isCopy ? "copyResources" : "moveResources"), pairs: paths)
@@ -388,7 +383,7 @@ enum HttpClient {
 	/// - Parameters:
 	///   - taskUrl: unique ID of the task to check
 	///   - handler: request completion handler
-	static func followServerTask(at taskUrl: String, handler: BackgroundTaskHandler) {
+	public static func followServerTask(at taskUrl: String, handler: BackgroundTaskHandler) {
 		Console.log(tag: TAG, msg: #function)
 		let req = URLRequest(to: serverAddress, SERVICES_PORTAL_API)
 			.set(method: .POST)
@@ -435,7 +430,7 @@ enum HttpClient {
 	/// - Parameters:
 	///   - taskUrl: unique ID of the task to check
 	///   - handler: request completion handler
-	static func checkTaskStatus(at taskUrl: String, handler: @escaping (Response<JsonObject>) -> ()) {
+	public static func checkTaskStatus(at taskUrl: String, handler: @escaping (Response<JsonObject>) -> ()) {
 		Console.log(tag: TAG, msg: #function)
 		let req = URLRequest(to: serverAddress, SERVICES_PORTAL_API)
 			.set(method: .POST)
@@ -445,7 +440,7 @@ enum HttpClient {
 		handle(request: req, JsonObject.init(from:), handler: handler)
 	}
 	
-	static func resolveConflict(_ srcDestData: SrcDestData, handler: BackgroundTaskHandler) {
+	public static func resolveConflict(_ srcDestData: SrcDestData, handler: BackgroundTaskHandler) {
 		Console.log(tag: Self.TAG, msg: #function)
 		srcDestRequest(data: srcDestData) { result in
 			switch result {
@@ -456,7 +451,7 @@ enum HttpClient {
 		}
 	}
 	
-	static func updateSession(handler: @escaping (Response<Data?>) -> ()) {
+	public static func updateSession(handler: @escaping (Response<Data?>) -> ()) {
 		Console.log(tag: TAG, msg: #function)
 		
 		sendSessionInfo { sessionInfoRes in //session
@@ -485,7 +480,7 @@ enum HttpClient {
 		}
 	}
 	
-	static func requestGlobalStatus(handler: @escaping (Response<JsonObject>) -> ()) {
+	public static func requestGlobalStatus(handler: @escaping (Response<JsonObject>) -> ()) {
 		Console.log(tag: Self.TAG, msg: #function)
 		let req = URLRequest(to: serverAddress, SERVICES_PORTAL_API)
 			.set(method: .POST)
@@ -495,9 +490,9 @@ enum HttpClient {
 		handle(request: req, JsonObject.init(from:), handler: handler)
 	}
 	
-	static func requestNavigationItems(completion: @escaping (Response<FolderInfo>)->()) {
+	public static func requestNavigationItems(completion: @escaping (Response<FolderInfo>)->()) {
 		Console.log(tag: Self.TAG, msg: #function)
-		let fetchReq = FetchRequest(path: "/ServicesPortal/webdav").set(navigationPane: true)
+		let fetchReq = FetchRequest(path: "/ServicesPortal/webdav").with(navigationPane: true)
 		
 		let req = URLRequest(to: serverAddress, SERVICES_PORTAL_API)
 			.set(method: .POST)
@@ -507,7 +502,7 @@ enum HttpClient {
 		handle(request: req, { try! FolderInfo.from(json: $0) }, handler: completion)
 	}
 	
-	static func requestPublicLinks(for item: ItemInfo, handler: @escaping (Response<[PublicLink]>) -> ()) {
+	public static func requestPublicLinks(for item: ItemInfo, handler: @escaping (Response<[PublicLink]>) -> ()) {
 		Console.log(tag: Self.TAG, msg: #function)
 		let req = URLRequest(to: serverAddress, SERVICES_PORTAL_API)
 			.set(method: .POST)
@@ -517,7 +512,7 @@ enum HttpClient {
 		handle(request: req, { try! [PublicLink].from(json: $0) }, handler: handler)
 	}
 	
-	static func createPublicLink(with link: PublicLink, handler: @escaping (Response<PublicLink>) -> ()) {
+	public static func createPublicLink(with link: PublicLink, handler: @escaping (Response<PublicLink>) -> ()) {
 		Console.log(tag: Self.TAG, msg: #function)
 		let req = URLRequest(to: serverAddress, SERVICES_PORTAL_API)
 			.set(method: .POST)
@@ -527,7 +522,7 @@ enum HttpClient {
 		handle(request: req, { try! PublicLink.from(json: $0) }, handler: handler)
 	}
 	
-	static func modifyPublicLink(with link: PublicLink, remove: Bool, handler: @escaping (Response<Data>) -> ()) {
+	public static func modifyPublicLink(with link: PublicLink, remove: Bool, handler: @escaping (Response<Data>) -> ()) {
 		Console.log(tag: Self.TAG, msg: #function)
 		let req = URLRequest(to: serverAddress, SERVICES_PORTAL_API)
 			.set(method: .POST)
@@ -537,7 +532,7 @@ enum HttpClient {
 		handle(request: req, handler: handler)
 	}
 	
-	static func requestCollaboration(for item: ItemInfo, handler: @escaping (Response<JsonObject>) -> ()) {
+	public static func requestCollaboration(for item: ItemInfo, handler: @escaping (Response<JsonObject>) -> ()) {
 		Console.log(tag: Self.TAG, msg: #function)
 		let req = URLRequest(to: serverAddress, SERVICES_PORTAL_API)
 			.set(method: .POST)
@@ -547,7 +542,7 @@ enum HttpClient {
 		handle(request: req, JsonObject.init(from:), handler: handler)
 	}
 	
-	static func saveCollaboration(at path: String, _ collaboration: JsonObject, handler: @escaping (Response<Data>) -> ()) {
+	public static func saveCollaboration(at path: String, _ collaboration: JsonObject, handler: @escaping (Response<Data>) -> ()) {
 		Console.log(tag: Self.TAG, msg: #function)
 		let req = URLRequest(to: serverAddress, SERVICES_PORTAL_API)
 			.set(method: .POST)
@@ -557,7 +552,7 @@ enum HttpClient {
 		handle(request: req, handler: handler)
 	}
 	
-	static func validateCollaborator(for item: ItemInfo, invitee: JsonObject, handler: @escaping (Response<JsonObject>) -> ()) {
+	public static func validateCollaborator(for item: ItemInfo, invitee: JsonObject, handler: @escaping (Response<JsonObject>) -> ()) {
 		Console.log(tag: Self.TAG, msg: #function)
 		let req = URLRequest(to: serverAddress, SERVICES_PORTAL_API)
 			.set(method: .POST)
@@ -567,7 +562,7 @@ enum HttpClient {
 		handle(request: req, JsonObject.init(from:), handler: handler)
 	}
 	
-	static func searchCollaborators(query: String, type: String, uid: Int, handler: @escaping (Response<JsonObject>) -> ()) {
+	public static func searchCollaborators(query: String, type: String, uid: Int, handler: @escaping (Response<JsonObject>) -> ()) {
 		Console.log(tag: Self.TAG, msg: #function)
 		let req = URLRequest(to: serverAddress, SERVICES_PORTAL_API)
 			.set(method: .POST)
@@ -577,7 +572,7 @@ enum HttpClient {
 		handle(request: req, JsonObject.init(from:), handler: handler)
 	}
 	
-	static func leaveShared(items: [ItemInfo], handler: @escaping (Response<Data>) -> ()) {
+	public static func leaveShared(items: [ItemInfo], handler: @escaping (Response<Data>) -> ()) {
 		Console.log(tag: Self.TAG, msg: #function)
 		let req = URLRequest(to: serverAddress, SERVICES_PORTAL_API)
 			.set(method: .POST)
@@ -587,7 +582,7 @@ enum HttpClient {
 		handle(request: req, handler: handler)
 	}
 	
-	static func requestVersions(of item: ItemInfo, handler: @escaping (Response<[Version]>) -> ()) {
+	public static func requestVersions(of item: ItemInfo, handler: @escaping (Response<[Version]>) -> ()) {
 		Console.log(tag: Self.TAG, msg: #function)
 		let req = URLRequest(to: serverAddress, SERVICES_PORTAL_API)
 			.set(method: .POST)
