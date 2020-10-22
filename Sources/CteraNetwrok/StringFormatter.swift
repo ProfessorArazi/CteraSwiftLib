@@ -135,7 +135,7 @@ enum StringFormatter {
 		}
 		
 		body += "</list></att>" +
-			"<att id=\"passphrase\">\(payload.passphrase != nil && !payload.passphrase!.isEmpty ? "<val>\(xmlEscape(payload.passphrase!))</val>" : "")</att>" +
+			"<att id=\"passphrase\"></att>" +
 			"<att id=\"userPassword\"></att>"
 		
 		

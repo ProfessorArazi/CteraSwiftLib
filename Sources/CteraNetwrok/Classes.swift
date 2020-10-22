@@ -39,7 +39,6 @@ public class ProgressTask {
 public struct SrcDestData {
 	let action: String
 	let pairs: [(src: String, dest: String)]
-	let passphrase: String?
 	var taskJson: JsonObject! = nil
 }
 
@@ -65,7 +64,6 @@ public protocol ThumbnailDelegate {
 	
 	func thumbnailDelegate(removedItem: ItemInfo, from url: URL, completion: @escaping ()->())
 }
-
 
 extension Encryptor {
 	static func decrypt(file src: URL, to dest: URL, task: ProgressTask? = nil) {

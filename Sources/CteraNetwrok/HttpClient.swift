@@ -353,34 +353,34 @@ enum HttpClient {
 	static func rename(item: ItemInfo, to newName: String, handler: @escaping (Response<(String, SrcDestData)>) -> ()) {
 		Console.log(tag: Self.TAG, msg: #function)
 		let newPath = item.parentPath + "/" + newName
-		let data = SrcDestData(action: "moveResources", pairs: [(src: item.path, dest: newPath)], passphrase: nil)
+		let data = SrcDestData(action: "moveResources", pairs: [(src: item.path, dest: newPath)])
 		srcDestRequest(data: data, handler: handler)
 	}
 	
-	static func delete(items: [ItemInfo], passphrase: String?, handler: @escaping (Response<(String, SrcDestData)>) -> ()) {
+	static func delete(items: [ItemInfo], handler: @escaping (Response<(String, SrcDestData)>) -> ()) {
 		Console.log(tag: TAG, msg: #function)
 		let paths = items.map { item in (src: item.path, dest: "") }
-		let data = SrcDestData(action: "deleteResources", pairs: paths, passphrase: passphrase)
+		let data = SrcDestData(action: "deleteResources", pairs: paths)
 		srcDestRequest(data: data, handler: handler)
 	}
 	
 	static func restore(items: [ItemInfo], handler: @escaping (Response<(String, SrcDestData)>) -> ()) {
 		Console.log(tag: TAG, msg: #function)
 		let paths = items.map { item in (src: item.path, dest: item.parentPath) }
-		let data = SrcDestData(action: "restoreResources", pairs: paths, passphrase: nil)
+		let data = SrcDestData(action: "restoreResources", pairs: paths)
 		srcDestRequest(data: data, handler: handler)
 	}
 	
-	static func restoreVersionedItem(item: ItemInfo, passphrase: String?, handler: @escaping (Response<(String, SrcDestData)>) -> ()) {
+	static func restoreVersionedItem(item: ItemInfo, handler: @escaping (Response<(String, SrcDestData)>) -> ()) {
 		Console.log(tag: TAG, msg: #function)
-		let data = SrcDestData(action: "restoreResources", pairs: [(src: item.path, dest: "")], passphrase: passphrase)
+		let data = SrcDestData(action: "restoreResources", pairs: [(src: item.path, dest: "")])
 		srcDestRequest(data: data, handler: handler)
 	}
 	
 	static func copyMove(isCopy: Bool, items: [ItemInfo], folderPath: String, handler: @escaping (Response<(String, SrcDestData)>) -> ()) {
 		Console.log(tag: TAG, msg: #function)
 		let paths = items.map { item in (src: item.path, dest: folderPath + "/" + item.name) }
-		let data = SrcDestData(action: (isCopy ? "copyResources" : "moveResources"), pairs: paths, passphrase: nil)
+		let data = SrcDestData(action: (isCopy ? "copyResources" : "moveResources"), pairs: paths)
 		srcDestRequest(data: data, handler: handler)
 	}
 	
