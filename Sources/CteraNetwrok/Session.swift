@@ -10,7 +10,7 @@ import BasicExtensions
 import StorageExtensions
 
 enum TrustManager {
-	private static var trustedKeyBase64: String? = Prefs.standard.string(key: .TRUSTED_CERTIFICATE)
+	private static var trustedKeyBase64: String? = Prefs.standard.string(key: .trustedCertificate)
 	fileprivate static var lastCheckedKey: SecKey?
 	
 	static func trustLastCheck() {
@@ -18,7 +18,7 @@ enum TrustManager {
 		
 		trustedKeyBase64 = b64Key
 		Prefs.standard.edit()
-			.put(key: .TRUSTED_CERTIFICATE, b64Key)
+			.put(key: .trustedCertificate, b64Key)
 			.commit()
 	}
 	

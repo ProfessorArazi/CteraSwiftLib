@@ -37,19 +37,19 @@ public enum SessionInfo {
 	public static func save() {
 		Console.log(tag: TAG, msg: #function)
 		Prefs.standard.edit()
-			.put(key: .USER_REF, userRef!)
-			.put(key: .SHOW_SHARED_BY_ME, showSharedByMe)
-			.put(key: .TIME_ZONE_DIFF, timeZoneDiff)
-			.put(key: .INVITATION_MAX_DURATION, invitationMaxDuration)
+			.put(key: .userRef, userRef!)
+			.put(key: .showSharedByMe, showSharedByMe)
+			.put(key: .timeZoneDiff, timeZoneDiff)
+			.put(key: .invitationMaxDuration, invitationMaxDuration)
 			.commit()
 	}
 	
 	public static func loadFromPrefs() {
 		Console.log(tag: TAG, msg: #function)
-		userRef = Prefs.standard.string(key: .USER_REF)
-		showSharedByMe = Prefs.standard.bool(key: .SHOW_SHARED_BY_ME)
-		timeZoneDiff = Prefs.standard.int(key: .TIME_ZONE_DIFF)
-		invitationMaxDuration = Prefs.standard.int(key: .INVITATION_MAX_DURATION)
+		userRef = Prefs.standard.string(key: .userRef)
+		showSharedByMe = Prefs.standard.bool(key: .showSharedByMe)
+		timeZoneDiff = Prefs.standard.int(key: .timeZoneDiff)
+		invitationMaxDuration = Prefs.standard.int(key: .invitationMaxDuration)
 	}
 	
 	public static func reset() {

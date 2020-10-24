@@ -6,6 +6,9 @@
 //
 
 public struct FolderInfo: Codable, Equatable {
+	
+	public static var navigationItems: FolderInfo?
+	
 	public var items: [ItemInfo]
 	public var folderItem: ItemInfo! = ItemInfo()
 	public var errorType: String?

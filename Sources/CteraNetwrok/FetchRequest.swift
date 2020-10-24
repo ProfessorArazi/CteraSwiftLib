@@ -10,8 +10,8 @@ import BasicExtensions
 import StorageExtensions
 
 public struct FetchRequest {
-	static var includeDeleted = Prefs.standard.bool(key: .SHOW_DELETED)
-	static var sortAscending = Prefs.standard.bool(key: .SORT_ASCENDING, fallback: true)
+	static var includeDeleted = Prefs.standard.bool(key: .showDeleted)
+	static var sortAscending = Prefs.standard.bool(key: .sortAscending, fallback: true)
 	
 	var path: String
 	var cachePath: String? = nil
@@ -117,12 +117,12 @@ public enum SortMethod: String, CaseIterable {
 	
 	///Gets and sets the current SortMethod stored in Prefs.standard
 	/// - Returns: Current SortMethod in Preferences or `Name` as default
-	static var stored: SortMethod {
+	public static var stored: SortMethod {
 		set {
-			Prefs.standard.edit().put(key: .SORT_METHOD, newValue.rawValue).commit()
+			Prefs.standard.edit().put(key: .sortMethod, newValue.rawValue).commit()
 		}
 		get {
-			guard let methodStr = Prefs.standard.string(key: .SORT_METHOD) else { return .Name }
+			guard let methodStr = Prefs.standard.string(key: .sortMethod) else { return .Name }
 			return SortMethod(rawValue: methodStr) ?? .Name
 		}
 	}

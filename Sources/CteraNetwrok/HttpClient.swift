@@ -16,9 +16,9 @@ public enum HttpClient {
 	private static let SERVICES_PORTAL_API = "ServicesPortal/api?format=jsonext"
 	private static let TAG = String(describing: HttpClient.self)
 	
+	static var hasConnection = true
 	public static var serverAddress, deviceId, sharedSecret: String!
 	public static var isPortalReadOnly = false
-	public static var hasConnection = true
 	public static var onConnectionChanged: [(Bool)->()] = []
 	public static var thumbnailDelegate: ThumbnailDelegate?
 	
@@ -39,8 +39,6 @@ public enum HttpClient {
 	
 	//MARK: Public API
 	public static let SERVICE_WEBDAV = "/ServicesPortal/webdav"
-	
-	public static func set(portalReadOnly mode: Bool) { isPortalReadOnly = mode }
 	
 	public static func set(hasConnection connection: Bool) {
 		guard hasConnection != connection else { return } //prevent multiple events for same status
@@ -234,7 +232,7 @@ public enum HttpClient {
 		let req = URLRequest(to: serverAddress, path + "?preview=true&showDeleted=true")
 		
 		let middleware = { (d: Data) -> String in
-			let json: [String: String] = try! .from(json: d)
+			let json: [String: String] = try .from(json: d)
 			return json["viewingSessionId"]!
 		}
 		handle(request: req, middleware, handler: handler)
@@ -250,7 +248,7 @@ public enum HttpClient {
 		let req = URLRequest(to: serverAddress, "ServicesPortal/pcc/Document/q/Attributes?DocumentID=u\(viewingSession)&DesiredPageCountConfidence=50")
 		
 		let middleware = { (d: Data) -> Int in
-			let json: [String: Int] = try! .from(json: d)
+			let json: [String: Int] = try .from(json: d)
 			return json["pageCount"]!
 		}
 		
@@ -271,8 +269,8 @@ public enum HttpClient {
 	}
 	
 	public static func uploadRequest(_ fileUrl: URL, to itemPath: String,
-							  onStart: @escaping (URLSessionUploadTask)->() = { $0.resume() },
-							  handler: @escaping ()->()) {
+									 onStart: @escaping (URLSessionUploadTask)->() = { $0.resume() },
+									 handler: @escaping ()->()) {
 		Console.log(tag: Self.TAG, msg: #function)
 		async {
 			let boundary = "----MobileBoundaryRRD29pvBCUWyLIg"
@@ -340,7 +338,7 @@ public enum HttpClient {
 			.set(body: StringFormatter.lastModified(items: items))
 		
 		handle(request: req, { data in
-			let arr = try! JSONSerialization.jsonObject(with: data) as! [[String: Any]]
+			let arr = try JSONSerialization.jsonObject(with: data) as! [[String: Any]]
 			return arr.map { dict in JsonObject(from: dict) }
 		}, handler: handler)
 	}
@@ -464,7 +462,7 @@ public enum HttpClient {
 					switch userSettingsRes {
 					case .success(let userSettings):
 						UserSettings.instance = userSettings
-						Prefs.standard.edit().put(key: .USER_SETTINGS, UserSettings.instance).commit()
+						Prefs.standard.edit().put(key: .userSettings, UserSettings.instance).commit()
 						
 						if let avaterName = userSettings.userAvatarName { //avatar
 							requestAvatar(avatarName: avaterName, handler: handler)
@@ -499,7 +497,7 @@ public enum HttpClient {
 			.set(contentType: .xml)
 			.set(body: StringFormatter.buildXml(from: fetchReq.toJson()))
 		
-		handle(request: req, { try! FolderInfo.from(json: $0) }, handler: completion)
+		handle(request: req, { try FolderInfo.from(json: $0) }, handler: completion)
 	}
 	
 	public static func requestPublicLinks(for item: ItemInfo, handler: @escaping (Response<[PublicLink]>) -> ()) {
@@ -509,7 +507,7 @@ public enum HttpClient {
 			.set(contentType: .xml)
 			.set(body: StringFormatter.getPublicLinks(at: item.path))
 		
-		handle(request: req, { try! [PublicLink].from(json: $0) }, handler: handler)
+		handle(request: req, { try [PublicLink].from(json: $0) }, handler: handler)
 	}
 	
 	public static func createPublicLink(with link: PublicLink, handler: @escaping (Response<PublicLink>) -> ()) {
@@ -519,7 +517,7 @@ public enum HttpClient {
 			.set(contentType: .xml)
 			.set(body: StringFormatter.createPublicLink(from: link))
 		
-		handle(request: req, { try! PublicLink.from(json: $0) }, handler: handler)
+		handle(request: req, { try PublicLink.from(json: $0) }, handler: handler)
 	}
 	
 	public static func modifyPublicLink(with link: PublicLink, remove: Bool, handler: @escaping (Response<Data>) -> ()) {
@@ -589,7 +587,7 @@ public enum HttpClient {
 			.set(contentType: .xml)
 			.set(body: StringFormatter.fileVersions(for: item))
 		
-		handle(request: req, { try! [Version].from(json: $0) }, handler: handler)
+		handle(request: req, { try [Version].from(json: $0) }, handler: handler)
 	}
 	
 	// MARK: - Private methods
@@ -630,7 +628,7 @@ public enum HttpClient {
 		Console.log(tag: Self.TAG, msg: #function)
 		let req = URLRequest(to: serverAddress, "ServicesPortal/api/\(SessionInfo.userRef!)?format=jsonext")
 		
-		handle(request: req, UserSettings.from(json:) , handler: handler)
+		handle(request: req, UserSettings.from(json:), handler: handler)
 	}
 	
 	private static func requestAvatar(avatarName: String, handler: @escaping (Response<Data?>) -> ()) {
