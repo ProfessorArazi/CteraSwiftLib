@@ -11,8 +11,8 @@ public struct InvitationSettingsDto: Codable, Equatable {
 	public var allowedFrequentContactsTime: Int64 = 0
 	public var inviteLifetime: Int64 = 0
 	
-	public var defaultProtectionLevel: ProtectionLevel?
-	public var protectionLevels: [ProtectionLevel]?
+	public var defaultProtectionLevel: ProtectionLevelDto?
+	public var protectionLevels: [ProtectionLevelDto]?
 	
 	public enum CodingKeys: String, CodingKey {
 		case allowCollaboratorsToReshareContent
@@ -21,9 +21,5 @@ public struct InvitationSettingsDto: Codable, Equatable {
 		case inviteLifetime
 		case defaultProtectionLevel = "defaultProtectionLevels"
 		case protectionLevels
-	}
-	
-	public enum ProtectionLevel: String, Codable { //2 step verification types
-		case publicLink, textMessage, email
 	}
 }
