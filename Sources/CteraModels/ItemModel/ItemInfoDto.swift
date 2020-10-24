@@ -1,12 +1,12 @@
 //
-//  ItemInfo.swift
+//  ItemInfoDto.swift
 //  
 //
 //  Created by Gal Yedidovich on 22/10/2020.
 //
 
 import Foundation
-public struct ItemInfo: Codable, Equatable {
+public struct ItemInfoDto: Codable, Equatable {
 	public var path: String = ""
 	public var name: String = ""
 	public var ext: String?
@@ -19,10 +19,10 @@ public struct ItemInfo: Codable, Equatable {
 	
 	public var lastModified: Date?
 	public var size: Int64?
-	public var actions: AllowedActions?
-	public var itemPermission: ItemPermission?
-	public var cloudFolderInfo: CloudFolderInfo?
-	public var lastActionBy: LastActionBy?
+	public var actions: AllowedActionsDto?
+	public var itemPermission: ItemPermissionDto?
+	public var cloudFolderInfo: CloudFolderInfoDto?
+	public var lastActionBy: LastActionDto?
 	
 	private enum CodingKeys: String, CodingKey {
 		case name
@@ -57,10 +57,10 @@ public struct ItemInfo: Codable, Equatable {
 		self.isDeleted = try values.decode(Bool.self, forKey: .isDeleted)
 		
 		self.size = try values.decodeIfPresent(Int64.self, forKey: .size)
-		self.actions = try values.decodeIfPresent(AllowedActions.self, forKey: .actions)
-		self.itemPermission = try values.decodeIfPresent(ItemPermission.self, forKey: .itemPermission)
-		self.cloudFolderInfo = try values.decodeIfPresent(CloudFolderInfo.self, forKey: .cloudFolderInfo)
-		self.lastActionBy = try values.decodeIfPresent(LastActionBy.self, forKey: .lastActionBy)
+		self.actions = try values.decodeIfPresent(AllowedActionsDto.self, forKey: .actions)
+		self.itemPermission = try values.decodeIfPresent(ItemPermissionDto.self, forKey: .itemPermission)
+		self.cloudFolderInfo = try values.decodeIfPresent(CloudFolderInfoDto.self, forKey: .cloudFolderInfo)
+		self.lastActionBy = try values.decodeIfPresent(LastActionDto.self, forKey: .lastActionBy)
 		
 		//all for this
 		if let lastModified = try values.decodeIfPresent(String.self, forKey: .lastModified) {
@@ -73,7 +73,7 @@ public struct ItemInfo: Codable, Equatable {
 	}
 }
 
-extension ItemInfo {
+extension ItemInfoDto {
 	static let standardFormat = DateFormatter(format: "yyyy-MM-dd'T'HH:mm:ss")
 	static let hourFormat = DateFormatter(format: "HH:mm")
 	static let dayFormat = DateFormatter(format: "d MMM HH:mm")

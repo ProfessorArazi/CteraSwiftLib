@@ -43,7 +43,7 @@ public enum FileCache {
 		updateJson()
 	}
 	
-	public static func save(file: URL, with item: ItemInfo) {
+	public static func save(file: URL, with item: ItemInfoDto) {
 		let downloads = FileSystem.url(of: .downloads)
 		if !FileManager.default.fileExists(atPath: downloads.path) {
 			try! FileManager.default.createDirectory(at: downloads, withIntermediateDirectories: true)
@@ -74,10 +74,10 @@ public enum FileCache {
 }
 
 public struct CacheItem: Codable {
-	public var item: ItemInfo
+	public var item: ItemInfoDto
 	public var localUrl: URL
 	
-	public mutating func isUpToDate(comparedTo item: ItemInfo) -> Bool {
+	public mutating func isUpToDate(comparedTo item: ItemInfoDto) -> Bool {
 		guard let compareLastModified = item.lastModified else { return true }
 		
 		guard let lastModified = self.item.lastModified else { //relevant only to uploaded files

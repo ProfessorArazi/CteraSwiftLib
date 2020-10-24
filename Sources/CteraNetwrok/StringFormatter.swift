@@ -32,8 +32,8 @@ enum StringFormatter {
 			if let obj = value as? JsonObject { body.append(buildXml(from: obj)) }  //build inner object
 			else if let dict = value as? [String: Any] { body.append(buildXml(from: JsonObject(from: dict))) }  //build inner object
 			else if let arr = value as? [Any] { body.append(buildXml(from: arr)) }    //build array
-			else if let num = value as? NSNumber, CFNumberGetType(num as  CFNumber) == .charType, let test = value as? Bool {
-				body.append("<val>\(test)</val>")
+			else if let num = value as? NSNumber, CFNumberGetType(num as CFNumber) == .charType, let bool = value as? Bool {
+				body.append("<val>\(bool)</val>")
 			}
 			else { body.append("<val>\(value)</val>") }
 			body.append("</att>")
@@ -179,7 +179,7 @@ enum StringFormatter {
 			"<val>\(itemPath)</val></att></obj>"
 	}
 	
-	static func createPublicLink(from link: PublicLink) -> String {
+	static func createPublicLink(from link: PublicLinkDto) -> String {
 		var body = "<obj>" +
 			"<att id=\"type\"><val>user-defined</val></att>" +
 			"<att id=\"name\">" +
@@ -212,7 +212,7 @@ enum StringFormatter {
 			"</obj></att></obj>"
 	}
 	
-	static func modifyPublicLink(from link: PublicLink, remove: Bool) -> String {
+	static func modifyPublicLink(from link: PublicLinkDto, remove: Bool) -> String {
 		let createDate = DateFormatter(format: "yyyy-MM-dd'T'HH:mm:ss").string(from: link.creationDate!)
 		var body = "<obj>" +
 			"<att id=\"type\"><val>user-defined</val> </att>" +
@@ -266,7 +266,7 @@ enum StringFormatter {
 		return buildXml(from: json)
 	}
 	
-	static func verifyCollaborator(for item: ItemInfo, _ invitee: JsonObject) -> String {
+	static func verifyCollaborator(for item: ItemInfoDto, _ invitee: JsonObject) -> String {
 		"<obj><att id=\"type\"><val>user-defined</val></att>" +
 			"<att id=\"name\"><val>preVerifySingleShare</val></att>" +
 			"<att id=\"param\">" +
@@ -287,7 +287,7 @@ enum StringFormatter {
 			"</obj></att></obj>"
 	}
 	
-	static func leaveShared(items: [ItemInfo]) -> String{
+	static func leaveShared(items: [ItemInfoDto]) -> String{
 		var body = "<obj>" +
 			"<att id=\"type\"><val>user-defined</val></att>" +
 			"<att id=\"name\">" +
@@ -299,12 +299,12 @@ enum StringFormatter {
 		return body + "</list></att></obj>"
 	}
 	
-	static func fileVersions(for item: ItemInfo) -> String {
+	static func fileVersions(for item: ItemInfoDto) -> String {
 		"<obj><att id=\"name\"><val>listVersions</val></att>" +
 			"<att id=\"param\"><val>\(item.path)</val></att></obj>"
 	}
 	
-	static func lastModified(items: [ItemInfo]) -> String{
+	static func lastModified(items: [ItemInfoDto]) -> String{
 		"<obj>" +
 			"<att id = \"type\"><val>user-defined</val></att>" +
 			"<att id=\"name\"><val>getLastModifiedOfFiles</val></att>" +

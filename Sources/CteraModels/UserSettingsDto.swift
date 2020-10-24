@@ -1,12 +1,12 @@
 //
-//  UserSettings.swift
+//  UserSettingsDto.swift
 //  
 //
 //  Created by Gal Yedidovich on 22/10/2020.
 //
 
-public struct UserSettings: Codable {
-	public static var instance: UserSettings!
+public struct UserSettingsDto: Codable {
+	public static var instance: UserSettingsDto!
 	
 	public var userAvatarName: String?
 	public var firstName, lastName, displayName, email: String!

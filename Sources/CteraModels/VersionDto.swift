@@ -1,12 +1,12 @@
 //
-//  Version.swift
+//  VersionDto.swift
 //  
 //
 //  Created by Gal Yedidovich on 22/10/2020.
 //
 
 import Foundation
-public struct Version: Codable, Equatable {
+public struct VersionDto: Codable, Equatable {
 	let timestamp: String
 	let fullUrl: String
 	let modifier: String

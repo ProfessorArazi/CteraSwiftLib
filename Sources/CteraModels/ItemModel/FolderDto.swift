@@ -1,16 +1,16 @@
 //
-//  FolderInfo.swift
+//  FolderDto.swift
 //  
 //
 //  Created by Gal Yedidovich on 22/10/2020.
 //
 
-public struct FolderInfo: Codable, Equatable {
+public struct FolderDto: Codable, Equatable {
 	
-	public static var navigationItems: FolderInfo?
+	public static var navigationItems: FolderDto?
 	
-	public var items: [ItemInfo]
-	public var folderItem: ItemInfo! = ItemInfo()
+	public var items: [ItemInfoDto]
+	public var folderItem: ItemInfoDto! = ItemInfoDto()
 	public var errorType: String?
 	public var hasMore: Bool = false
 	

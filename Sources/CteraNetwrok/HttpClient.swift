@@ -48,24 +48,21 @@ public enum HttpClient {
 		for observer in onConnectionChanged { observer(connection) }
 	}
 	
-	public static func requestPublicInfo(address: String, handler: @escaping (Response<JsonObject>) -> ()) {
+	public static func requestPublicInfo(address: String, handler: @escaping (Response<PublicInfoDto>) -> ()) {
 		Console.log(tag: Self.TAG, msg: #function)
 		serverAddress = address
 		let req = URLRequest(url: URL(string: "https://\(address)/ServicesPortal/public/publicInfo?format=jsonext")!)
-		handle(request: req, JsonObject.init(from:), handler: handler)
+		handle(request: req, PublicInfoDto.from(json:), handler: handler)
 	}
 	
-	public static func login(_ user: String? = nil, _ pass: String? = nil, activationCode code: String? = nil, deviceID: String, deviceName: String, handler: @escaping (Response<JsonObject>) -> ()) {
+	public static func login(_ user: String? = nil, _ pass: String? = nil, activationCode code: String? = nil, deviceID: String, deviceName: String, handler: @escaping (Response<CredentialsDto>) -> ()) {
 		Console.log(tag: Self.TAG, msg: #function)
 		let req = URLRequest(to: serverAddress, "ServicesPortal/public/users\(user != nil ? "/\(user!)" : "")?format=jsonext")
 			.set(method: .POST)
 			.set(contentType: .xml)
 			.set(body: StringFormatter.attachMobileDevice(server: serverAddress, password: pass, activationCode: code, deviceID: deviceID, deviceName: deviceName))
 		
-		let middleware = { (data: Data) in
-			try! JsonObject(from: String(decoding: data, as: UTF8.self))
-		}
-		handle(request: req, middleware, handler: handler)
+		handle(request: req, CredentialsDto.from(json:), handler: handler)
 	}
 	
 	public static func logout() {
@@ -93,16 +90,10 @@ public enum HttpClient {
 			.set(contentType: .xml)
 			.set(body: StringFormatter.updateMobileInfo(deviceID: deviceID, deviceName: deviceName))
 		
-		session.dataTask(with: req) { result in
-			switch result {
-			case .success(_): break
-			case .failure(_, let msg): Console.log(tag: Self.TAG, msg: "\(#function), failure: \(msg)")
-			case .error(let error): Console.log(tag: Self.TAG, msg: "\(#function), Error: \(error)")
-			}
-		}.resume()
+		handle(request: req, handler: nil)
 	}
 	
-	public static func fetchFolder(_ request: FetchRequest, handler: @escaping (Response<FolderInfo>) -> ()) {
+	public static func fetchFolder(_ request: FetchRequest, handler: @escaping (Response<FolderDto>) -> ()) {
 		Console.log(tag: Self.TAG, msg: #function)
 		let cachePath = request.cachePath ?? request.path
 		
@@ -129,7 +120,7 @@ public enum HttpClient {
 		})
 	}
 	
-	public static func searchFolder(_ request: FetchRequest, handler: @escaping (Response<FolderInfo>) -> ()) {
+	public static func searchFolder(_ request: FetchRequest, handler: @escaping (Response<FolderDto>) -> ()) {
 		Console.log(tag: Self.TAG, msg: #function)
 		requestFolder(request, handler: handler)
 	}
@@ -144,7 +135,7 @@ public enum HttpClient {
 		handle(request: req, handler: handler)
 	}
 	
-	public static func requestFile(for item: ItemInfo, autoDeleteTempFile: Bool = false, config: @escaping (ProgressTask)->(), handler: @escaping (Response<URL>) -> ()) {
+	public static func requestFile(for item: ItemInfoDto, autoDeleteTempFile: Bool = false, config: @escaping (ProgressTask)->(), handler: @escaping (Response<URL>) -> ()) {
 		Console.log(tag: TAG, msg: "\(#function), \(item.name)")
 		let fm = FileManager.default
 		
@@ -225,7 +216,7 @@ public enum HttpClient {
 		}
 	}
 	
-	public static func requestPreviewSession(for item: ItemInfo, handler: @escaping (Response<String>) -> ()) {
+	public static func requestPreviewSession(for item: ItemInfoDto, handler: @escaping (Response<String>) -> ()) {
 		Console.log(tag: TAG, msg: "\(#function), \(item.name)")
 		
 		let path = item.path.dropFirst()
@@ -330,7 +321,7 @@ public enum HttpClient {
 		}
 	}
 	
-	public static func requestLastModified(for items: [ItemInfo], handler: @escaping (Response<[JsonObject]>)->()) {
+	public static func requestLastModified(for items: [ItemInfoDto], handler: @escaping (Response<[JsonObject]>)->()) {
 		Console.log(tag: TAG, msg: "\(#function), items: \(items.map { $0.name })")
 		let req = URLRequest(to: serverAddress, "ServicesPortal/api/\(SessionInfo.userRef!)?format=jsonext")
 			.set(method: .POST)
@@ -343,34 +334,34 @@ public enum HttpClient {
 		}, handler: handler)
 	}
 	
-	public static func rename(item: ItemInfo, to newName: String, handler: @escaping (Response<(String, SrcDestData)>) -> ()) {
+	public static func rename(item: ItemInfoDto, to newName: String, handler: @escaping (Response<(String, SrcDestData)>) -> ()) {
 		Console.log(tag: Self.TAG, msg: #function)
 		let newPath = item.parentPath + "/" + newName
 		let data = SrcDestData(action: "moveResources", pairs: [(src: item.path, dest: newPath)])
 		srcDestRequest(data: data, handler: handler)
 	}
 	
-	public static func delete(items: [ItemInfo], handler: @escaping (Response<(String, SrcDestData)>) -> ()) {
+	public static func delete(items: [ItemInfoDto], handler: @escaping (Response<(String, SrcDestData)>) -> ()) {
 		Console.log(tag: TAG, msg: #function)
 		let paths = items.map { item in (src: item.path, dest: "") }
 		let data = SrcDestData(action: "deleteResources", pairs: paths)
 		srcDestRequest(data: data, handler: handler)
 	}
 	
-	public static func restore(items: [ItemInfo], handler: @escaping (Response<(String, SrcDestData)>) -> ()) {
+	public static func restore(items: [ItemInfoDto], handler: @escaping (Response<(String, SrcDestData)>) -> ()) {
 		Console.log(tag: TAG, msg: #function)
 		let paths = items.map { item in (src: item.path, dest: item.parentPath) }
 		let data = SrcDestData(action: "restoreResources", pairs: paths)
 		srcDestRequest(data: data, handler: handler)
 	}
 	
-	public static func restoreVersionedItem(item: ItemInfo, handler: @escaping (Response<(String, SrcDestData)>) -> ()) {
+	public static func restoreVersionedItem(item: ItemInfoDto, handler: @escaping (Response<(String, SrcDestData)>) -> ()) {
 		Console.log(tag: TAG, msg: #function)
 		let data = SrcDestData(action: "restoreResources", pairs: [(src: item.path, dest: "")])
 		srcDestRequest(data: data, handler: handler)
 	}
 	
-	public static func copyMove(isCopy: Bool, items: [ItemInfo], folderPath: String, handler: @escaping (Response<(String, SrcDestData)>) -> ()) {
+	public static func copyMove(isCopy: Bool, items: [ItemInfoDto], folderPath: String, handler: @escaping (Response<(String, SrcDestData)>) -> ()) {
 		Console.log(tag: TAG, msg: #function)
 		let paths = items.map { item in (src: item.path, dest: folderPath + "/" + item.name) }
 		let data = SrcDestData(action: (isCopy ? "copyResources" : "moveResources"), pairs: paths)
@@ -461,8 +452,8 @@ public enum HttpClient {
 				sendUserSettings { userSettingsRes in //settings
 					switch userSettingsRes {
 					case .success(let userSettings):
-						UserSettings.instance = userSettings
-						Prefs.standard.edit().put(key: .userSettings, UserSettings.instance).commit()
+						UserSettingsDto.instance = userSettings
+						Prefs.standard.edit().put(key: .userSettings, userSettings).commit()
 						
 						if let avaterName = userSettings.userAvatarName { //avatar
 							requestAvatar(avatarName: avaterName, handler: handler)
@@ -488,7 +479,7 @@ public enum HttpClient {
 		handle(request: req, JsonObject.init(from:), handler: handler)
 	}
 	
-	public static func requestNavigationItems(completion: @escaping (Response<FolderInfo>)->()) {
+	public static func requestNavigationItems(completion: @escaping (Response<FolderDto>)->()) {
 		Console.log(tag: Self.TAG, msg: #function)
 		let fetchReq = FetchRequest(path: "/ServicesPortal/webdav").with(navigationPane: true)
 		
@@ -497,30 +488,30 @@ public enum HttpClient {
 			.set(contentType: .xml)
 			.set(body: StringFormatter.buildXml(from: fetchReq.toJson()))
 		
-		handle(request: req, { try FolderInfo.from(json: $0) }, handler: completion)
+		handle(request: req, { try FolderDto.from(json: $0) }, handler: completion)
 	}
 	
-	public static func requestPublicLinks(for item: ItemInfo, handler: @escaping (Response<[PublicLink]>) -> ()) {
+	public static func requestPublicLinks(for item: ItemInfoDto, handler: @escaping (Response<[PublicLinkDto]>) -> ()) {
 		Console.log(tag: Self.TAG, msg: #function)
 		let req = URLRequest(to: serverAddress, SERVICES_PORTAL_API)
 			.set(method: .POST)
 			.set(contentType: .xml)
 			.set(body: StringFormatter.getPublicLinks(at: item.path))
 		
-		handle(request: req, { try [PublicLink].from(json: $0) }, handler: handler)
+		handle(request: req, { try [PublicLinkDto].from(json: $0) }, handler: handler)
 	}
 	
-	public static func createPublicLink(with link: PublicLink, handler: @escaping (Response<PublicLink>) -> ()) {
+	public static func createPublicLink(with link: PublicLinkDto, handler: @escaping (Response<PublicLinkDto>) -> ()) {
 		Console.log(tag: Self.TAG, msg: #function)
 		let req = URLRequest(to: serverAddress, SERVICES_PORTAL_API)
 			.set(method: .POST)
 			.set(contentType: .xml)
 			.set(body: StringFormatter.createPublicLink(from: link))
 		
-		handle(request: req, { try PublicLink.from(json: $0) }, handler: handler)
+		handle(request: req, { try PublicLinkDto.from(json: $0) }, handler: handler)
 	}
 	
-	public static func modifyPublicLink(with link: PublicLink, remove: Bool, handler: @escaping (Response<Data>) -> ()) {
+	public static func modifyPublicLink(with link: PublicLinkDto, remove: Bool, handler: @escaping (Response<Data>) -> ()) {
 		Console.log(tag: Self.TAG, msg: #function)
 		let req = URLRequest(to: serverAddress, SERVICES_PORTAL_API)
 			.set(method: .POST)
@@ -530,7 +521,7 @@ public enum HttpClient {
 		handle(request: req, handler: handler)
 	}
 	
-	public static func requestCollaboration(for item: ItemInfo, handler: @escaping (Response<JsonObject>) -> ()) {
+	public static func requestCollaboration(for item: ItemInfoDto, handler: @escaping (Response<JsonObject>) -> ()) {
 		Console.log(tag: Self.TAG, msg: #function)
 		let req = URLRequest(to: serverAddress, SERVICES_PORTAL_API)
 			.set(method: .POST)
@@ -550,7 +541,7 @@ public enum HttpClient {
 		handle(request: req, handler: handler)
 	}
 	
-	public static func validateCollaborator(for item: ItemInfo, invitee: JsonObject, handler: @escaping (Response<JsonObject>) -> ()) {
+	public static func validateCollaborator(for item: ItemInfoDto, invitee: JsonObject, handler: @escaping (Response<JsonObject>) -> ()) {
 		Console.log(tag: Self.TAG, msg: #function)
 		let req = URLRequest(to: serverAddress, SERVICES_PORTAL_API)
 			.set(method: .POST)
@@ -570,7 +561,7 @@ public enum HttpClient {
 		handle(request: req, JsonObject.init(from:), handler: handler)
 	}
 	
-	public static func leaveShared(items: [ItemInfo], handler: @escaping (Response<Data>) -> ()) {
+	public static func leaveShared(items: [ItemInfoDto], handler: @escaping (Response<Data>) -> ()) {
 		Console.log(tag: Self.TAG, msg: #function)
 		let req = URLRequest(to: serverAddress, SERVICES_PORTAL_API)
 			.set(method: .POST)
@@ -580,24 +571,24 @@ public enum HttpClient {
 		handle(request: req, handler: handler)
 	}
 	
-	public static func requestVersions(of item: ItemInfo, handler: @escaping (Response<[Version]>) -> ()) {
+	public static func requestVersions(of item: ItemInfoDto, handler: @escaping (Response<[VersionDto]>) -> ()) {
 		Console.log(tag: Self.TAG, msg: #function)
 		let req = URLRequest(to: serverAddress, SERVICES_PORTAL_API)
 			.set(method: .POST)
 			.set(contentType: .xml)
 			.set(body: StringFormatter.fileVersions(for: item))
 		
-		handle(request: req, { try [Version].from(json: $0) }, handler: handler)
+		handle(request: req, { try [VersionDto].from(json: $0) }, handler: handler)
 	}
 	
 	// MARK: - Private methods
-	private static func requestFolder(_ request: FetchRequest, handler: @escaping (Response<FolderInfo>) -> ()) {
+	private static func requestFolder(_ request: FetchRequest, handler: @escaping (Response<FolderDto>) -> ()) {
 		let req = URLRequest(to: serverAddress, SERVICES_PORTAL_API)
 			.set(method: .POST)
 			.set(contentType: .xml)
 			.set(body: StringFormatter.buildXml(from: request.toJson()))
 		
-		handle(request: req, FolderInfo.from(json:), handler: handler)
+		handle(request: req, FolderDto.from(json:), handler: handler)
 	}
 	
 	private static func sendCredentials(handler: @escaping (Response<Any?>) -> ()) {
@@ -624,11 +615,11 @@ public enum HttpClient {
 		handle(request: req, JsonObject.init(from:), handler: handler)
 	}
 	
-	private static func sendUserSettings(handler: @escaping (Response<UserSettings>) -> ()) {
+	private static func sendUserSettings(handler: @escaping (Response<UserSettingsDto>) -> ()) {
 		Console.log(tag: Self.TAG, msg: #function)
 		let req = URLRequest(to: serverAddress, "ServicesPortal/api/\(SessionInfo.userRef!)?format=jsonext")
 		
-		handle(request: req, UserSettings.from(json:), handler: handler)
+		handle(request: req, UserSettingsDto.from(json:), handler: handler)
 	}
 	
 	private static func requestAvatar(avatarName: String, handler: @escaping (Response<Data?>) -> ()) {

@@ -12,7 +12,7 @@ import CteraModels
 
 public enum FolderCache {
 	private static let queue = DispatchQueue(label: "Folder Cache", qos: .background)
-	private static var cache: [String: FolderInfo] = [:]
+	private static var cache: [String: FolderDto] = [:]
 	
 	public static func initialize() {
 		cache = FileSystem.load(json: .folderCache) ?? [:]
@@ -20,9 +20,9 @@ public enum FolderCache {
 	
 	public static func has(_ path: String) -> Bool { cache[path] != nil }
 	
-	public static func load(folder path: String) -> FolderInfo? { cache[path] }
+	public static func load(folder path: String) -> FolderDto? { cache[path] }
 	
-	public static func save(_ path: String, _ folder: FolderInfo) {
+	public static func save(_ path: String, _ folder: FolderDto) {
 		cache[path] = folder
 		update()
 	}

@@ -1,11 +1,11 @@
 //
-//  ItemPermission.swift
+//  ItemPermissionDto.swift
 //  
 //
 //  Created by Gal Yedidovich on 22/10/2020.
 //
 
-public enum ItemPermission: String, Codable {
+public enum ItemPermissionDto: String, Codable {
 	case None, ReadWrite, ReadOnly, PreviewOnly
 	
 	var prettyString: String {
@@ -17,7 +17,7 @@ public enum ItemPermission: String, Codable {
 		}
 	}
 	
-	static func from(string: String) -> ItemPermission {
+	static func from(string: String) -> ItemPermissionDto {
 		switch string {
 		case ".permissionReadWrite":	return .ReadWrite
 		case ".permissionReadOnly":		return .ReadOnly
