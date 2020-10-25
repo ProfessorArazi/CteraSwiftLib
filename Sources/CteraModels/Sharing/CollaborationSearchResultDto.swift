@@ -7,4 +7,5 @@
 
 public struct CollaborationSearchResultDto: Codable {
 	public let objects: [InviteeDto]
+	public let hasMore: Bool
 }

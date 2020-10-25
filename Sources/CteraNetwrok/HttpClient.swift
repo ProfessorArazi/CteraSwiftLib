@@ -383,7 +383,7 @@ public enum HttpClient {
 		post { handler.onTaskStart() }
 		
 		func checkStatus() {
-			handle(request: req, JsonObject.init(from:)) { result in
+			handle(request: req, JsonObject.init(data:)) { result in
 				switch result {
 				case .success(let json):
 					if let errorType = json.string(key: "errorType"), !errorType.isEmpty {
@@ -426,7 +426,7 @@ public enum HttpClient {
 			.set(contentType: .xml)
 			.set(body: StringFormatter.getStatus(for: taskUrl))
 		
-		handle(request: req, JsonObject.init(from:), handler: handler)
+		handle(request: req, JsonObject.init(data:), handler: handler)
 	}
 	
 	public static func resolveConflict(_ srcDestData: SrcDestData, handler: BackgroundTaskHandler) {
@@ -476,7 +476,7 @@ public enum HttpClient {
 			.set(contentType: .xml)
 			.set(body: StringFormatter.buildXml(from: JsonObject(from: ["name": "getGlobalSystemStatus"])))
 		
-		handle(request: req, JsonObject.init(from:), handler: handler)
+		handle(request: req, JsonObject.init(data:), handler: handler)
 	}
 	
 	public static func requestNavigationItems(completion: @escaping (Response<FolderDto>)->()) {
@@ -521,17 +521,17 @@ public enum HttpClient {
 		handle(request: req, handler: handler)
 	}
 	
-	public static func requestCollaboration(for item: ItemInfoDto, handler: @escaping (Response<JsonObject>) -> ()) {
+	public static func requestCollaboration(for item: ItemInfoDto, handler: @escaping (Response<CollaborationDTO>) -> ()) {
 		Console.log(tag: Self.TAG, msg: #function)
 		let req = URLRequest(to: serverAddress, SERVICES_PORTAL_API)
 			.set(method: .POST)
 			.set(contentType: .xml)
 			.set(body: StringFormatter.listShares(for: item.path))
 		
-		handle(request: req, JsonObject.init(from:), handler: handler)
+		handle(request: req, CollaborationDTO.from(json:), handler: handler)
 	}
 	
-	public static func saveCollaboration(at path: String, _ collaboration: JsonObject, handler: @escaping (Response<Data>) -> ()) {
+	public static func saveCollaboration(at path: String, _ collaboration: CollaborationDTO, handler: @escaping (Response<Data>) -> ()) {
 		Console.log(tag: Self.TAG, msg: #function)
 		let req = URLRequest(to: serverAddress, SERVICES_PORTAL_API)
 			.set(method: .POST)
@@ -541,24 +541,24 @@ public enum HttpClient {
 		handle(request: req, handler: handler)
 	}
 	
-	public static func validateCollaborator(for item: ItemInfoDto, invitee: JsonObject, handler: @escaping (Response<JsonObject>) -> ()) {
+	public static func validateCollaborator(for item: ItemInfoDto, invitee: InviteeDto, handler: @escaping (Response<CollaborationPolicyDto>) -> ()) {
 		Console.log(tag: Self.TAG, msg: #function)
 		let req = URLRequest(to: serverAddress, SERVICES_PORTAL_API)
 			.set(method: .POST)
 			.set(contentType: .xml)
 			.set(body: StringFormatter.verifyCollaborator(for: item, invitee))
 		
-		handle(request: req, JsonObject.init(from:), handler: handler)
+		handle(request: req, CollaborationPolicyDto.from(json:), handler: handler)
 	}
 	
-	public static func searchCollaborators(query: String, type: String, uid: Int, handler: @escaping (Response<JsonObject>) -> ()) {
+	public static func searchCollaborators(query: String, type: String, uid: Int, count: Int = 25, handler: @escaping (Response<CollaborationSearchResultDto>) -> ()) {
 		Console.log(tag: Self.TAG, msg: #function)
 		let req = URLRequest(to: serverAddress, SERVICES_PORTAL_API)
 			.set(method: .POST)
 			.set(contentType: .xml)
-			.set(body: StringFormatter.searchCollaborators(query, type, uid))
+			.set(body: StringFormatter.searchCollaborators(query, type, uid, count))
 		
-		handle(request: req, JsonObject.init(from:), handler: handler)
+		handle(request: req, CollaborationSearchResultDto.from(json:), handler: handler)
 	}
 	
 	public static func leaveShared(items: [ItemInfoDto], handler: @escaping (Response<Data>) -> ()) {
@@ -612,7 +612,7 @@ public enum HttpClient {
 			.set(contentType: .xml)
 			.set(body: StringFormatter.getMulticommand())
 		
-		handle(request: req, JsonObject.init(from:), handler: handler)
+		handle(request: req, JsonObject.init(data:), handler: handler)
 	}
 	
 	private static func sendUserSettings(handler: @escaping (Response<UserSettingsDto>) -> ()) {

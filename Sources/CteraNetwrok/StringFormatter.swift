@@ -249,41 +249,48 @@ enum StringFormatter {
 			"<att id=\"param\"><val>\(path)</val></att></obj>"
 	}
 	
-	static func saveCollaboration(at path: String, _ collaboration: JsonObject) -> String {
-		if let shares: [JsonObject] = collaboration["shares"] { //configure each share values for request
-			for var share in shares {
-				share["$class"] = "ShareConfig"
+	static func saveCollaboration(at path: String, _ collaboration: CollaborationDTO) -> String {
+		var collJson = try! JsonObject(encodable: collaboration)
+
+		if var shares = collJson.jsonArray(key: "shares") {
+			for i in 0..<shares.count {
+				let share = shares.jsonObject(at: i)!
+					.put(key: "$class", "ShareConfig")
+
+				shares[i] = share
 			}
+			
+			collJson["shares"] = shares
 		}
 		
 		let json = JsonObject()
 			.put(key: "name", "shareResource")
 			.put(key: "type", "user-defined")
-			.put(key: "param", collaboration
+			.put(key: "param", collJson
 					.put(key: "$class", "ShareResourceParam")
 					.put(key: "url", path))
 		
 		return buildXml(from: json)
 	}
 	
-	static func verifyCollaborator(for item: ItemInfoDto, _ invitee: JsonObject) -> String {
+	static func verifyCollaborator(for item: ItemInfoDto, _ invitee: InviteeDto) -> String {
 		"<obj><att id=\"type\"><val>user-defined</val></att>" +
 			"<att id=\"name\"><val>preVerifySingleShare</val></att>" +
 			"<att id=\"param\">" +
 			"<obj class=\"PreVerifyShareParam\">" +
 			"<att id=\"url\"><val>\(item.path)</val></att>" +
-			"<att id=\"invitee\">\(buildXml(from: invitee))</att>" +
+			"<att id=\"invitee\">\(buildXml(from: try! JsonObject(encodable: invitee)))</att>" +
 			"</obj></att></obj>"
 	}
 	
-	static func searchCollaborators(_ query: String, _ type: String, _ uid: Int) -> String {
+	static func searchCollaborators(_ query: String, _ type: String, _ uid: Int, _ count: Int) -> String {
 		"<obj><att id=\"type\"><val>user-defined</val></att>" +
 			"<att id=\"name\"><val>searchCollaborationMembers</val></att>" +
 			"<att id=\"param\"><obj>" +
 			"<att id=\"searchType\"><val>\(type)</val></att>" +
 			"<att id=\"searchTerm\"><val>\(query)</val></att>" +
 			"<att id=\"resourceUid\"><val>\(uid)</val></att>" +
-			"<att id=\"countLimit\"><val>25</val></att>" +
+			"<att id=\"countLimit\"><val>\(count)</val></att>" +
 			"</obj></att></obj>"
 	}
 	
