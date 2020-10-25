@@ -10,6 +10,6 @@ public struct PublicInfoDto: Decodable {
 }
 
 public struct CredentialsDto: Decodable {
-	public let deviceUID: String
+	public let deviceUID: Int
 	public let sharedSecret: String
 }
