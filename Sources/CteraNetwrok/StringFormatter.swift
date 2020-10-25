@@ -72,8 +72,8 @@ enum StringFormatter {
 			"</obj></att></obj>"
 	}
 	
-	static func login(deviceId: String, sharedSecret: String) -> String {
-		"j_username=device%5c\(deviceId)&j_password=\(sharedSecret)"
+	static func login(with credentials: CredentialsDto) -> String {
+		"j_username=device%5c\(credentials.deviceUID)&j_password=\(credentials.sharedSecret)"
 	}
 	
 	static func updateMobileInfo(deviceID: String, deviceName: String) -> String {

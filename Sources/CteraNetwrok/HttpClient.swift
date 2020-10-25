@@ -17,8 +17,9 @@ public enum HttpClient {
 	private static let TAG = String(describing: HttpClient.self)
 	
 	static var hasConnection = true
-	public static var serverAddress, deviceId, sharedSecret: String!
-	public static var isPortalReadOnly = false
+	static var credentials: CredentialsDto!
+	public static var serverAddress: String!
+//	public static var isPortalReadOnly = false
 	public static var onConnectionChanged: [(Bool)->()] = []
 	public static var thumbnailDelegate: ThumbnailDelegate?
 	
@@ -62,7 +63,19 @@ public enum HttpClient {
 			.set(contentType: .xml)
 			.set(body: StringFormatter.attachMobileDevice(server: serverAddress, password: pass, activationCode: code, deviceID: deviceID, deviceName: deviceName))
 		
-		handle(request: req, CredentialsDto.from(json:), handler: handler)
+		handle(request: req, CredentialsDto.from(json:)) { (response: Response<CredentialsDto>) in
+			if case let .success(credentials) = response {
+				Prefs.standard.edit()
+					.put(key: .deviceId, credentials.deviceUID)
+					.put(key: .sharedSecret, credentials.sharedSecret)
+					.commit()
+				
+				//save in memory
+				Self.credentials = credentials
+			}
+			
+			handler(response)
+		}
 	}
 	
 	public static func logout() {
@@ -85,7 +98,7 @@ public enum HttpClient {
 	
 	public static func sendUpdateMobileInfo(deviceID: String, deviceName: String) {
 		Console.log(tag: Self.TAG, msg: #function)
-		let req = URLRequest(to: serverAddress, "ServicesPortal/api/objs/\(deviceId!)?format=jsonext")
+		let req = URLRequest(to: serverAddress, "ServicesPortal/api/objs/\(credentials.deviceUID)?format=jsonext")
 			.set(method: .POST)
 			.set(contentType: .xml)
 			.set(body: StringFormatter.updateMobileInfo(deviceID: deviceID, deviceName: deviceName))
@@ -595,7 +608,7 @@ public enum HttpClient {
 		Console.log(tag: Self.TAG, msg: #function)
 		let req = URLRequest(to: serverAddress, "ServicesPortal/api/login?format=jsonext")
 			.set(method: .POST)
-			.set(body: StringFormatter.login(deviceId: deviceId, sharedSecret: sharedSecret))
+			.set(body: StringFormatter.login(with: credentials))
 			.set(contentType: .urlEncoded)
 		
 		session.dataTask(with: req) { (d, r, e) in
@@ -681,7 +694,7 @@ public enum HttpClient {
 	
 	private static func send(request: URLRequest,  handler: @escaping (Result<Data, Data>) -> ()) {
 		session.dataTask(with: request) { result in
-			if case let .failure(status, _) = result, status == 302 && sharedSecret != nil && deviceId != nil {
+			if case let .failure(status, _) = result, status == 302 && credentials != nil {
 				sendCredentials { response in
 					if case .error(let error) = response {
 						handler(.error(error))

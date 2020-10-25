@@ -14,11 +14,11 @@ public struct UserSettingsDto: Codable {
 	public var userStats: UserStats
 	
 	public struct SLA: Codable {
-		var calculatedQuota: Int64?
+		public var calculatedQuota: Int64?
 	}
 	
 	public struct UserStats: Codable {
-		var foldersSize: Int64
+		public var foldersSize: Int64
 	}
 	
 	public var abbreviation: String {
