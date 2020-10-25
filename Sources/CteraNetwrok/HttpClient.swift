@@ -84,17 +84,17 @@ public enum HttpClient {
 		handle(request: req, handler: nil)
 	}
 	
-	public static func fullLogin(handler: @escaping (Response<Data?>) -> ()) {
-		Console.log(tag: Self.TAG, msg: #function)
-		sendCredentials { response in
-			switch response {
-			case .success:
-				updateSession(handler: handler)
-			case .error(let error):
-				handler(.error(error))
-			}
-		}
-	}
+//	static func fullLogin(handler: @escaping (Response<Data?>) -> ()) {
+//		Console.log(tag: Self.TAG, msg: #function)
+//		sendCredentials { response in
+//			switch response {
+//			case .success:
+//				updateSession(handler: handler)
+//			case .error(let error):
+//				handler(.error(error))
+//			}
+//		}
+//	}
 	
 	public static func sendUpdateMobileInfo(deviceID: String, deviceName: String) {
 		Console.log(tag: Self.TAG, msg: #function)
@@ -334,9 +334,10 @@ public enum HttpClient {
 		}
 	}
 	
-	public static func requestLastModified(for items: [ItemInfoDto], handler: @escaping (Response<[JsonObject]>)->()) {
+	public static func requestLastModified(for items: [ItemInfoDto], userRef: String,
+										   handler: @escaping (Response<[JsonObject]>)->()) {
 		Console.log(tag: TAG, msg: "\(#function), items: \(items.map { $0.name })")
-		let req = URLRequest(to: serverAddress, "ServicesPortal/api/\(SessionInfo.userRef!)?format=jsonext")
+		let req = URLRequest(to: serverAddress, "ServicesPortal/api/\(userRef)?format=jsonext")
 			.set(method: .POST)
 			.set(contentType: .xml)
 			.set(body: StringFormatter.lastModified(items: items))
@@ -453,34 +454,33 @@ public enum HttpClient {
 		}
 	}
 	
-	public static func updateSession(handler: @escaping (Response<Data?>) -> ()) {
-		Console.log(tag: TAG, msg: #function)
-		
-		sendSessionInfo { sessionInfoRes in //session
-			switch sessionInfoRes {
-			case .success(let json):
-				SessionInfo.load(json: json)
-				SessionInfo.save()
-				
-				sendUserSettings { userSettingsRes in //settings
-					switch userSettingsRes {
-					case .success(let userSettings):
-						UserSettingsDto.instance = userSettings
-						Prefs.standard.edit().put(key: .userSettings, userSettings).commit()
-						
-						if let avaterName = userSettings.userAvatarName { //avatar
-							requestAvatar(avatarName: avaterName, handler: handler)
-						} else {
-							handler(.success(nil))
-						}
-						
-					case .error(let error): handler(.error(error))
-					}
-				}
-			case .error(let error): handler(.error(error))
-			}
-		}
-	}
+//	public static func updateSession(handler: @escaping (Response<Data?>) -> ()) {
+//		Console.log(tag: TAG, msg: #function)
+//
+//		sendSessionInfo { sessionInfoRes in //session
+//			switch sessionInfoRes {
+//			case .success(let sessionInfoDto):
+//				Prefs.standard.edit().put(key: .sessionInfo, sessionInfoDto).commit()
+//
+//				sendUserSettings(userRef: sessionInfoDto.currentSession.userRef) { userSettingsRes in //settings
+//					switch userSettingsRes {
+//					case .success(let userSettings):
+////						UserSettingsDto.instance = userSettings
+//						Prefs.standard.edit().put(key: .userSettings, userSettings).commit()
+//
+//						if let avaterName = userSettings.userAvatarName { //avatar
+//							requestAvatar(avatarName: avaterName, handler: handler)
+//						} else {
+//							handler(.success(nil))
+//						}
+//
+//					case .error(let error): handler(.error(error))
+//					}
+//				}
+//			case .error(let error): handler(.error(error))
+//			}
+//		}
+//	}
 	
 	public static func requestGlobalStatus(handler: @escaping (Response<JsonObject>) -> ()) {
 		Console.log(tag: Self.TAG, msg: #function)
@@ -618,19 +618,19 @@ public enum HttpClient {
 		}.resume()
 	}
 	
-	private static func sendSessionInfo(handler: @escaping (Response<JsonObject>) -> ()) {
+	private static func sendSessionInfo(handler: @escaping (Response<SessionInfoDto>) -> ()) {
 		Console.log(tag: Self.TAG, msg: #function)
 		let req = URLRequest(to: serverAddress, SERVICES_PORTAL_API)
 			.set(method: .POST)
 			.set(contentType: .xml)
 			.set(body: StringFormatter.getMulticommand())
 		
-		handle(request: req, JsonObject.init(data:), handler: handler)
+		handle(request: req, SessionInfoDto.from(json:), handler: handler)
 	}
 	
-	private static func sendUserSettings(handler: @escaping (Response<UserSettingsDto>) -> ()) {
+	private static func sendUserSettings(userRef: String, handler: @escaping (Response<UserSettingsDto>) -> ()) {
 		Console.log(tag: Self.TAG, msg: #function)
-		let req = URLRequest(to: serverAddress, "ServicesPortal/api/\(SessionInfo.userRef!)?format=jsonext")
+		let req = URLRequest(to: serverAddress, "ServicesPortal/api/\(userRef)?format=jsonext")
 		
 		handle(request: req, UserSettingsDto.from(json:), handler: handler)
 	}

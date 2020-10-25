@@ -6,8 +6,6 @@
 //
 
 public struct UserSettingsDto: Codable {
-	public static var instance: UserSettingsDto!
-	
 	public var userAvatarName: String?
 	public var firstName, lastName, displayName, email: String!
 	public var sla: SLA

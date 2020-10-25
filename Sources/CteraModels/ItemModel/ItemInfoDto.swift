@@ -78,10 +78,9 @@ extension ItemInfoDto {
 	static let hourFormat = DateFormatter(format: "HH:mm")
 	static let dayFormat = DateFormatter(format: "d MMM HH:mm")
 	
-	static func format(lastModified: Date) -> String {
+	static func format(lastModified: Date, timeDiff diff: Int) -> String {
 		var date = lastModified
 		let timezone = TimeZone.current.secondsFromGMT()
-		let diff = Int(SessionInfo.timeZoneDiff)
 		
 		date.addTimeInterval(TimeInterval(timezone - diff))
 		

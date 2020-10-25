@@ -35,24 +35,24 @@ public extension PrefKey {
 //
 //	//info
 //	//	static let PORTAL_VERSION = 				PrefKey(value: "_________________")
-	static let hasWebSso =					PrefKey(value: "__________________")
+	static let hasWebSso =						PrefKey(value: "__________________")
 //	static let ITEM_VIEW_MODE =					PrefKey(value: "___________________")
 //	//	static let COMMON_PATH =					PrefKey(value: "____________________")
 //
 	static let userSettings =					PrefKey(value: "_____________________")
 	static let navigationItems =				PrefKey(value: "______________________")
-//	static let SHARED_WITH_ME_ITEM =			PrefKey(value: "_______________________")
+	static let sessionInfo =					PrefKey(value: "_______________________")
 //	static let HOME_FOLDER_ITEM =				PrefKey(value: "_________________________")
-	static let showSharedByMe =				PrefKey(value: "________________________")
+//	static let showSharedByMe =					PrefKey(value: "________________________")
 //
 //	//	static let MIGRATED =						PrefKey(value: "__________________________")
 //	static let JAILBREAK_DETECTED =				PrefKey(value: "___________________________")
-	static let timeZoneDiff =					PrefKey(value: "____________________________")
+//	static let timeZoneDiff =					PrefKey(value: "____________________________")
 //
 //	static let PASSCODE_LENGTH = 				PrefKey(value: "___________________________-")
 	static let appVersion = 					PrefKey(value: "__________________________--")
 	static let trustedCertificate = 			PrefKey(value: "_________________________---")
-	static let invitationMaxDuration = 		PrefKey(value: "________________________----")
+//	static let invitationMaxDuration = 			PrefKey(value: "________________________----")
 //	static let BIO_AUTH_ALLOWED = 				PrefKey(value: "_______________________-----")
 //	static let BIO_AUTH_FAILED = 				PrefKey(value: "______________________------")
 //	static let SHORCUTS = 						PrefKey(value: "_____________________-------")
