@@ -194,7 +194,7 @@ public enum HttpClient {
 				guard let status = (r as? HTTPURLResponse)?.statusCode else { return }
 				guard status != 404 else {
 					if let tempFile = u { try? fm.removeItem(at: tempFile) }
-					post { handler(.error(Errors.text(".fileNotFoundErrorMsg"))) }
+					post { handler(.error(Errors.text(.fileNotFoundErrorMsg))) }
 					return
 				}
 				

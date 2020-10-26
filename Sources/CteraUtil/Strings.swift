@@ -45,8 +45,8 @@ public extension String {
 //	static let moving = "moving".localized
 //	static let loading = "loading".localized
 //	static let renaming = "renaming".localized
-//	static let downloading = "downloading".localized
-//	static let opening = "opening".localized
+	static let downloading = "downloading".localized
+	static let opening = "opening".localized
 //	static let verifying = "verifying".localized
 //	static let signing = "signing".localized
 //	static let cancel = "cancel".localized
@@ -282,9 +282,9 @@ public extension String {
 //
 //	//MARK: - Error Messages
 //	static let invalidUrl = "invalidUrl".localized
-//	static let noConnectionMsg = "noConnectionMsg".localized
+	static let noConnectionMsg = "noConnectionMsg".localized
 //	static let folderNotFoundMsg = "folderNotFoundMsg".localized
-//	static let fileNotFoundErrorMsg = "fileNotFoundErrorMsg".localized
+	static let fileNotFoundErrorMsg = "fileNotFoundErrorMsg".localized
 //	static let couldNotUploadImage = "couldNotUploadImage".localized
 //	static let libraryPermissionDenied = "libraryPermissionDenied".localized
 //	static let certificateErrorTtl = "certificateErrorTtl".localized

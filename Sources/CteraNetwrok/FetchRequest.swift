@@ -10,26 +10,26 @@ import BasicExtensions
 import StorageExtensions
 
 public struct FetchRequest {
-	static var includeDeleted = Prefs.standard.bool(key: .showDeleted)
-	static var sortAscending = Prefs.standard.bool(key: .sortAscending, fallback: true)
+	public static var includeDeleted = Prefs.standard.bool(key: .showDeleted)
+	public static var sortAscending = Prefs.standard.bool(key: .sortAscending, fallback: true)
 	
-	var path: String
-	var cachePath: String? = nil
-	var folderType = "Personal"
-	var passPhrase: String? = nil
-	var depth: String = "1"
-	var userPassword: String? = nil
-	var query: String? = nil
-	var withCache = true
-	var includeShared = false
-	var navigationPane = false
-	var startIndex = 0
+	private(set) var path: String
+	private(set) var cachePath: String? = nil
+	private(set) var folderType = "Personal"
+	private(set) var passPhrase: String? = nil
+	private(set) var depth: String = "1"
+	private(set) var userPassword: String? = nil
+	private(set) var query: String? = nil
+	private(set) var withCache = true
+	private(set) var includeShared = false
+	private(set) var navigationPane = false
+	private(set) var startIndex = 0
 	
-	init(path: String) {
+	public init(path: String) {
 		self.path = path
 	}
 	
-	func toJson() -> JsonObject {
+	public func toJson() -> JsonObject {
 		var param = JsonObject().put(key: "$class", "FetchResourcesParam")
 			.put(key: "root", path)
 			.put(key: "depth", depth)
@@ -51,61 +51,61 @@ public struct FetchRequest {
 		return JsonObject().put(key: "type", "user-defined").put(key: "name", "fetchResources").put(key: "param", param);
 	}
 	
-	func with(cachePath: String) -> FetchRequest {
+	public func with(cachePath: String) -> FetchRequest {
 		var copy = self
 		copy.cachePath = cachePath
 		return copy
 	}
 	
-	func with(folderType: String) -> FetchRequest {
+	public func with(folderType: String) -> FetchRequest {
 		var copy = self
 		copy.folderType = folderType
 		return copy
 	}
 	
-	func with(passPhrase: String) -> FetchRequest {
+	public func with(passPhrase: String) -> FetchRequest {
 		var copy = self
 		copy.passPhrase = passPhrase
 		return copy
 	}
 	
-	func with(depth: String) -> FetchRequest {
+	public func with(depth: String) -> FetchRequest {
 		var copy = self
 		copy.depth = depth
 		return copy
 	}
 	
-	func with(userPassword: String) -> FetchRequest {
+	public func with(userPassword: String) -> FetchRequest {
 		var copy = self
 		copy.userPassword = userPassword
 		return copy
 	}
 	
-	func with(query: String) -> FetchRequest {
+	public func with(query: String) -> FetchRequest {
 		var copy = self
 		copy.query = query
 		return copy
 	}
 	
-	func with(withCache: Bool) -> FetchRequest {
+	public func with(withCache: Bool) -> FetchRequest {
 		var copy = self
 		copy.withCache = withCache
 		return copy
 	}
 	
-	func with(includeShared: Bool) -> FetchRequest {
+	public func with(includeShared: Bool) -> FetchRequest {
 		var copy = self
 		copy.includeShared = includeShared
 		return copy
 	}
 	
-	func with(startIndex: Int) -> FetchRequest {
+	public func with(startIndex: Int) -> FetchRequest {
 		var copy = self
 		copy.startIndex = startIndex
 		return self
 	}
 	
-	func with(navigationPane: Bool) -> FetchRequest {
+	public func with(navigationPane: Bool) -> FetchRequest {
 		var copy = self
 		copy.navigationPane = navigationPane
 		return self

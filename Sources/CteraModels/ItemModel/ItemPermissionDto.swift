@@ -19,9 +19,9 @@ public enum ItemPermissionDto: String, Codable {
 	
 	static func from(string: String) -> ItemPermissionDto {
 		switch string {
-		case ".permissionReadWrite":	return .ReadWrite
-		case ".permissionReadOnly":		return .ReadOnly
-		case ".permissionPreviewOnly":	return .PreviewOnly
+		case .permissionReadWrite:		return .ReadWrite
+		case .permissionReadOnly:		return .ReadOnly
+		case .permissionPreviewOnly:	return .PreviewOnly
 		default:						return .None
 		}
 	}

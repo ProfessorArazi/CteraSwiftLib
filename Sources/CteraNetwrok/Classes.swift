@@ -19,14 +19,14 @@ public class ProgressTask {
 	
 	init() {
 		progress = Progress()
-		msg = ".opening"
+		msg = .opening
 		task = nil
 	}
 	
 	init(from task: URLSessionTask) {
 		progress = task.progress
 		onCancel = task.cancel
-		msg = ".downloading"
+		msg = .downloading
 		self.task = task
 	}
 	
@@ -102,7 +102,7 @@ class ParserDelegate: NSObject, XMLParserDelegate {
 		let parser = XMLParser(data: data)
 		let delegate = ParserDelegate()
 		parser.delegate = delegate
-		return parser.parse() ? delegate.msg : ".error"
+		return parser.parse() ? delegate.msg : .error
 	}
 	
 	private var currentElement = ""
@@ -136,7 +136,7 @@ enum Errors: LocalizedError {
 	var errorDescription: String? {
 		switch self {
 		case .text(let msg): return msg
-		case .offline: return ".noConnectionMsg"
+		case .offline: return .noConnectionMsg
 		}
 	}
 }
