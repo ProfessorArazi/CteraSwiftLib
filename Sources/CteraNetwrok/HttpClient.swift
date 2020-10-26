@@ -496,7 +496,7 @@ public enum HttpClient {
 		}.resume()
 	}
 	
-	public static func resuqestSessionInfo(handler: @escaping (Response<SessionInfoDto>) -> ()) {
+	public static func requestSessionInfo(handler: @escaping (Response<SessionInfoDto>) -> ()) {
 		Console.log(tag: Self.TAG, msg: #function)
 		let req = URLRequest(to: serverAddress, SERVICES_PORTAL_API)
 			.set(method: .POST)
