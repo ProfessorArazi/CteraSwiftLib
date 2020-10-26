@@ -496,7 +496,7 @@ public enum HttpClient {
 		}.resume()
 	}
 	
-	public static func sendSessionInfo(handler: @escaping (Response<SessionInfoDto>) -> ()) {
+	public static func resuqestSessionInfo(handler: @escaping (Response<SessionInfoDto>) -> ()) {
 		Console.log(tag: Self.TAG, msg: #function)
 		let req = URLRequest(to: serverAddress, SERVICES_PORTAL_API)
 			.set(method: .POST)
@@ -506,11 +506,18 @@ public enum HttpClient {
 		handle(request: req, SessionInfoDto.from(json:), handler: handler)
 	}
 	
-	public static func sendUserSettings(userRef: String, handler: @escaping (Response<UserSettingsDto>) -> ()) {
+	public static func requestUserSettings(userRef: String, handler: @escaping (Response<UserSettingsDto>) -> ()) {
 		Console.log(tag: Self.TAG, msg: #function)
 		let req = URLRequest(to: serverAddress, "ServicesPortal/api/\(userRef)?format=jsonext")
 		
 		handle(request: req, UserSettingsDto.from(json:), handler: handler)
+	}
+	
+	private static func requestAvatar(avatarName: String, handler: @escaping (Response<Data?>) -> ()) {
+		Console.log(tag: Self.TAG, msg: #function)
+		let req = URLRequest(to: serverAddress, "/ServicesPortal/avatar/getUserAtar/\(avatarName)?format=jsonext")
+		
+		handle(request: req, { $0 }, handler: handler)
 	}
 	
 	public static func requestGlobalStatus(handler: @escaping (Response<JsonObject>) -> ()) {
@@ -633,13 +640,6 @@ public enum HttpClient {
 			.set(body: StringFormatter.buildXml(from: request.toJson()))
 		
 		handle(request: req, FolderDto.from(json:), handler: handler)
-	}
-	
-	private static func requestAvatar(avatarName: String, handler: @escaping (Response<Data?>) -> ()) {
-		Console.log(tag: Self.TAG, msg: #function)
-		let req = URLRequest(to: serverAddress, "/ServicesPortal/avatar/getUserAtar/\(avatarName)?format=jsonext")
-		
-		handle(request: req, { $0 }, handler: handler)
 	}
 	
 	private static func srcDestRequest(data payload: SrcDestData, handler: @escaping (Response<(String, SrcDestData)>) ->()) {
