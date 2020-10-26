@@ -10,9 +10,9 @@ import StorageExtensions
 
 public extension PrefKey {
 	static let serverAddress =					PrefKey(value: "-----_")
-	static let sharedSecret =					PrefKey(value: "----__")
-	static let deviceId =						PrefKey(value: "---___")
-	static let userRef =						PrefKey(value: "--____")
+	static let credentials =					PrefKey(value: "----__")
+//	static let deviceId =						PrefKey(value: "---___")
+//	static let userRef =						PrefKey(value: "--____")
 //	static let PASSCODE_MODE =					PrefKey(value: "-_____")
 //
 //	//Offline Access Settings

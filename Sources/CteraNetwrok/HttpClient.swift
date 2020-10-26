@@ -17,7 +17,7 @@ public enum HttpClient {
 	private static let TAG = String(describing: HttpClient.self)
 	
 	static var hasConnection = true
-	static var credentials: CredentialsDto!
+	public static var credentials: CredentialsDto!
 	public static var serverAddress: String!
 //	public static var isPortalReadOnly = false
 	public static var onConnectionChanged: [(Bool)->()] = []
@@ -66,8 +66,7 @@ public enum HttpClient {
 		handle(request: req, CredentialsDto.from(json:)) { (response: Response<CredentialsDto>) in
 			if case let .success(credentials) = response {
 				Prefs.standard.edit()
-					.put(key: .deviceId, credentials.deviceUID)
-					.put(key: .sharedSecret, credentials.sharedSecret)
+					.put(key: .credentials, credentials)
 					.commit()
 				
 				//save in memory
@@ -83,18 +82,6 @@ public enum HttpClient {
 		let req = URLRequest(to: serverAddress, "ServicesPortal/api/logout").set(method: .POST)
 		handle(request: req, handler: nil)
 	}
-	
-//	static func fullLogin(handler: @escaping (Response<Data?>) -> ()) {
-//		Console.log(tag: Self.TAG, msg: #function)
-//		sendCredentials { response in
-//			switch response {
-//			case .success:
-//				updateSession(handler: handler)
-//			case .error(let error):
-//				handler(.error(error))
-//			}
-//		}
-//	}
 	
 	public static func sendUpdateMobileInfo(deviceID: String, deviceName: String) {
 		Console.log(tag: Self.TAG, msg: #function)

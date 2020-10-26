@@ -9,7 +9,7 @@ public struct PublicInfoDto: Decodable {
 	public let hasWebSSO: Bool
 }
 
-public struct CredentialsDto: Decodable {
+public struct CredentialsDto: Codable {
 	public let deviceUID: Int
 	public let sharedSecret: String
 }
