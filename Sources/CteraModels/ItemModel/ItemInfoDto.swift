@@ -73,7 +73,7 @@ public struct ItemInfoDto: Codable, Equatable {
 	}
 }
 
-extension ItemInfoDto {
+public extension ItemInfoDto {
 	static let standardFormat = DateFormatter(format: "yyyy-MM-dd'T'HH:mm:ss")
 	static let hourFormat = DateFormatter(format: "HH:mm")
 	static let dayFormat = DateFormatter(format: "d MMM HH:mm")
