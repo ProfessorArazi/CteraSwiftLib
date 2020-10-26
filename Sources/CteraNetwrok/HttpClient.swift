@@ -482,6 +482,37 @@ public enum HttpClient {
 //		}
 //	}
 	
+	public static func sendCredentials(handler: @escaping (Response<Any?>) -> ()) {
+		Console.log(tag: Self.TAG, msg: #function)
+		let req = URLRequest(to: serverAddress, "ServicesPortal/api/login?format=jsonext")
+			.set(method: .POST)
+			.set(body: StringFormatter.login(with: credentials))
+			.set(contentType: .urlEncoded)
+		
+		session.dataTask(with: req) { (d, r, e) in
+			if let error = e { post { handler(.error(error)) } }
+			handler(.success(nil))
+			
+		}.resume()
+	}
+	
+	public static func sendSessionInfo(handler: @escaping (Response<SessionInfoDto>) -> ()) {
+		Console.log(tag: Self.TAG, msg: #function)
+		let req = URLRequest(to: serverAddress, SERVICES_PORTAL_API)
+			.set(method: .POST)
+			.set(contentType: .xml)
+			.set(body: StringFormatter.getMulticommand())
+		
+		handle(request: req, SessionInfoDto.from(json:), handler: handler)
+	}
+	
+	public static func sendUserSettings(userRef: String, handler: @escaping (Response<UserSettingsDto>) -> ()) {
+		Console.log(tag: Self.TAG, msg: #function)
+		let req = URLRequest(to: serverAddress, "ServicesPortal/api/\(userRef)?format=jsonext")
+		
+		handle(request: req, UserSettingsDto.from(json:), handler: handler)
+	}
+	
 	public static func requestGlobalStatus(handler: @escaping (Response<JsonObject>) -> ()) {
 		Console.log(tag: Self.TAG, msg: #function)
 		let req = URLRequest(to: serverAddress, SERVICES_PORTAL_API)
@@ -602,37 +633,6 @@ public enum HttpClient {
 			.set(body: StringFormatter.buildXml(from: request.toJson()))
 		
 		handle(request: req, FolderDto.from(json:), handler: handler)
-	}
-	
-	private static func sendCredentials(handler: @escaping (Response<Any?>) -> ()) {
-		Console.log(tag: Self.TAG, msg: #function)
-		let req = URLRequest(to: serverAddress, "ServicesPortal/api/login?format=jsonext")
-			.set(method: .POST)
-			.set(body: StringFormatter.login(with: credentials))
-			.set(contentType: .urlEncoded)
-		
-		session.dataTask(with: req) { (d, r, e) in
-			if let error = e { post { handler(.error(error)) } }
-			handler(.success(nil))
-			
-		}.resume()
-	}
-	
-	private static func sendSessionInfo(handler: @escaping (Response<SessionInfoDto>) -> ()) {
-		Console.log(tag: Self.TAG, msg: #function)
-		let req = URLRequest(to: serverAddress, SERVICES_PORTAL_API)
-			.set(method: .POST)
-			.set(contentType: .xml)
-			.set(body: StringFormatter.getMulticommand())
-		
-		handle(request: req, SessionInfoDto.from(json:), handler: handler)
-	}
-	
-	private static func sendUserSettings(userRef: String, handler: @escaping (Response<UserSettingsDto>) -> ()) {
-		Console.log(tag: Self.TAG, msg: #function)
-		let req = URLRequest(to: serverAddress, "ServicesPortal/api/\(userRef)?format=jsonext")
-		
-		handle(request: req, UserSettingsDto.from(json:), handler: handler)
 	}
 	
 	private static func requestAvatar(avatarName: String, handler: @escaping (Response<Data?>) -> ()) {
