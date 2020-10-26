@@ -106,7 +106,7 @@ public enum HttpClient {
 		handle(request: req, handler: nil)
 	}
 	
-	public static func fetchFolder(_ request: FetchRequest, handler: @escaping (Response<FolderDto>) -> ()) {
+	public static func fetchFolder(_ request: FetchRequestDto, handler: @escaping (Response<FolderDto>) -> ()) {
 		Console.log(tag: Self.TAG, msg: #function)
 		let cachePath = request.cachePath ?? request.path
 		
@@ -133,7 +133,7 @@ public enum HttpClient {
 		})
 	}
 	
-	public static func searchFolder(_ request: FetchRequest, handler: @escaping (Response<FolderDto>) -> ()) {
+	public static func searchFolder(_ request: FetchRequestDto, handler: @escaping (Response<FolderDto>) -> ()) {
 		Console.log(tag: Self.TAG, msg: #function)
 		requestFolder(request, handler: handler)
 	}
@@ -532,7 +532,7 @@ public enum HttpClient {
 	
 	public static func requestNavigationItems(completion: @escaping (Response<FolderDto>)->()) {
 		Console.log(tag: Self.TAG, msg: #function)
-		let fetchReq = FetchRequest(path: "/ServicesPortal/webdav").with(navigationPane: true)
+		let fetchReq = FetchRequestDto(path: "/ServicesPortal/webdav").with(navigationPane: true)
 		
 		let req = URLRequest(to: serverAddress, SERVICES_PORTAL_API)
 			.set(method: .POST)
@@ -633,7 +633,7 @@ public enum HttpClient {
 	}
 	
 	// MARK: - Private methods
-	private static func requestFolder(_ request: FetchRequest, handler: @escaping (Response<FolderDto>) -> ()) {
+	private static func requestFolder(_ request: FetchRequestDto, handler: @escaping (Response<FolderDto>) -> ()) {
 		let req = URLRequest(to: serverAddress, SERVICES_PORTAL_API)
 			.set(method: .POST)
 			.set(contentType: .xml)
