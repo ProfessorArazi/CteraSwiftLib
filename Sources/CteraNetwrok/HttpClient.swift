@@ -513,7 +513,7 @@ public enum HttpClient {
 		handle(request: req, UserSettingsDto.from(json:), handler: handler)
 	}
 	
-	private static func requestAvatar(avatarName: String, handler: @escaping (Response<Data?>) -> ()) {
+	public static func requestAvatar(avatarName: String, handler: @escaping (Response<Data?>) -> ()) {
 		Console.log(tag: Self.TAG, msg: #function)
 		let req = URLRequest(to: serverAddress, "/ServicesPortal/avatar/getUserAtar/\(avatarName)?format=jsonext")
 		
