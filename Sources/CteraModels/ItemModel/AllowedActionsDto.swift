@@ -21,4 +21,28 @@ public struct AllowedActionsDto: Codable, Equatable {
 	
 	public var invitePermissions: InvitePermissionDto?
 	public var previewStatus: PreviewStatusDto?
+	
+	private enum CodingKeys: String, CodingKey {
+		case delete = "_delete"
+		case copy
+		case move
+		case createFile
+		case createFolder
+		case createPublicLink
+		case manageSharing
+		case leaveShare
+		case download
+		case allowShowDeleted
+		case versioning
+		case undelete
+		
+		case invitePermissions
+		case previewStatus
+		
+		
+		
+		
+		
+		
+	}
 }

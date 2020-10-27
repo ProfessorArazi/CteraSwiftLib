@@ -15,7 +15,7 @@ public struct VersionDto: Codable, Equatable {
 	let size: Int64
 	let relativeTime: String
 	
-	enum CodingKeys: String, CodingKey {
+	private enum CodingKeys: String, CodingKey {
 		case timestamp
 		case fullUrl
 		case modifier
