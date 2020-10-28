@@ -9,11 +9,11 @@ import Foundation
 import BasicExtensions
 import StorageExtensions
 
-enum TrustManager {
+public enum TrustManager {
 	private static var trustedKeyBase64: String? = Prefs.standard.string(key: .trustedCertificate)
 	fileprivate static var lastCheckedKey: SecKey?
 	
-	static func trustLastCheck() {
+	public static func trustLastCheck() {
 		guard let b64Key = lastCheckedKey?.base64 else { fatalError("missing key") }
 		
 		trustedKeyBase64 = b64Key
