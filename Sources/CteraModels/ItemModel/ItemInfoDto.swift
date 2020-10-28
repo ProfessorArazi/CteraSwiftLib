@@ -68,6 +68,31 @@ public struct ItemInfoDto: Codable, Equatable {
 		}
 	}
 	
+	public func encode(to encoder: Encoder) throws {
+		var container = encoder.container(keyedBy: CodingKeys.self)
+		
+		try container.encode(name, forKey: .name)
+		try container.encode(path, forKey: .path)
+		try container.encode(ext, forKey: .ext)
+		try container.encode(scope, forKey: .scope)
+		
+		try container.encode(isShared, forKey: .isShared)
+		try container.encode(hasLinks, forKey: .hasLinks)
+		try container.encode(isFolder, forKey: .isFolder)
+		try container.encode(isDeleted, forKey: .isDeleted)
+		
+		try container.encode(size, forKey: .size)
+		try container.encode(actions, forKey: .actions)
+		try container.encode(itemPermission, forKey: .itemPermission)
+		try container.encode(cloudFolderInfo, forKey: .cloudFolderInfo)
+		try container.encode(lastActionBy, forKey: .lastActionBy)
+		
+		if let lastModified = lastModified {
+			let str = Self.standardFormat.string(from: lastModified)
+			try container.encode(str, forKey: .lastModified)
+		}
+	}
+	
 	public var parentPath: String {
 		String(path.prefix(upTo: path.lastIndex(of: "/")!))
 	}
