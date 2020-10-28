@@ -1,5 +1,5 @@
 //
-//  File.swift
+//  Strings.swift
 //  
 //
 //  Created by Gal Yedidovich on 22/10/2020.
