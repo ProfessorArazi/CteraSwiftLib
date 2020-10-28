@@ -77,10 +77,6 @@ public struct SessionInfoDto: Codable {
 	}
 	
 	public struct General: Codable {
-		public let invitationSettings: InvitationSettings
-		
-		public struct InvitationSettings: Codable {
-			public let invitationMaxValidityDuration: Int
-		}
+		public let invitationSettings: InvitationSettingsDto
 	}
 }
