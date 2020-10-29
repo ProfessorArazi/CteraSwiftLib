@@ -7,7 +7,6 @@
 
 import Foundation
 
-
 public extension URLRequest {
 	init(to host: String, _ path: String) {
 		let url = URL(string: "https://\(host)/\(path)")!
@@ -47,6 +46,8 @@ public extension SecKey {
 }
 
 public extension Bundle {
+	static let CteraResources = Bundle.module
+	
 	private static var ctera: [String: String] { main.infoDictionary!["CTERA"] as! [String: String] }
 	
 	static var keyGroup: String { ctera["KeyGroup"]! }
