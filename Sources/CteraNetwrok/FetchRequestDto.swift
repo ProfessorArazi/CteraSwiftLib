@@ -102,13 +102,13 @@ public struct FetchRequestDto {
 	public func with(startIndex: Int) -> FetchRequestDto {
 		var copy = self
 		copy.startIndex = startIndex
-		return self
+		return copy
 	}
 	
 	public func with(navigationPane: Bool) -> FetchRequestDto {
 		var copy = self
 		copy.navigationPane = navigationPane
-		return self
+		return copy
 	}
 }
 
