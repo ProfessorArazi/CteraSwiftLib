@@ -16,7 +16,9 @@ public enum HttpClient {
 	private static let SERVICES_PORTAL_API = "ServicesPortal/api?format=jsonext"
 	private static let TAG = String(describing: HttpClient.self)
 	
-	static var hasConnection = true
+	private static var auth = Auth()
+	private static var hasConnection = true
+	
 	public static var credentials: CredentialsDto!
 	public static var serverAddress: String!
 //	public static var isPortalReadOnly = false
@@ -153,11 +155,7 @@ public enum HttpClient {
 			
 			async {
 				Encryptor.decrypt(file: cacheItem.localUrl, to: tempFile, task: task)
-				//TODO: handle thumbnail
 				thumbnailDelegate?.thumbnailDelegate(receivedFile: tempFile, for: item)
-//				if ThumbnailCache.thumbnail(at: item.path) == nil {
-//					ThumbnailCache.saveThumbnail(for: item, from: tempFile)
-//				}
 				post { handler(.success(tempFile)) }
 			}
 			
@@ -441,46 +439,19 @@ public enum HttpClient {
 		}
 	}
 	
-//	public static func updateSession(handler: @escaping (Response<Data?>) -> ()) {
-//		Console.log(tag: TAG, msg: #function)
-//
-//		sendSessionInfo { sessionInfoRes in //session
-//			switch sessionInfoRes {
-//			case .success(let sessionInfoDto):
-//				Prefs.standard.edit().put(key: .sessionInfo, sessionInfoDto).commit()
-//
-//				sendUserSettings(userRef: sessionInfoDto.currentSession.userRef) { userSettingsRes in //settings
-//					switch userSettingsRes {
-//					case .success(let userSettings):
-////						UserSettingsDto.instance = userSettings
-//						Prefs.standard.edit().put(key: .userSettings, userSettings).commit()
-//
-//						if let avaterName = userSettings.userAvatarName { //avatar
-//							requestAvatar(avatarName: avaterName, handler: handler)
-//						} else {
-//							handler(.success(nil))
-//						}
-//
-//					case .error(let error): handler(.error(error))
-//					}
-//				}
-//			case .error(let error): handler(.error(error))
-//			}
-//		}
-//	}
-	
-	public static func sendCredentials(handler: @escaping (Response<Any?>) -> ()) {
+	public static func requestSession(handler: @escaping (Response<Any?>) -> ()) {
 		Console.log(tag: Self.TAG, msg: #function)
-		let req = URLRequest(to: serverAddress, "ServicesPortal/api/login?format=jsonext")
-			.set(method: .POST)
-			.set(body: StringFormatter.login(with: credentials))
-			.set(contentType: .urlEncoded)
-		
-		session.dataTask(with: req) { (d, r, e) in
-			if let error = e { post { handler(.error(error)) } }
-			handler(.success(nil))
+		async {
+			auth.semaphore.wait() //wait for earlier requests to finish (if any)
 			
-		}.resume()
+			switch auth.status {
+			case .success:
+				auth.semaphore.signal()
+				post { handler(.success(nil)) }
+			case .notAuthenticated:
+				sendCredentials(handler: handler)
+			}
+		}
 	}
 	
 	public static func requestSessionInfo(handler: @escaping (Response<SessionInfoDto>) -> ()) {
@@ -647,6 +618,32 @@ public enum HttpClient {
 		handle(request: req, middleware, handler: handler)
 	}
 	
+	private static func sendCredentials(handler: @escaping (Response<Any?>) -> ()) {
+		Console.log(tag: Self.TAG, msg: #function)
+		let req = URLRequest(to: serverAddress, "ServicesPortal/api/login?format=jsonext")
+			.set(method: .POST)
+			.set(body: StringFormatter.login(with: credentials))
+			.set(contentType: .urlEncoded)
+		
+		session.dataTask(with: req) { result in
+			post {
+				switch result {
+				case .success:
+					auth.renew()
+					handler(.success(nil))
+				case .failure(let status, let data):
+					Console.log(tag: TAG, msg: "Failure - status: \(status), msg:" + String(decoding: data, as: UTF8.self))
+					let errorMsg = ParserDelegate.parse(data: data)
+					handler(.error(Errors.text(errorMsg)))
+				case .error(let error):
+					handler(.error(error))
+				}
+				
+				auth.semaphore.signal()
+			}
+		}.resume()
+	}
+	
 	// MARK: handling requests
 	private static func handle<T>(request: URLRequest, _ middleware: @escaping (Data) throws -> T, handler: ((Response<T>) -> ())?) {
 		if !hasConnection {
@@ -680,16 +677,56 @@ public enum HttpClient {
 	}
 	
 	private static func send(request: URLRequest,  handler: @escaping (Result<Data, Data>) -> ()) {
+		let requestTime = Date()
 		session.dataTask(with: request) { result in
 			if case let .failure(status, _) = result, status == 302 && credentials != nil {
-				sendCredentials { response in
-					if case .error(let error) = response {
-						handler(.error(error))
-					} else {
-						send(request: request, handler: handler)
-					}
-				}
+				handle302(at: requestTime, with: request, and: handler)
 			} else { handler(result) }
 		}.resume()
+	}
+	
+	private static func handle302(at time: Date, with request: URLRequest, and handler: @escaping (Result<Data, Data>) -> ()) {
+		Console.log(tag: Self.TAG, msg: #function)
+		if auth.validated(after: time) { //session already renewed. retry original request
+			send(request: request, handler: handler)
+			return
+		}
+		
+		auth.invalidate() //need to renew session
+		requestSession { response in
+			if case .error(let error) = response {
+				handler(.error(error))
+			} else {
+				send(request: request, handler: handler) //retry original request
+			}
+		}
+	}
+}
+
+fileprivate struct Auth {
+	let semaphore = DispatchSemaphore(value: 1)
+	private(set) var status: AuthStatus = .notAuthenticated
+	private(set) var timestamp: Date = Date(timeIntervalSince1970: 0)
+	
+	///invalidate the authentication status to 'Not Authenticated' and authentication time to minimum
+	mutating func invalidate() {
+		status = .notAuthenticated
+		timestamp = Date(timeIntervalSince1970: 0)
+	}
+	
+	///set authentication status to 'Success' and authentication time to now
+	mutating func renew() {
+		status = .success
+		timestamp = Date()
+	}
+	
+	///checks whether the session renewed after a given time
+	func validated(after: Date) -> Bool {
+		status == .success && after < timestamp
+	}
+	
+	enum AuthStatus {
+		case notAuthenticated
+		case success
 	}
 }
