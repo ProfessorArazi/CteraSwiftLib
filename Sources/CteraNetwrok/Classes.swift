@@ -140,3 +140,22 @@ enum Errors: LocalizedError {
 		}
 	}
 }
+
+
+struct Auth {
+	let semaphore = DispatchSemaphore(value: 1)
+	private(set) var cookie: HTTPCookie?
+	private(set) var timestamp: Date = Date(timeIntervalSince1970: 0)
+	
+	///invalidate the authentication status to 'Not Authenticated' and authentication time to minimum
+	mutating func invalidate() {
+		cookie = nil
+		timestamp = Date(timeIntervalSince1970: 0)
+	}
+	
+	///set authentication status to 'Success' and authentication time to now
+	mutating func renew(with newCookie: HTTPCookie) {
+		cookie = newCookie
+		timestamp = Date()
+	}
+}

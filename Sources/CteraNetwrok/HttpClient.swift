@@ -441,17 +441,27 @@ public enum HttpClient {
 	
 	public static func renewSession(handler: @escaping (Response<Any?>) -> ()) {
 		Console.log(tag: Self.TAG, msg: #function)
-		async {
-			auth.semaphore.wait() //wait for earlier requests to finish (if any)
-			
-			switch auth.status {
-			case .success:
-				auth.semaphore.signal()
-				post { handler(.success(nil)) }
-			case .notAuthenticated:
-				sendCredentials(handler: handler)
+		let req = URLRequest(to: serverAddress, "ServicesPortal/api/login?format=jsonext")
+			.set(method: .POST)
+			.set(body: StringFormatter.login(with: credentials))
+			.set(contentType: .urlEncoded)
+		
+		session.dataTask(with: req) { result in
+			post {
+				switch result {
+				case .success:
+					let newCookie = HTTPCookieStorage.shared.cookies!.first { $0.name == "JSESSIONID" }!
+					auth.renew(with: newCookie)
+					handler(.success(nil))
+				case .failure(let status, let data):
+					Console.log(tag: TAG, msg: "Failure - status: \(status), msg:" + String(decoding: data, as: UTF8.self))
+					let errorMsg = ParserDelegate.parse(data: data)
+					handler(.error(Errors.text(errorMsg)))
+				case .error(let error):
+					handler(.error(error))
+				}
 			}
-		}
+		}.resume()
 	}
 	
 	public static func requestSessionInfo(handler: @escaping (Response<SessionInfoDto>) -> ()) {
@@ -618,32 +628,6 @@ public enum HttpClient {
 		handle(request: req, middleware, handler: handler)
 	}
 	
-	private static func sendCredentials(handler: @escaping (Response<Any?>) -> ()) {
-		Console.log(tag: Self.TAG, msg: #function)
-		let req = URLRequest(to: serverAddress, "ServicesPortal/api/login?format=jsonext")
-			.set(method: .POST)
-			.set(body: StringFormatter.login(with: credentials))
-			.set(contentType: .urlEncoded)
-		
-		session.dataTask(with: req) { result in
-			post {
-				switch result {
-				case .success:
-					auth.renew()
-					handler(.success(nil))
-				case .failure(let status, let data):
-					Console.log(tag: TAG, msg: "Failure - status: \(status), msg:" + String(decoding: data, as: UTF8.self))
-					let errorMsg = ParserDelegate.parse(data: data)
-					handler(.error(Errors.text(errorMsg)))
-				case .error(let error):
-					handler(.error(error))
-				}
-				
-				auth.semaphore.signal()
-			}
-		}.resume()
-	}
-	
 	// MARK: handling requests
 	private static func handle<T>(request: URLRequest, _ middleware: @escaping (Data) throws -> T, handler: ((Response<T>) -> ())?) {
 		if !hasConnection {
@@ -688,47 +672,26 @@ public enum HttpClient {
 	
 	private static func handle302(at time: Date, with request: URLRequest, and handler: @escaping (Result<Data, Data>) -> ()) {
 		Console.log(tag: Self.TAG, msg: #function)
-		if auth.validated(after: time) { //session already renewed. retry original request
-			send(request: request, handler: handler)
-			return
-		}
-		
-		auth.invalidate() //need to renew session
-		renewSession { response in
-			if case .error(let error) = response {
-				handler(.error(error))
-			} else {
-				send(request: request, handler: handler) //retry original request
+		async {
+			auth.semaphore.wait()
+			if let cookie = auth.cookie, auth.timestamp > time { //session already renewed. retry original request
+				Console.log(tag: Self.TAG, msg: "session already renewed")
+				HTTPCookieStorage.shared.setCookie(cookie)  //override response cookie with verified cookie
+				
+				send(request: request, handler: handler)
+				auth.semaphore.signal()
+				return
+			}
+			
+			print("req at: \(time.timeIntervalSince1970) is sending credentials")
+			renewSession { response in
+				if case .error(let error) = response {
+					handler(.error(error))
+				} else {
+					send(request: request, handler: handler)
+				}
+				auth.semaphore.signal()
 			}
 		}
-	}
-}
-
-fileprivate struct Auth {
-	let semaphore = DispatchSemaphore(value: 1)
-	private(set) var status: AuthStatus = .notAuthenticated
-	private(set) var timestamp: Date = Date(timeIntervalSince1970: 0)
-	
-	///invalidate the authentication status to 'Not Authenticated' and authentication time to minimum
-	mutating func invalidate() {
-		status = .notAuthenticated
-		timestamp = Date(timeIntervalSince1970: 0)
-	}
-	
-	///set authentication status to 'Success' and authentication time to now
-	mutating func renew() {
-		status = .success
-		timestamp = Date()
-		Console.log(tag: "Auth", msg: "timestamp: \(timestamp.timeIntervalSince1970)")
-	}
-	
-	///checks whether the session renewed after a given time
-	func validated(after: Date) -> Bool {
-		status == .success && after.timeIntervalSince1970 < timestamp.timeIntervalSince1970
-	}
-	
-	enum AuthStatus {
-		case notAuthenticated
-		case success
 	}
 }
