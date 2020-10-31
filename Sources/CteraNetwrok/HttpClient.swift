@@ -719,6 +719,7 @@ fileprivate struct Auth {
 	mutating func renew() {
 		status = .success
 		timestamp = Date()
+		Console.log(tag: "Auth", msg: "timestamp: \(timestamp.timeIntervalSince1970)")
 	}
 	
 	///checks whether the session renewed after a given time
