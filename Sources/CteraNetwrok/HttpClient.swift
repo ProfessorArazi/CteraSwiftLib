@@ -439,7 +439,7 @@ public enum HttpClient {
 		}
 	}
 	
-	public static func requestSession(handler: @escaping (Response<Any?>) -> ()) {
+	public static func renewSession(handler: @escaping (Response<Any?>) -> ()) {
 		Console.log(tag: Self.TAG, msg: #function)
 		async {
 			auth.semaphore.wait() //wait for earlier requests to finish (if any)
@@ -680,6 +680,7 @@ public enum HttpClient {
 		let requestTime = Date()
 		session.dataTask(with: request) { result in
 			if case let .failure(status, _) = result, status == 302 && credentials != nil {
+				Console.log(tag: Self.TAG, msg: "received 302, sent at: \(requestTime)")
 				handle302(at: requestTime, with: request, and: handler)
 			} else { handler(result) }
 		}.resume()
@@ -693,7 +694,7 @@ public enum HttpClient {
 		}
 		
 		auth.invalidate() //need to renew session
-		requestSession { response in
+		renewSession { response in
 			if case .error(let error) = response {
 				handler(.error(error))
 			} else {
