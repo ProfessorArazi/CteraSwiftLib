@@ -683,7 +683,6 @@ public enum HttpClient {
 				return
 			}
 			
-			print("req at: \(time.timeIntervalSince1970) is sending credentials")
 			renewSession { response in
 				if case .error(let error) = response {
 					handler(.error(error))

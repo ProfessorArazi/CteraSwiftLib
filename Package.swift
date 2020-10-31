@@ -55,8 +55,8 @@ let package = Package(
 				"CteraUtil",
 			]
 		),
-//		.testTarget(
-//			name: "CteraSwiftLibTests",
-//			dependencies: ["CteraNetwrok"]),
+		.testTarget(
+			name: "CteraNetworkTests",
+			dependencies: ["CteraNetwrok", "CteraCache"]),
 	]
 )
