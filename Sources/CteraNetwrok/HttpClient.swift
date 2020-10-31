@@ -680,7 +680,7 @@ public enum HttpClient {
 		let requestTime = Date()
 		session.dataTask(with: request) { result in
 			if case let .failure(status, _) = result, status == 302 && credentials != nil {
-				Console.log(tag: Self.TAG, msg: "received 302, sent at: \(requestTime)")
+				Console.log(tag: Self.TAG, msg: "received 302, sent at: \(requestTime.timeIntervalSince1970)")
 				handle302(at: requestTime, with: request, and: handler)
 			} else { handler(result) }
 		}.resume()
@@ -723,7 +723,7 @@ fileprivate struct Auth {
 	
 	///checks whether the session renewed after a given time
 	func validated(after: Date) -> Bool {
-		status == .success && after < timestamp
+		status == .success && after.timeIntervalSince1970 < timestamp.timeIntervalSince1970
 	}
 	
 	enum AuthStatus {
