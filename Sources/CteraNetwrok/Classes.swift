@@ -11,28 +11,22 @@ import StorageExtensions
 import CteraModels
 
 public class ProgressTask {
-	let progress: Progress
-	private(set) var cancelled = false
-	var onCancel: ()->() = { }
-	let msg: String
-	let task: URLSessionTask?
+	public let progress: Progress
+	private let task: URLSessionTask?
 	
-	init() {
-		progress = Progress()
-		msg = .opening
+	public init(totalUnitCount count: Int64) {
+		progress = Progress(totalUnitCount: count)
 		task = nil
 	}
 	
-	init(from task: URLSessionTask) {
+	public init(from task: URLSessionTask) {
 		progress = task.progress
-		onCancel = task.cancel
-		msg = .downloading
 		self.task = task
 	}
 	
-	func cancel() {
-		cancelled = true
-		onCancel()
+	public func cancel() {
+		task?.cancel()
+		progress.cancel()
 	}
 }
 
@@ -60,9 +54,9 @@ public protocol BackgroundTaskHandler {
 }
 
 public protocol ThumbnailDelegate {
-	func thumbnailDelegate(receivedFile url: URL, for item: ItemInfoDto)
+	func thumbnail(receivedFile url: URL, for item: ItemInfoDto)
 	
-	func thumbnailDelegate(removedItem: ItemInfoDto, from url: URL, completion: @escaping ()->())
+	func thumbnail(removedItem: ItemInfoDto, from url: URL, completion: @escaping ()->())
 }
 
 extension Encryptor {
@@ -77,7 +71,7 @@ extension Encryptor {
 		var chunck: Data = readHandle.readData(ofLength: SIZE)
 		
 		while chunck.count > 0 {
-			guard !(task?.cancelled ?? false) else {
+			 if task?.progress.isCancelled ?? false {
 				try! FileManager.default.removeItem(at: dest)
 				break
 			}
