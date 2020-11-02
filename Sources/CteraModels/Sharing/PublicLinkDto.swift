@@ -20,6 +20,10 @@ public struct PublicLinkDto: Codable {
 	public var expiration: Date?
 	public var creationDate: Date?
 	
+	init(href: String, isFolder: Bool) {
+		self.href = href
+		self.isFolder = isFolder
+	}
 	
 	private enum CodingKeys: String, CodingKey {
 		case href

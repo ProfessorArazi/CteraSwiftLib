@@ -13,17 +13,11 @@ import CteraUtil
 import CteraCache
 
 public enum HttpClient {
+	//MARK: Private Fields
 	private static let SERVICES_PORTAL_API = "ServicesPortal/api?format=jsonext"
 	private static let TAG = String(describing: HttpClient.self)
 	
 	private static var auth = Auth()
-	private static var hasConnection = true
-	
-	public static var credentials: CredentialsDto!
-	public static var serverAddress: String!
-//	public static var isPortalReadOnly = false
-	public static var onConnectionChanged: [(Bool)->()] = []
-	public static var thumbnailDelegate: ThumbnailDelegate?
 	
 	private static let session = URLSession(configuration: URLSessionConfiguration.default, delegate: Session(), delegateQueue: nil)
 	private static let backgroundSession: URLSession = {
@@ -41,6 +35,14 @@ public enum HttpClient {
 	}()
 	
 	//MARK: Public API
+	public private(set) static var hasConnection = true
+	
+	public static var credentials: CredentialsDto!
+	public static var serverAddress: String!
+//	public static var isPortalReadOnly = false
+	public static var onConnectionChanged: [(Bool)->()] = []
+	public static var thumbnailDelegate: ThumbnailDelegate?
+	
 	public static let SERVICE_WEBDAV = "/ServicesPortal/webdav"
 	
 	public static func set(hasConnection connection: Bool) {
