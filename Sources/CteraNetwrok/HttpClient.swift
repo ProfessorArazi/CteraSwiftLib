@@ -101,7 +101,7 @@ public enum HttpClient {
 		Console.log(tag: Self.TAG, msg: #function)
 		let cachePath = request.cachePath ?? request.path
 		
-		if request.withCache, let cache = FolderCache.load(folder: cachePath) {
+		if request.withCache, let cache = FolderCache[cachePath] {
 			Console.log(tag: TAG, msg: "loading from cache")
 			handler(.success(cache))
 		}
@@ -109,13 +109,13 @@ public enum HttpClient {
 		requestFolder(request, handler: { result in
 			async {
 				if case let .success(folder) = result {
-					if request.withCache && FolderCache.has(cachePath) && folder == FolderCache.load(folder: cachePath) {
+					if request.withCache, folder == FolderCache[cachePath] {
 						Console.log(tag: TAG, msg: "same list, not refreshing list")
 						return
 					}
 					
 					if request.startIndex == 0 {
-						FolderCache.save(cachePath, folder)
+						FolderCache[cachePath] = folder
 					}
 				}
 				

@@ -18,16 +18,19 @@ public enum FolderCache {
 		cache = FileSystem.load(json: .folderCache) ?? [:]
 	}
 	
-	public static func has(_ path: String) -> Bool { cache[path] != nil }
-	
-	public static func load(folder path: String) -> FolderDto? { cache[path] }
-	
-	public static func save(_ path: String, _ folder: FolderDto) {
-		cache[path] = folder
-		update()
-	}
-	
 	public static func clearCache() { cache = [:] }
+	
+	public static subscript(key: String) -> FolderDto? {
+		get { cache[key] }
+		set {
+			if let folder = newValue {
+				cache[key] = folder
+			} else {
+				cache.removeValue(forKey: key)
+			}
+			update()
+		}
+	}
 	
 	private static func update() {
 		let copy = cache //using copy to avoid manipulation while queue is budy
