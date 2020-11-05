@@ -4,8 +4,15 @@
 //
 //  Created by Gal Yedidovich on 22/10/2020.
 //
+//MARK: - General
+"on" = "On";
+"off" = "Off";
+"yes" = "Yes";
+"ok" = "OK";
+"error" = "Error";
+"trust" = "Trust";
 
-
+//MARK: - Sizes
 "zeroBytes" = "0 Bytes";
 "oneByte" = "1 Byte";
 "bytes" = "Bytes";
@@ -14,3 +21,16 @@
 "gb" = "GB";
 "tb" = "TB";
 "pb" = "PB";
+
+//MARK: - Pretty Time
+"lessThanMinuteAgo" = "Less than a minute ago";
+"oneMinuteAgo" = "One minute ago";
+"minutesAgo" = "%d minutes ago";
+"todayAt" = "Today at %@";
+"yesterdayAt" = "Yesterday at %@";
+
+//MARK: - Permissions
+"permissionPreviewOnly" = "Preview Only";
+"permissionReadOnly" = "Read Only";
+"permissionReadWrite" = "Read Write";
+"permissionDenied" = "No Access";
