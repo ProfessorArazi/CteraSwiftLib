@@ -11,65 +11,20 @@ import CteraModels
 
 enum StringFormatter {
 	
-	/// build an XML body for HTTP request to server (until happy time when server accepts JSON).
-	///
-	/// The XML is built from converting a JSON object, current implementation is recursive.
-	///
-	/// Iterating the values in the JSON:
-	/// in case value is JsonObject, convert it (recursively)
-	/// in case value is array, build array
-	/// otherwise use value as is String, Bool or Int
-	/// - Parameter json: a json object to format as XML
-	static func buildXml(from json: JsonObject) -> String{
-		var body = "<obj";
-		if let cls = json.string(key: "$class") { body.append(" class=\"\(cls)\"") }
-		body.append(">")
-		
-		for (key, value) in json {
-			if key == "$class" { continue }
-			
-			body.append("<att id=\"\(key)\">")
-			if let obj = value as? JsonObject { body.append(buildXml(from: obj)) }  //build inner object
-			else if let dict = value as? [String: Any] { body.append(buildXml(from: JsonObject(from: dict))) }  //build inner object
-			else if let arr = value as? [Any] { body.append(buildXml(from: arr)) }    //build array
-			else if let num = value as? NSNumber, CFNumberGetType(num as CFNumber) == .charType, let bool = value as? Bool {
-				body.append("<val>\(bool)</val>")
-			}
-			else { body.append("<val>\(value)</val>") }
-			body.append("</att>")
-		}
-		
-		body.append("</obj>")
-		return body
-	}
-	
-	/// build an XML list from array of objects.
-	///
-	/// - Parameter array: array of values to convert to JSON string
-	private static func buildXml(from array: [Any]) -> String {
-		var body = "<list>"
-		for value in array {
-			if let obj = value as? JsonObject { body.append(buildXml(from: obj)) }  //build inner object
-			else if let dict = value as? [String: Any] { body.append(buildXml(from: JsonObject(from: dict))) }  //build inner Json
-			else if let arr = value as? [Any] { body.append(buildXml(from: arr)) }  //build array
-			else { body.append("<val>\(value)</val>") }
-		}
-		
-		body.append("</list>")
-		return body
-	}
-	
 	static func attachMobileDevice(server: String, password pass: String?, activationCode code: String?, deviceID: String, deviceName: String) -> String {
-		return "<obj><att id=\"type\"><val>user-defined</val></att>" +
-			"<att id=\"name\"><val>attachMobileDevice</val></att>" +
-			"<att id=\"param\"><obj class=\"AttachedMobileDeviceParams\">" +
-			"<att id=\"deviceMac\"><val>\(deviceID)</val></att>" +
-			"<att id=\"deviceType\"><val>Mobile</val></att>" +
-			"<att id=\"serverName\"><val>\(server)</val></att>" +
-			"<att id=\"password\"><val>\(xmlEscape(pass ?? ""))</val></att>" +
-			"<att id=\"ssoActivationCode\"><val>\(xmlEscape(code ?? ""))</val></att>" +
-			"<att id=\"hostname\"><val>\(deviceName)</val></att>" +
-			"</obj></att></obj>"
+		JsonObject()
+			.put(key: "type", "user-defined")
+			.put(key: "name", "attachMobileDevice")
+			.put(key: "param", JsonObject()
+					.put(key: "$class", "AttachedMobileDeviceParams")
+					.put(key: "hostname", deviceName)
+					.put(key: "deviceMac", deviceID)
+					.put(key: "deviceType", "Mobile")
+					.put(key: "serverName", server)
+					.put(key: "password", pass?.escaped ?? "")
+					.put(key: "ssoActivationCode", code?.escaped ?? "")
+			)
+			.xmlString
 	}
 	
 	static func login(with credentials: CredentialsDto) -> String {
@@ -77,36 +32,38 @@ enum StringFormatter {
 	}
 	
 	static func updateMobileInfo(deviceID: String, deviceName: String) -> String {
-		"<obj>" +
-			"<att id = \"type\"><val>user-defined</val></att>" +
-			"<att id=\"name\"><val>updateMobileInfo</val></att>" +
-			"<att id=\"param\">" +
-			"<obj class=\"UpdateMobileInfoParams\">" +
-			"<att id=\"cteraMobileVersion\"><val>\(Bundle.main.infoDictionary!["CFBundleShortVersionString"] as! String)</val></att>" +
-			"<att id=\"hostname\"><val>\(deviceID)</val></att>" +
-			"<att id=\"platform\"><val>iOS</val></att>" +
-			"<att id=\"osName\"><val>\(ProcessInfo.processInfo.operatingSystemVersionString)</val></att>" +
-			"<att id=\"uniqueId\"><val>\(deviceName)</val></att>" +
-			"</obj></att></obj>"
+		JsonObject()
+			.put(key: "type", "user-defined")
+			.put(key: "name", "updateMobileInfo")
+			.put(key: "param", JsonObject()
+					.put(key: "$class", "UpdateMobileInfoParams")
+					.put(key: "cteraMobileVersion", Bundle.main.infoDictionary!["CFBundleShortVersionString"] as! String)
+					.put(key: "hostname", deviceName)
+					.put(key: "platform", "iOS") //TODO: Check with PM (Ron)
+					.put(key: "osName", ProcessInfo.processInfo.operatingSystemVersionString)
+					.put(key: "uniqueId", deviceID)
+			)
+			.xmlString
 	}
 	
 	static func getMulticommand() -> String {
-		"<obj><att id=\"type\"><val>db</val></att>" +
-			"<att id=\"name\"><val>get-multi</val></att>" +
-			"<att id=\"param\"><list>" +
-			"<val>/currentSession</val>" +
-			"<val>/currentTime</val>" +
-			"<val>/general</val>" +
-			"</list></att></obj>"
+		JsonObject()
+			.put(key: "type", "db")
+			.put(key: "name", "get-multi")
+			.put(key: "param", ["/currentSession", "/currentTime", "/general"])
+			.xmlString
 	}
 	
 	static func createNewFolder(folderPath: String, folderName: String) -> String {
-		"<obj><att id=\"type\"><val>user-defined</val></att>" +
-			"<att id=\"name\"><val>makeCollection</val></att>" +
-			"<att id=\"param\"><obj class=\"makeCollectionParam\">" +
-			"<att id=\"name\"><val>\(xmlEscape(folderName))</val></att>" +
-			"<att id=\"parentPath\"><val>\(xmlEscape(folderPath))</val></att>" +
-			"</obj></att></obj>"
+		JsonObject()
+			.put(key: "type", "user-defined")
+			.put(key: "name", "makeCollection")
+			.put(key: "param", JsonObject()
+					.put(key: "$class", "makeCollectionParam")
+					.put(key: "name", folderName.escaped)
+					.put(key: "parentPath", folderPath.escaped)
+			)
+			.xmlString
 	}
 	
 	static func multipartData(filePath: String) -> String{
@@ -155,7 +112,7 @@ enum StringFormatter {
 			}
 			
 			cursor = cursor.remove(key: "handler").remove(key: "applyAll")
-			body += "<att id=\"startFrom\">\(buildXml(from: cursor))</att>"
+			body += "<att id=\"startFrom\">\(cursor.xmlString)</att>"
 		} else if "restoreResources" == payload.action {
 			body += "<att id=\"startFrom\"></att>"
 		}
@@ -164,19 +121,20 @@ enum StringFormatter {
 	}
 	
 	static func getStatus(for task: String) -> String {
-		"<obj><att id=\"type\"><val>user-defined</val></att>" +
-			"<att id=\"name\"><val>getTaskStatus</val></att>" +
-			"<att id=\"param\"><val>\(task)</val>" +
-			"</att></obj>"
+		JsonObject()
+			.put(key: "type", "user-defined")
+			.put(key: "name", "getTaskStatus")
+			.put(key: "param", task)
+			.xmlString
 	}
 	
 	//MARK: - public links
-	
 	static func getPublicLinks(at itemPath: String) -> String {
-		"<obj><att id=\"type\"><val>user-defined</val></att>" +
-			"<att id=\"name\"><val>listPublicShares</val></att>" +
-			"<att id=\"param\">" +
-			"<val>\(itemPath)</val></att></obj>"
+		JsonObject()
+			.put(key: "type", "user-defined")
+			.put(key: "name", "listPublicShares")
+			.put(key: "param", itemPath)
+			.xmlString
 	}
 	
 	static func createPublicLink(from link: PublicLinkDto) -> String {
@@ -227,13 +185,13 @@ enum StringFormatter {
 		}
 		else { body += "<att id=\"expiration\"></att>" }
 		
-		body += "<att id=\"href\"><val>\(xmlEscape(link.href))</val></att>" +
+		body += "<att id=\"href\"><val>\(link.href.escaped)</val></att>" +
 			"<att id=\"id\"><val>\(link.id!)</val></att>" +
 			"<att id=\"invitee\"><obj class=\"Collaborator\"><att id=\"type\"><val>external</val></att></obj></att>" +
 			"<att id=\"isDirectory\"><val>\(link.isFolder)</val></att>" +
 			"<att id=\"key\"><val>\(link.key!)</val></att>" +
 			"<att id=\"protectionLevel\"><val>\(link.protectionLevel!)</val></att>" +
-			"<att id=\"publicLink\"><val>\(xmlEscape(link.link))</val></att>" +
+			"<att id=\"publicLink\"><val>\(link.link.escaped)</val></att>" +
 			"<att id=\"resourceName\"><val>\(link.resourceName!)</val></att>"
 		
 		if remove { body += "<att id=\"isRemove\"><val>true</val></att>" }
@@ -242,11 +200,12 @@ enum StringFormatter {
 	}
 	
 	//MARK: - Collaboration
-	
 	static func listShares(for path: String) -> String {
-		"<obj><att id=\"type\"><val>user-defined</val></att>" +
-			"<att id=\"name\"><val>listShares</val></att>" +
-			"<att id=\"param\"><val>\(path)</val></att></obj>"
+		JsonObject()
+			.put(key: "type", "user-defined")
+			.put(key: "name", "listShares")
+			.put(key: "param", path)
+			.xmlString
 	}
 	
 	static func saveCollaboration(at path: String, _ collaboration: CollaborationDTO) -> String {
@@ -263,35 +222,39 @@ enum StringFormatter {
 			collJson["shares"] = shares
 		}
 		
-		let json = JsonObject()
+		return JsonObject()
 			.put(key: "name", "shareResource")
 			.put(key: "type", "user-defined")
 			.put(key: "param", collJson
 					.put(key: "$class", "ShareResourceParam")
-					.put(key: "url", path))
-		
-		return buildXml(from: json)
+					.put(key: "url", path)
+			)
+			.xmlString
 	}
 	
 	static func verifyCollaborator(for item: ItemInfoDto, _ invitee: InviteeDto) -> String {
-		"<obj><att id=\"type\"><val>user-defined</val></att>" +
-			"<att id=\"name\"><val>preVerifySingleShare</val></att>" +
-			"<att id=\"param\">" +
-			"<obj class=\"PreVerifyShareParam\">" +
-			"<att id=\"url\"><val>\(item.path)</val></att>" +
-			"<att id=\"invitee\">\(buildXml(from: try! JsonObject(encodable: invitee)))</att>" +
-			"</obj></att></obj>"
+		JsonObject()
+			.put(key: "type", "user-defined")
+			.put(key: "name", "preVerifySingleShare")
+			.put(key: "param", JsonObject()
+					.put(key: "$class", "PreVerifyShareParam")
+					.put(key: "url", item.path)
+					.put(key: "invitee", invitee)
+			)
+			.xmlString
 	}
 	
 	static func searchCollaborators(_ query: String, _ type: String, _ uid: Int, _ count: Int) -> String {
-		"<obj><att id=\"type\"><val>user-defined</val></att>" +
-			"<att id=\"name\"><val>searchCollaborationMembers</val></att>" +
-			"<att id=\"param\"><obj>" +
-			"<att id=\"searchType\"><val>\(type)</val></att>" +
-			"<att id=\"searchTerm\"><val>\(query)</val></att>" +
-			"<att id=\"resourceUid\"><val>\(uid)</val></att>" +
-			"<att id=\"countLimit\"><val>\(count)</val></att>" +
-			"</obj></att></obj>"
+		JsonObject()
+			.put(key: "type", "user-defined")
+			.put(key: "name", "searchCollaborationMembers")
+			.put(key: "param", JsonObject()
+					.put(key: "searchType", type)
+					.put(key: "searchTerm", query)
+					.put(key: "resourceUid", uid)
+					.put(key: "countLimit", count)
+			)
+			.xmlString
 	}
 	
 	static func leaveShared(items: [ItemInfoDto]) -> String{
@@ -307,13 +270,15 @@ enum StringFormatter {
 	}
 	
 	static func fileVersions(for item: ItemInfoDto) -> String {
-		"<obj><att id=\"name\"><val>listVersions</val></att>" +
-			"<att id=\"param\"><val>\(item.path)</val></att></obj>"
+		JsonObject()
+			.put(key: "name", "listVersions")
+			.put(key: "param", item.path)
+			.xmlString
 	}
 	
 	static func lastModified(items: [ItemInfoDto]) -> String{
 		"<obj>" +
-			"<att id = \"type\"><val>user-defined</val></att>" +
+			"<att id=\"type\"><val>user-defined</val></att>" +
 			"<att id=\"name\"><val>getLastModifiedOfFiles</val></att>" +
 			"<att id=\"param\"><list>" +
 			items.reduce("") { result, item -> String in
@@ -324,12 +289,64 @@ enum StringFormatter {
 			} +
 			"</list></att></obj>"
 	}
-	
-	private static func xmlEscape(_ str: String) -> String {
-		str.replacingOccurrences(of: "&", with: "&amp;")
+}
+
+fileprivate extension String {
+	var escaped: String {
+		self.replacingOccurrences(of: "&", with: "&amp;")
 			.replacingOccurrences(of: "/\"", with: "&quot;")
 			.replacingOccurrences(of: "'", with: "&apos;")
 			.replacingOccurrences(of: "<", with: "&lt;")
 			.replacingOccurrences(of: ">", with: "&gt;")
 	}
+}
+
+internal extension JsonObject {
+	
+	/// build an XML body for HTTP request to server (until happy time when server accepts JSON).
+	///
+	/// The XML is built from converting this JSON object, current implementation is recursive.
+	///
+	/// Iterating the values in the JSON:
+	/// in case value is JsonObject, convert it (recursively)
+	/// in case value is array, build array
+	/// otherwise use value as is String, Bool or Int
+	var xmlString: String {
+		var body = "<obj";
+		if let cls = string(key: "$class") { body.append(" class=\"\(cls)\"") }
+		body.append(">")
+		
+		for (key, value) in self {
+			if key == "$class" { continue }
+			
+			body.append("<att id=\"\(key)\">")
+			if let obj = value as? JsonObject { body.append(obj.xmlString) }  //build inner object
+			else if let dict = value as? [String: Any] { body.append(JsonObject(from: dict).xmlString) }  //build inner object
+			else if let arr = value as? [Any] { body.append(buildXml(from: arr)) }    //build array
+			else if let num = value as? NSNumber, CFNumberGetType(num as CFNumber) == .charType, let bool = value as? Bool {
+				body.append("<val>\(bool)</val>")
+			}
+			else { body.append("<val>\(value)</val>") }
+			body.append("</att>")
+		}
+		
+		body.append("</obj>")
+		return body
+	}
+}
+
+/// build an XML list from array of objects.
+///
+/// - Parameter array: array of values to convert to JSON string
+fileprivate func buildXml(from array: [Any]) -> String {
+	var body = "<list>"
+	for value in array {
+		if let obj = value as? JsonObject { body.append(obj.xmlString) }  //build inner object
+		else if let dict = value as? [String: Any] { body.append(JsonObject(from: dict).xmlString) }  //build inner Json
+		else if let arr = value as? [Any] { body.append(buildXml(from: arr)) }  //build array
+		else { body.append("<val>\(value)</val>") }
+	}
+	
+	body.append("</list>")
+	return body
 }

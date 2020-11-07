@@ -494,7 +494,7 @@ public enum HttpClient {
 		let req = URLRequest(to: serverAddress, SERVICES_PORTAL_API)
 			.set(method: .POST)
 			.set(contentType: .xml)
-			.set(body: StringFormatter.buildXml(from: JsonObject(from: ["name": "getGlobalSystemStatus"])))
+			.set(body: JsonObject(from: ["name": "getGlobalSystemStatus"]).xmlString)
 		
 		handle(request: req, JsonObject.init(data:), handler: handler)
 	}
@@ -506,7 +506,7 @@ public enum HttpClient {
 		let req = URLRequest(to: serverAddress, SERVICES_PORTAL_API)
 			.set(method: .POST)
 			.set(contentType: .xml)
-			.set(body: StringFormatter.buildXml(from: fetchReq.toJson()))
+			.set(body: fetchReq.toJson().xmlString)
 		
 		handle(request: req, { try FolderDto.from(json: $0) }, handler: completion)
 	}
@@ -606,7 +606,7 @@ public enum HttpClient {
 		let req = URLRequest(to: serverAddress, SERVICES_PORTAL_API)
 			.set(method: .POST)
 			.set(contentType: .xml)
-			.set(body: StringFormatter.buildXml(from: request.toJson()))
+			.set(body: request.toJson().xmlString)
 		
 		handle(request: req, FolderDto.from(json:), handler: handler)
 	}
