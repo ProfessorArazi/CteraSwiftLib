@@ -66,7 +66,7 @@ enum StringFormatter {
 			.xmlString
 	}
 	
-	static func multipartData(filePath: String) -> String{
+	static func multipartData(filePath: String) -> String {
 		let line = "\r\n",
 			boundary = "------MobileBoundaryRRD29pvBCUWyLIg",
 			name = filePath.suffix(from: "/")!
@@ -81,20 +81,19 @@ enum StringFormatter {
 	}
 	
 	static func sourceDestCommand(with payload: SrcDestData) -> String {
-		var body = "<obj><att id=\"type\"><val>user-defined</val></att>" +
-			"<att id=\"name\"><val>\(payload.action)</val></att>" +
-			"<att id=\"param\"><obj class=\"ActionResourcesParam\"><att id=\"urls\"><list>"
-		
-		for (src, dest) in payload.pairs {
-			body += "<obj class=\"SrcDstParam\">" +
-				"<att id=\"src\"><val>\(src)</val></att>" +
-				"<att id=\"dest\"><val>\(dest)</val></att></obj>"
+		let urls = payload.pairs.map { pair in
+			JsonObject()
+				.put(key: "$class", "SrcDstParam")
+				.put(key: "src", pair.src)
+				.put(key: "dest", pair.dest)
 		}
-		
-		body += "</list></att>" +
-			"<att id=\"passphrase\"></att>" +
-			"<att id=\"userPassword\"></att>"
-		
+		var json = JsonObject()
+			.put(key: "type", "user-defined")
+			.put(key: "name", payload.action)
+			.put(key: "param", JsonObject()
+					.put(key: "$class", "ActionResourcesParam")
+					.put(key: "urls", urls)
+			)
 		
 		if let taskJson = payload.taskJson {
 			var cursor = taskJson.jsonObject(key: "cursor")!
@@ -106,18 +105,16 @@ enum StringFormatter {
 							JsonObject()
 								.put(key: "$class", "FileMoveConflictResolutaion")
 								.put(key: "errorType", taskJson.string(key: "errorType")!)
-								.put(key: "handler", handler)])
+								.put(key: "handler", handler)
+					])
 			} else {
 				cursor = cursor.put(key: "skipHandler", handler)
 			}
 			
 			cursor = cursor.remove(key: "handler").remove(key: "applyAll")
-			body += "<att id=\"startFrom\">\(cursor.xmlString)</att>"
-		} else if "restoreResources" == payload.action {
-			body += "<att id=\"startFrom\"></att>"
+			json = json.put(key: "startFrom", cursor)
 		}
-		
-		return body + "</obj></att></obj>"
+		return json.xmlString
 	}
 	
 	static func getStatus(for task: String) -> String {
@@ -138,65 +135,59 @@ enum StringFormatter {
 	}
 	
 	static func createPublicLink(from link: PublicLinkDto) -> String {
-		var body = "<obj>" +
-			"<att id=\"type\"><val>user-defined</val></att>" +
-			"<att id=\"name\">" +
-			"<val>createShare</val>" +
-			"</att>" +
-			"<att id=\"param\">" +
-			"<obj class=\"CreateShareParam\">" +
-			"<att id=\"url\">" +
-			"<val>\(link.href)!)</val>" +
-			"</att>" +
-			"<att id=\"share\">" +
-			"<obj class=\"ShareConfig\">" +
-			"<att id=\"accessMode\">" +
-			"<val>\(link.permission.rawValue)!)</val>" +
-			"</att>" +
-			"<att id=\"protectionLevel\">" +
-			"<val>publicLink</val>" +
-			"</att>"
+		var shareJson: JsonObject = JsonObject()
+			.put(key: "$class", "ShareConfig")
+			.put(key: "accessMode", link.permission.rawValue)
+			.put(key: "protectionLevel", "publicLink")
+			.put(key: "invitee", JsonObject()
+					.put(key: "$class", "Collaborator")
+					.put(key: "type", "external")
+			)
 		
 		if let experation = link.expiration {
-			body += "<att id=\"expiration\"><val>\(experation)</val></att>"
+			shareJson["expiration"] = experation
 		}
 		
-		return body + "<att id=\"invitee\">" +
-			"<obj class=\"Collaborator\">" +
-			"<att id=\"type\">" +
-			"<val>external</val>" +
-			"</att></obj>" +
-			"</att></obj></att>" +
-			"</obj></att></obj>"
+		return JsonObject()
+			.put(key: "type", "user-defined")
+			.put(key: "name", "createShare")
+			.put(key: "param", JsonObject()
+					.put(key: "$class", "CreateShareParam")
+					.put(key: "url", link.href)
+					.put(key: "share", shareJson)
+			)
+			.xmlString
 	}
 	
 	static func modifyPublicLink(from link: PublicLinkDto, remove: Bool) -> String {
-		let createDate = DateFormatter(format: "yyyy-MM-dd'T'HH:mm:ss").string(from: link.creationDate!)
-		var body = "<obj>" +
-			"<att id=\"type\"><val>user-defined</val> </att>" +
-			"<att id=\"name\"><val>\(remove ? "deleteShare" : "updateShare")</val></att>" +
-			"<att id=\"param\"><obj class=\"Share\">" +
-			"<att id=\"accessMode\"><val>\(link.permission.rawValue)</val></att>" +
-			"<att id=\"canEdit\"><val>false</val></att>" +
-			"<att id=\"createDate\"><val>\(createDate)</val></att>"
-		
+		let createDate = ItemInfoDto.standardFormat.string(from: link.creationDate!)
+		var shareJson: JsonObject = JsonObject()
+			.put(key: "$class", "Share")
+			.put(key: "accessMode", link.permission.rawValue)
+			.put(key: "canEdit", false)
+			.put(key: "createDate", createDate)
+			.put(key: "href", link.href.escaped)
+			.put(key: "id", link.id!)
+			.put(key: "isDirectory", link.isFolder)
+			.put(key: "key", link.key!)
+			.put(key: "protectionLevel", link.protectionLevel!)
+			.put(key: "publicLink", link.link!)
+			.put(key: "resourceName", link.resourceName!)
+			.put(key: "isRemove", remove)
+			.put(key: "invitee", JsonObject()
+					.put(key: "$class", "Collaborator")
+					.put(key: "type", "external")
+			)
+			
 		if let expiration = link.expiration {
-			body += "<att id=\"expiration\"><val>\(expiration)</val></att>"
+			shareJson["expiration"] = expiration
 		}
-		else { body += "<att id=\"expiration\"></att>" }
 		
-		body += "<att id=\"href\"><val>\(link.href.escaped)</val></att>" +
-			"<att id=\"id\"><val>\(link.id!)</val></att>" +
-			"<att id=\"invitee\"><obj class=\"Collaborator\"><att id=\"type\"><val>external</val></att></obj></att>" +
-			"<att id=\"isDirectory\"><val>\(link.isFolder)</val></att>" +
-			"<att id=\"key\"><val>\(link.key!)</val></att>" +
-			"<att id=\"protectionLevel\"><val>\(link.protectionLevel!)</val></att>" +
-			"<att id=\"publicLink\"><val>\(link.link.escaped)</val></att>" +
-			"<att id=\"resourceName\"><val>\(link.resourceName!)</val></att>"
-		
-		if remove { body += "<att id=\"isRemove\"><val>true</val></att>" }
-		
-		return body + "</obj></att></obj>"
+		return JsonObject()
+			.put(key: "type", "user-defined")
+			.put(key: "name", remove ? "deleteShare" : "updateShare")
+			.put(key: "param", shareJson)
+			.xmlString
 	}
 	
 	//MARK: - Collaboration
@@ -208,7 +199,7 @@ enum StringFormatter {
 			.xmlString
 	}
 	
-	static func saveCollaboration(at path: String, _ collaboration: CollaborationDTO) -> String {
+	static func saveCollaboration(at path: String, _ collaboration: CollaborationDto) -> String {
 		var collJson = try! JsonObject(encodable: collaboration)
 
 		if var shares = collJson.jsonArray(key: "shares") {
@@ -257,16 +248,12 @@ enum StringFormatter {
 			.xmlString
 	}
 	
-	static func leaveShared(items: [ItemInfoDto]) -> String{
-		var body = "<obj>" +
-			"<att id=\"type\"><val>user-defined</val></att>" +
-			"<att id=\"name\">" +
-			"<val>leaveShare</val></att>" +
-			"<att id=\"param\"><list>"
-		
-		for item in items { body += "<val>\(item.path)</val>" }
-		
-		return body + "</list></att></obj>"
+	static func leaveShared(items: [ItemInfoDto]) -> String {
+		JsonObject()
+			.put(key: "type", "user-defined")
+			.put(key: "name", "leaveShare")
+			.put(key: "param", items.map(\.path))
+			.xmlString
 	}
 	
 	static func fileVersions(for item: ItemInfoDto) -> String {
@@ -276,18 +263,17 @@ enum StringFormatter {
 			.xmlString
 	}
 	
-	static func lastModified(items: [ItemInfoDto]) -> String{
-		"<obj>" +
-			"<att id=\"type\"><val>user-defined</val></att>" +
-			"<att id=\"name\"><val>getLastModifiedOfFiles</val></att>" +
-			"<att id=\"param\"><list>" +
-			items.reduce("") { result, item -> String in
-				result +
-					"<obj class=\"getLastModifiedOfFilesParam\">" +
-					"<att id=\"folderUID\"><val>\(item.cloudFolderInfo!.uid)</val></att>" +
-					"<att id=\"path\"><val>\(item.path)</val></att></obj>"
-			} +
-			"</list></att></obj>"
+	static func lastModified(items: [ItemInfoDto]) -> String {
+		JsonObject()
+			.put(key: "type", "user-defined")
+			.put(key: "name", "getLastModifiedOfFiles")
+			.put(key: "param", items.map({ item in
+				JsonObject()
+					.put(key: "$class", "getLastModifiedOfFilesParam")
+					.put(key: "folderUID", item.cloudFolderInfo!.uid)
+					.put(key: "path", item.path)
+			}))
+			.xmlString
 	}
 }
 
@@ -320,10 +306,11 @@ internal extension JsonObject {
 			if key == "$class" { continue }
 			
 			body.append("<att id=\"\(key)\">")
-			if let obj = value as? JsonObject { body.append(obj.xmlString) }  //build inner object
-			else if let dict = value as? [String: Any] { body.append(JsonObject(from: dict).xmlString) }  //build inner object
-			else if let arr = value as? [Any] { body.append(buildXml(from: arr)) }    //build array
-			else if let num = value as? NSNumber, CFNumberGetType(num as CFNumber) == .charType, let bool = value as? Bool {
+			if let dict = value as? [String: Any] { body.append(JsonObject(from: dict).xmlString) }  //build inner object
+			else if let arr = value as? [Any] { body.append(buildXml(from: arr)) } //build array
+			else if let num = value as? NSNumber,
+					CFNumberGetType(num as CFNumber) == .charType,
+					let bool = value as? Bool {
 				body.append("<val>\(bool)</val>")
 			}
 			else { body.append("<val>\(value)</val>") }

@@ -5,7 +5,7 @@
 //  Created by Gal Yedidovich on 24/10/2020.
 //
 
-public struct CollaborationDTO: Codable {
+public struct CollaborationDto: Codable {
 	public var shares: [CollaboratorDto]
 	public var owner: InviteeDto
 

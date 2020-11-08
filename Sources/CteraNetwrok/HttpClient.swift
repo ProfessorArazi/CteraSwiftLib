@@ -541,17 +541,17 @@ public enum HttpClient {
 		handle(request: req, handler: handler)
 	}
 	
-	public static func requestCollaboration(for item: ItemInfoDto, handler: @escaping (Response<CollaborationDTO>) -> ()) {
+	public static func requestCollaboration(for item: ItemInfoDto, handler: @escaping (Response<CollaborationDto>) -> ()) {
 		Console.log(tag: Self.TAG, msg: #function)
 		let req = URLRequest(to: serverAddress, SERVICES_PORTAL_API)
 			.set(method: .POST)
 			.set(contentType: .xml)
 			.set(body: StringFormatter.listShares(for: item.path))
 		
-		handle(request: req, CollaborationDTO.from(json:), handler: handler)
+		handle(request: req, CollaborationDto.from(json:), handler: handler)
 	}
 	
-	public static func saveCollaboration(at path: String, _ collaboration: CollaborationDTO, handler: @escaping (Response<Data>) -> ()) {
+	public static func saveCollaboration(at path: String, _ collaboration: CollaborationDto, handler: @escaping (Response<Data>) -> ()) {
 		Console.log(tag: Self.TAG, msg: #function)
 		let req = URLRequest(to: serverAddress, SERVICES_PORTAL_API)
 			.set(method: .POST)
