@@ -322,7 +322,7 @@ public enum HttpClient {
 	
 	public static func requestLastModified(for items: [ItemInfoDto], userRef: String,
 										   handler: @escaping (Response<[JsonObject]>)->()) {
-		Console.log(tag: TAG, msg: "\(#function), items: \(items.map { $0.name })")
+		Console.log(tag: TAG, msg: "\(#function), items: \(items.map(\.name))")
 		let req = URLRequest(to: serverAddress, "ServicesPortal/api/\(userRef)?format=jsonext")
 			.set(method: .POST)
 			.set(contentType: .xml)

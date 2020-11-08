@@ -39,7 +39,7 @@ public enum Console {
 				
 				let oldLogs = logFiles()
 				if oldLogs.count >= ROLLING_COUNT {
-					for i in 0 ... oldLogs.count - ROLLING_COUNT {
+					for i in 0...oldLogs.count - ROLLING_COUNT {
 						try! fm.removeItem(at: oldLogs[i])
 					}
 				}
@@ -75,32 +75,5 @@ public enum Console {
 			logs = ""
 			currentLog = newLogUrl()
 		}
-	}
-}
-
-public extension Folder {
-	static let downloads =	Folder(name: "___")
-	static let uploads =	Folder(name: "____")
-	static let sharing =	Folder(name: "_____")
-	static let logs =		Folder(name: "__________")
-	static let thumbnails =	Folder(name: "__________--")
-	
-	static var all: [Folder] { [downloads, uploads, sharing, logs, thumbnails] }
-}
-
-public extension Filename {
-	//Prefs.standard filename is "_", defined in SwiftExtensions Package
-	static let avatar = 			Filename(name: "__")
-	static let fileCache = 			Filename(name: "______")
-	static let activity = 			Filename(name: "_______")
-	static let folderCache = 		Filename(name: "________")
-	static let offline = 			Filename(name: "_________")
-	static let fileProviderIds = 	Filename(name: "___________")
-	static let shortcuts = 			Filename(name: "____________")
-	static let thumbnailsJson = 	Filename(name: "___________-")
-	static let uploads = 			Filename(name: "-___________")
-	
-	static var all: [Filename] {
-		[prefs, avatar, fileCache, activity, folderCache, offline, fileProviderIds, shortcuts, thumbnailsJson, uploads]
 	}
 }

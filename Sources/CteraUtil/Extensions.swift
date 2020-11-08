@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import StorageExtensions
 
 public extension URLRequest {
 	init(to host: String, _ path: String) {
@@ -71,4 +72,15 @@ public extension String {
 		
 		return String(suffix(from: self.index(after: index)))
 	}
+}
+
+public extension Folder {
+	static let downloads =	Folder(name: "_______________-")
+	static let logs =		Folder(name: "______________--")
+}
+
+public extension Filename {
+	//Prefs.standard filename is "_", defined in SwiftExtensions Package
+	static let fileCache = 			Filename(name: "-_______________")
+	static let folderCache = 		Filename(name: "--______________")
 }
