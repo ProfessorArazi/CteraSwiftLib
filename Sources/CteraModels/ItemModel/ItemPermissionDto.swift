@@ -8,7 +8,7 @@
 public enum ItemPermissionDto: String, Codable {
 	case None, ReadWrite, ReadOnly, PreviewOnly
 	
-	var prettyString: String {
+	public var prettyString: String {
 		switch self {
 		case .PreviewOnly:	return .permissionPreviewOnly
 		case .ReadOnly:		return .permissionReadOnly
