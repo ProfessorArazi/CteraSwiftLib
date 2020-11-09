@@ -7,8 +7,8 @@
 
 import Foundation
 public struct InviteeDto: Codable {
-	public let uid: Int
 	public let type: CollaboratorType
+	public let uid: Int?
 	public let email: String?
 	public let firstName: String?
 	public let lastName: String?
@@ -16,7 +16,7 @@ public struct InviteeDto: Codable {
 	public let frequentlyUsed: Bool
 	public let userAvatarName: String?
 	
-	public init(uid: Int, type: CollaboratorType = .localUser, email: String? = nil,
+	public init(uid: Int?, type: CollaboratorType = .localUser, email: String? = nil,
 				firstName: String? = nil, lastName: String? = nil,
 				name: String? = nil, frequentlyUsed: Bool = false, userAvatarName: String? = nil) {
 		self.uid = uid
