@@ -19,7 +19,7 @@ public struct ShareDto: Codable {
 	public var createDate: Date
 	public var expiration: Date?
 	
-	public init(id: Int = 0, href: String = "", invitee: CollaboratorDto, createdBy: CollaboratorDto, accessMode: ItemPermissionDto = .None, protectionLevel: ProtectionLevelDto, collaborationPolicyData: CollaborationPolicyDto, isDirectory: Bool = false, canEdit: Bool = false, createDate: Date = Date(), expiration: Date? = nil) {
+	public init(id: Int = 0, href: String = "", invitee: CollaboratorDto, createdBy: CollaboratorDto, accessMode: ItemPermissionDto = .None, protectionLevel: ProtectionLevelDto = .publicLink, collaborationPolicyData: CollaborationPolicyDto, isDirectory: Bool = false, canEdit: Bool = false, createDate: Date = Date(), expiration: Date? = nil) {
 		self.id = id
 		self.href = href
 		self.invitee = invitee
