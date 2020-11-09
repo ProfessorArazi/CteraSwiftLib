@@ -6,10 +6,10 @@
 //
 
 public struct CollaborationSearchResultDto: Codable {
-	public let objects: [InviteeDto]
+	public let objects: [CollaboratorDto]
 	public let hasMore: Bool
 	
-	public init(objects: [InviteeDto], hasMore: Bool) {
+	public init(objects: [CollaboratorDto], hasMore: Bool) {
 		self.objects = objects
 		self.hasMore = hasMore
 	}

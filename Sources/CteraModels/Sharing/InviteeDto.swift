@@ -1,12 +1,12 @@
 //
-//  InviteeDto.swift
+//  CollaboratorDto.swift
 //  
 //
 //  Created by Gal Yedidovich on 24/10/2020.
 //
 
 import Foundation
-public struct InviteeDto: Codable {
+public struct CollaboratorDto: Codable {
 	public let type: CollaboratorType
 	public let uid: Int?
 	public let email: String?

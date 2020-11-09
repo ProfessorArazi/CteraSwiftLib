@@ -223,7 +223,7 @@ enum StringFormatter {
 			.xmlString
 	}
 	
-	static func verifyCollaborator(for item: ItemInfoDto, _ invitee: InviteeDto) -> String {
+	static func verifyCollaborator(for item: ItemInfoDto, _ invitee: CollaboratorDto) -> String {
 		JsonObject()
 			.put(key: "type", "user-defined")
 			.put(key: "name", "preVerifySingleShare")

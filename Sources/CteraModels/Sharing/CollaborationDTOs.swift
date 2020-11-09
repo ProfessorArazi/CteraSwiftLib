@@ -6,8 +6,8 @@
 //
 
 public struct CollaborationDto: Codable {
-	public var shares: [CollaboratorDto]
-	public var owner: InviteeDto
+	public var shares: [ShareDto]
+	public var owner: CollaboratorDto
 
 	public var allowReshare: Bool
 	public var teamProject: Bool
@@ -19,7 +19,7 @@ public struct CollaborationDto: Codable {
 	public let canModifyShouldSync: Bool
 	public let canModifySyncWinNtAcl: Bool
 	
-	public init(shares: [CollaboratorDto], owner: InviteeDto,
+	public init(shares: [ShareDto], owner: CollaboratorDto,
 				allowReshare: Bool = false, teamProject: Bool = false,
 				shouldSync: Bool = false, enableSyncWinNtExtendedAttributes: Bool = false,
 				canModifyTeamProject: Bool = false, showAllowReshare: Bool = false,

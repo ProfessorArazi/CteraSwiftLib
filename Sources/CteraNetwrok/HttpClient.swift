@@ -561,7 +561,7 @@ public enum HttpClient {
 		handle(request: req, handler: handler)
 	}
 	
-	public static func validateCollaborator(for item: ItemInfoDto, invitee: InviteeDto, handler: @escaping (Response<CollaborationPolicyDto>) -> ()) {
+	public static func validateCollaborator(for item: ItemInfoDto, invitee: CollaboratorDto, handler: @escaping (Response<CollaborationPolicyDto>) -> ()) {
 		Console.log(tag: Self.TAG, msg: #function)
 		let req = URLRequest(to: serverAddress, SERVICES_PORTAL_API)
 			.set(method: .POST)
