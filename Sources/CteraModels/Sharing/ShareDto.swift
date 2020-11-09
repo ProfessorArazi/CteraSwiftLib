@@ -16,10 +16,10 @@ public struct ShareDto: Codable {
 	public var collaborationPolicyData: CollaborationPolicyDto
 	public var isDirectory: Bool
 	public var canEdit: Bool
-	public var createDate: Date
+//	public var createDate: Date
 	public var expiration: Date?
 	
-	public init(id: Int = 0, href: String = "", invitee: CollaboratorDto, createdBy: CollaboratorDto, accessMode: ItemPermissionDto = .None, protectionLevel: ProtectionLevelDto = .publicLink, collaborationPolicyData: CollaborationPolicyDto, isDirectory: Bool = false, canEdit: Bool = false, createDate: Date = Date(), expiration: Date? = nil) {
+	public init(id: Int = 0, href: String = "", invitee: CollaboratorDto, createdBy: CollaboratorDto, accessMode: ItemPermissionDto = .None, protectionLevel: ProtectionLevelDto = .publicLink, collaborationPolicyData: CollaborationPolicyDto, isDirectory: Bool = false, canEdit: Bool = false,/* createDate: Date = Date(),*/ expiration: Date? = nil) {
 		self.id = id
 		self.href = href
 		self.invitee = invitee
@@ -29,7 +29,7 @@ public struct ShareDto: Codable {
 		self.collaborationPolicyData = collaborationPolicyData
 		self.isDirectory = isDirectory
 		self.canEdit = canEdit
-		self.createDate = createDate
+//		self.createDate = createDate
 		self.expiration = expiration
 	}
 }
