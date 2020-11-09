@@ -13,6 +13,17 @@ public struct CollaboratorDto: Codable {
 	public var isDirectory: Bool
 	public var protectionLevel: ProtectionLevelDto
 	public var expiration: Date?
+	
+	public init(invitee: InviteeDto, accessMode: ItemPermissionDto = .None,
+				collaborationPolicyData: CollaborationPolicyDto, isDirectory: Bool = false,
+				protectionLevel: ProtectionLevelDto = .publicLink, expiration: Date? = nil) {
+		self.invitee = invitee
+		self.accessMode = accessMode
+		self.collaborationPolicyData = collaborationPolicyData
+		self.isDirectory = isDirectory
+		self.protectionLevel = protectionLevel
+		self.expiration = expiration
+	}
 }
 
 public enum CollaboratorType: String, Codable {

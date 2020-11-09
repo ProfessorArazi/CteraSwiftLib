@@ -15,4 +15,17 @@ public struct InviteeDto: Codable {
 	public let name: String?
 	public let frequentlyUsed: Bool
 	public let userAvatarName: String?
+	
+	public init(uid: String, type: CollaboratorType = .localUser, email: String? = nil,
+				firstName: String? = nil, lastName: String? = nil,
+				name: String? = nil, frequentlyUsed: Bool = false, userAvatarName: String? = nil) {
+		self.uid = uid
+		self.type = type
+		self.email = email
+		self.firstName = firstName
+		self.lastName = lastName
+		self.name = name
+		self.frequentlyUsed = frequentlyUsed
+		self.userAvatarName = userAvatarName
+	}
 }
