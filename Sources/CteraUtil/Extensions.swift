@@ -16,6 +16,12 @@ public extension URLRequest {
 	}
 }
 
+public extension DateFormatter {
+	static let standardFormat = DateFormatter(format: "yyyy-MM-dd'T'HH:mm:ss")
+	static let hourFormat = DateFormatter(format: "HH:mm")
+	static let dayFormat = DateFormatter(format: "d MMM HH:mm")
+}
+
 public extension Int64 {
 	/// calculates and returns a string representation of this value in byte units.
 	var sizeFormat: String {

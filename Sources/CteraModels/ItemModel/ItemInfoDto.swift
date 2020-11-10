@@ -64,7 +64,7 @@ public struct ItemInfoDto: Codable, Equatable {
 		
 		//all for this
 		if let lastModified = try values.decodeIfPresent(String.self, forKey: .lastModified) {
-			self.lastModified = Self.standardFormat.date(from: lastModified)
+			self.lastModified = DateFormatter.standardFormat.date(from: lastModified)
 		}
 	}
 	
@@ -88,7 +88,7 @@ public struct ItemInfoDto: Codable, Equatable {
 		try container.encode(lastActionBy, forKey: .lastActionBy)
 		
 		if let lastModified = lastModified {
-			let str = Self.standardFormat.string(from: lastModified)
+			let str = DateFormatter.standardFormat.string(from: lastModified)
 			try container.encode(str, forKey: .lastModified)
 		}
 	}
@@ -99,10 +99,6 @@ public struct ItemInfoDto: Codable, Equatable {
 }
 
 public extension ItemInfoDto {
-	static let standardFormat = DateFormatter(format: "yyyy-MM-dd'T'HH:mm:ss")
-	static let hourFormat = DateFormatter(format: "HH:mm")
-	static let dayFormat = DateFormatter(format: "d MMM HH:mm")
-	
 	static func format(lastModified: Date, timeDiff diff: Int) -> String {
 		var date = lastModified
 		let timezone = TimeZone.current.secondsFromGMT()
@@ -116,11 +112,11 @@ public extension ItemInfoDto {
 				if seconds < 60 { return .lessThanMinuteAgo }
 				else if seconds < 120 { return .oneMinuteAgo }
 				else { return .localizedStringWithFormat(.minutesAgo, Int(seconds / 60)) }
-			} else { return .localizedStringWithFormat(.todayAt, hourFormat.string(from: date)) }
+			} else { return .localizedStringWithFormat(.todayAt, DateFormatter.hourFormat.string(from: date)) }
 		} else if Calendar.current.isDateInYesterday(date) {
-			return .localizedStringWithFormat(.yesterdayAt, hourFormat.string(from: date))
+			return .localizedStringWithFormat(.yesterdayAt, DateFormatter.hourFormat.string(from: date))
 		} else {
-			return dayFormat.string(from: date)
+			return DateFormatter.dayFormat.string(from: date)
 		}
 	}
 }

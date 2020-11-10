@@ -160,7 +160,7 @@ enum StringFormatter {
 	}
 	
 	static func modifyPublicLink(from link: PublicLinkDto, remove: Bool) -> String {
-		let createDate = ItemInfoDto.standardFormat.string(from: link.creationDate!)
+		let createDate = DateFormatter.standardFormat.string(from: link.creationDate!)
 		var shareJson: JsonObject = JsonObject()
 			.put(key: "$class", "Share")
 			.put(key: "accessMode", link.permission.rawValue)
