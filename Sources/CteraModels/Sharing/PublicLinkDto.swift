@@ -18,9 +18,9 @@ public struct PublicLinkDto: Codable {
 	public var permission: ItemPermissionDto!
 	
 	public var expiration: Date?
-	public var creationDate: Date?
+	public var creationDate: String! //different format 'yyyy-dd-MM'
 	
-	init(href: String, isFolder: Bool) {
+	public init(href: String, isFolder: Bool) {
 		self.href = href
 		self.isFolder = isFolder
 	}
@@ -62,10 +62,10 @@ public struct PublicLinkDto: Codable {
 	private enum CodingKeys: String, CodingKey {
 		case href
 		case id
+		
 		case key
 		case protectionLevel
 		case resourceName
-		
 		case link = "publicLink"
 		case isFolder = "isDirectory"
 		
