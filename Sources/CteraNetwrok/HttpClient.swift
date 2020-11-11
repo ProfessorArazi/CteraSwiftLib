@@ -57,7 +57,7 @@ public enum HttpClient {
 		Console.log(tag: Self.TAG, msg: #function)
 		serverAddress = address
 		let req = URLRequest(url: URL(string: "https://\(address)/ServicesPortal/public/publicInfo?format=jsonext")!)
-		handle(request: req, PublicInfoDto.from(json:), handler: handler)
+		handle(request: req, PublicInfoDto.fromFormatted(json:), handler: handler)
 	}
 	
 	public static func login(_ user: String? = nil, _ pass: String? = nil, activationCode code: String? = nil, deviceID: String, deviceName: String, handler: @escaping (Response<CredentialsDto>) -> ()) {
@@ -67,7 +67,7 @@ public enum HttpClient {
 			.set(contentType: .xml)
 			.set(body: StringFormatter.attachMobileDevice(server: serverAddress, password: pass, activationCode: code, deviceID: deviceID, deviceName: deviceName))
 		
-		handle(request: req, CredentialsDto.from(json:)) { (response: Response<CredentialsDto>) in
+		handle(request: req, CredentialsDto.fromFormatted(json:)) { (response: Response<CredentialsDto>) in
 			if case let .success(credentials) = response {
 				Prefs.standard.edit()
 					.put(key: .credentials, credentials)
@@ -238,7 +238,7 @@ public enum HttpClient {
 		let req = URLRequest(to: serverAddress, "ServicesPortal/pcc/Document/q/Attributes?DocumentID=u\(viewingSession)&DesiredPageCountConfidence=50")
 		
 		let middleware = { (d: Data) -> Int in
-			let json: [String: Int] = try .from(json: d)
+			let json: [String: Int] = try .fromFormatted(json: d)
 			return json["pageCount"]!
 		}
 		
@@ -472,14 +472,14 @@ public enum HttpClient {
 			.set(contentType: .xml)
 			.set(body: StringFormatter.getMulticommand())
 		
-		handle(request: req, SessionInfoDto.from(json:), handler: handler)
+		handle(request: req, SessionInfoDto.fromFormatted(json:), handler: handler)
 	}
 	
 	public static func requestUserSettings(userRef: String, handler: @escaping (Response<UserSettingsDto>) -> ()) {
 		Console.log(tag: Self.TAG, msg: #function)
 		let req = URLRequest(to: serverAddress, "ServicesPortal/api/\(userRef)?format=jsonext")
 		
-		handle(request: req, UserSettingsDto.from(json:), handler: handler)
+		handle(request: req, UserSettingsDto.fromFormatted(json:), handler: handler)
 	}
 	
 	public static func requestAvatar(avatarName: String, handler: @escaping (Response<Data?>) -> ()) {
@@ -508,7 +508,7 @@ public enum HttpClient {
 			.set(contentType: .xml)
 			.set(body: fetchReq.toJson().xmlString)
 		
-		handle(request: req, { try FolderDto.from(json: $0) }, handler: completion)
+		handle(request: req, { try FolderDto.fromFormatted(json: $0) }, handler: completion)
 	}
 	
 	public static func requestPublicLinks(for item: ItemInfoDto, handler: @escaping (Response<[PublicLinkDto]>) -> ()) {
@@ -518,7 +518,7 @@ public enum HttpClient {
 			.set(contentType: .xml)
 			.set(body: StringFormatter.getPublicLinks(at: item.path))
 		
-		handle(request: req, { try [PublicLinkDto].from(json: $0) }, handler: handler)
+		handle(request: req, { try [PublicLinkDto].fromFormatted(json: $0) }, handler: handler)
 	}
 	
 	public static func createPublicLink(with link: PublicLinkDto, handler: @escaping (Response<PublicLinkDto>) -> ()) {
@@ -528,7 +528,7 @@ public enum HttpClient {
 			.set(contentType: .xml)
 			.set(body: StringFormatter.createPublicLink(from: link))
 		
-		handle(request: req, { try PublicLinkDto.from(json: $0) }, handler: handler)
+		handle(request: req, { try PublicLinkDto.fromFormatted(json: $0) }, handler: handler)
 	}
 	
 	public static func modifyPublicLink(with link: PublicLinkDto, remove: Bool, handler: @escaping (Response<Data>) -> ()) {
@@ -548,7 +548,7 @@ public enum HttpClient {
 			.set(contentType: .xml)
 			.set(body: StringFormatter.listShares(for: item.path))
 		
-		handle(request: req, CollaborationDto.from(json:), handler: handler)
+		handle(request: req, CollaborationDto.fromFormatted(json:), handler: handler)
 	}
 	
 	public static func saveCollaboration(at path: String, _ collaboration: CollaborationDto, handler: @escaping (Response<Data>) -> ()) {
@@ -568,7 +568,7 @@ public enum HttpClient {
 			.set(contentType: .xml)
 			.set(body: StringFormatter.verifyCollaborator(for: item, invitee))
 		
-		handle(request: req, CollaborationPolicyDto.from(json:), handler: handler)
+		handle(request: req, CollaborationPolicyDto.fromFormatted(json:), handler: handler)
 	}
 	
 	public static func searchCollaborators(query: String, type: String, uid: Int, count: Int = 25, handler: @escaping (Response<CollaborationSearchResultDto>) -> ()) {
@@ -578,7 +578,7 @@ public enum HttpClient {
 			.set(contentType: .xml)
 			.set(body: StringFormatter.searchCollaborators(query, type, uid, count))
 		
-		handle(request: req, CollaborationSearchResultDto.from(json:), handler: handler)
+		handle(request: req, CollaborationSearchResultDto.fromFormatted(json:), handler: handler)
 	}
 	
 	public static func leaveShared(items: [ItemInfoDto], handler: @escaping (Response<Data>) -> ()) {
@@ -598,7 +598,7 @@ public enum HttpClient {
 			.set(contentType: .xml)
 			.set(body: StringFormatter.fileVersions(for: item))
 		
-		handle(request: req, { try [VersionDto].from(json: $0) }, handler: handler)
+		handle(request: req, { try [VersionDto].fromFormatted(json: $0) }, handler: handler)
 	}
 	
 	// MARK: - Private methods
@@ -608,7 +608,7 @@ public enum HttpClient {
 			.set(contentType: .xml)
 			.set(body: request.toJson().xmlString)
 		
-		handle(request: req, FolderDto.from(json:), handler: handler)
+		handle(request: req, FolderDto.fromFormatted(json:), handler: handler)
 	}
 	
 	private static func srcDestRequest(data payload: SrcDestData, handler: @escaping (Response<(String, SrcDestData)>) ->()) {

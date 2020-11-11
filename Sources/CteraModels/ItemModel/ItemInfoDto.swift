@@ -43,55 +43,49 @@ public struct ItemInfoDto: Codable, Equatable {
 	
 	public init() { }
 	
-	public init(from decoder: Decoder) throws {
-		let values = try decoder.container(keyedBy: CodingKeys.self)
-		
-		self.name = try values.decode(String.self, forKey: .name)
-		self.path = try values.decode(String.self, forKey: .path)
-		self.ext = try values.decodeIfPresent(String.self, forKey: .ext)
-		self.scope = try values.decode(String.self, forKey: .scope)
-		
-		self.isShared = try values.decode(Bool.self, forKey: .isShared)
-		self.hasLinks = try values.decode(Bool.self, forKey: .hasLinks)
-		self.isFolder = try values.decode(Bool.self, forKey: .isFolder)
-		self.isDeleted = try values.decode(Bool.self, forKey: .isDeleted)
-		
-		self.size = try values.decodeIfPresent(Int64.self, forKey: .size)
-		self.actions = try values.decodeIfPresent(AllowedActionsDto.self, forKey: .actions)
-		self.itemPermission = try values.decodeIfPresent(ItemPermissionDto.self, forKey: .itemPermission)
-		self.cloudFolderInfo = try values.decodeIfPresent(CloudFolderInfoDto.self, forKey: .cloudFolderInfo)
-		self.lastActionBy = try values.decodeIfPresent(LastActionDto.self, forKey: .lastActionBy)
-		
-		//all for this
-		if let lastModified = try values.decodeIfPresent(String.self, forKey: .lastModified) {
-			self.lastModified = DateFormatter.standardFormat.date(from: lastModified)
-		}
-	}
+//	public init(from decoder: Decoder) throws {
+//		let values = try decoder.container(keyedBy: CodingKeys.self)
+//
+//		self.name = try values.decode(String.self, forKey: .name)
+//		self.path = try values.decode(String.self, forKey: .path)
+//		self.ext = try values.decodeIfPresent(String.self, forKey: .ext)
+//		self.scope = try values.decode(String.self, forKey: .scope)
+//
+//		self.isShared = try values.decode(Bool.self, forKey: .isShared)
+//		self.hasLinks = try values.decode(Bool.self, forKey: .hasLinks)
+//		self.isFolder = try values.decode(Bool.self, forKey: .isFolder)
+//		self.isDeleted = try values.decode(Bool.self, forKey: .isDeleted)
+//
+//		self.size = try values.decodeIfPresent(Int64.self, forKey: .size)
+//		self.actions = try values.decodeIfPresent(AllowedActionsDto.self, forKey: .actions)
+//		self.itemPermission = try values.decodeIfPresent(ItemPermissionDto.self, forKey: .itemPermission)
+//		self.cloudFolderInfo = try values.decodeIfPresent(CloudFolderInfoDto.self, forKey: .cloudFolderInfo)
+//		self.lastActionBy = try values.decodeIfPresent(LastActionDto.self, forKey: .lastActionBy)
+//
+//		lastModified = try values.decodeDateIfPresent(forKey: .lastModified)
+//	}
 	
-	public func encode(to encoder: Encoder) throws {
-		var container = encoder.container(keyedBy: CodingKeys.self)
-		
-		try container.encode(name, forKey: .name)
-		try container.encode(path, forKey: .path)
-		try container.encode(ext, forKey: .ext)
-		try container.encode(scope, forKey: .scope)
-		
-		try container.encode(isShared, forKey: .isShared)
-		try container.encode(hasLinks, forKey: .hasLinks)
-		try container.encode(isFolder, forKey: .isFolder)
-		try container.encode(isDeleted, forKey: .isDeleted)
-		
-		try container.encode(size, forKey: .size)
-		try container.encode(actions, forKey: .actions)
-		try container.encode(itemPermission, forKey: .itemPermission)
-		try container.encode(cloudFolderInfo, forKey: .cloudFolderInfo)
-		try container.encode(lastActionBy, forKey: .lastActionBy)
-		
-		if let lastModified = lastModified {
-			let str = DateFormatter.standardFormat.string(from: lastModified)
-			try container.encode(str, forKey: .lastModified)
-		}
-	}
+//	public func encode(to encoder: Encoder) throws {
+//		var container = encoder.container(keyedBy: CodingKeys.self)
+//
+//		try container.encode(name, forKey: .name)
+//		try container.encode(path, forKey: .path)
+//		try container.encodeIfPresent(ext, forKey: .ext)
+//		try container.encode(scope, forKey: .scope)
+//
+//		try container.encode(isShared, forKey: .isShared)
+//		try container.encode(hasLinks, forKey: .hasLinks)
+//		try container.encode(isFolder, forKey: .isFolder)
+//		try container.encode(isDeleted, forKey: .isDeleted)
+//
+//		try container.encodeIfPresent(size, forKey: .size)
+//		try container.encodeIfPresent(actions, forKey: .actions)
+//		try container.encodeIfPresent(itemPermission, forKey: .itemPermission)
+//		try container.encodeIfPresent(cloudFolderInfo, forKey: .cloudFolderInfo)
+//		try container.encodeIfPresent(lastActionBy, forKey: .lastActionBy)
+//
+//		try container.encodeIfPresent(date: lastModified, forKey: .lastModified)
+//	}
 	
 	public var parentPath: String {
 		String(path.prefix(upTo: path.lastIndex(of: "/")!))

@@ -68,7 +68,7 @@ public enum FileCache {
 	
 	private static func updateJson() {
 		queue.async {
-			try! FileSystem.write(data: cache.json(), to: .fileCache)
+			try! FileSystem.write(data: cache.json(format: .standardFormat), to: .fileCache)
 		}
 	}
 }

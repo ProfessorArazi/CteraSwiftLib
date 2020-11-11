@@ -90,3 +90,19 @@ public extension Filename {
 	static let fileCache = 			Filename(name: "-_______________")
 	static let folderCache = 		Filename(name: "--______________")
 }
+
+public extension Encodable {
+	func json(format: DateFormatter) -> Data {
+		let encoder = JSONEncoder()
+		encoder.dateEncodingStrategy = .formatted(format)
+		return try! encoder.encode(self)
+	}
+}
+
+public extension Decodable {
+	static func fromFormatted<T: Decodable>(json: Data) throws -> T {
+		let decoder = JSONDecoder()
+		decoder.dateDecodingStrategy = .formatted(.standardFormat)
+		return try decoder.decode(T.self, from: json)
+	}
+}

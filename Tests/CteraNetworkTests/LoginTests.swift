@@ -21,7 +21,7 @@ final class CteraNetworkTests: XCTestCase {
 """
 		let data = Data(str.utf8)
 		HttpClient.serverAddress = "team65.ctera.me"
-		HttpClient.credentials = try! .from(json: data)
+		HttpClient.credentials = try! .fromFormatted(json: data)
 	}
 	
 	func testRenewSessionConcurrent() throws {
