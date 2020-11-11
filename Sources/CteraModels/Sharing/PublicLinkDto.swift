@@ -10,7 +10,7 @@ public struct PublicLinkDto: Codable {
 	public var href: String
 	public var isFolder: Bool
 	
-	public var id: String!
+	public var id: Int!
 	public var key: String!
 	public var protectionLevel: String!
 	public var link: String!
