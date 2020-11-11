@@ -508,7 +508,7 @@ public enum HttpClient {
 			.set(contentType: .xml)
 			.set(body: fetchReq.toJson().xmlString)
 		
-		handle(request: req, { try FolderDto.fromFormatted(json: $0) }, handler: completion)
+		handle(request: req, FolderDto.fromFormatted(json: ), handler: completion)
 	}
 	
 	public static func requestPublicLinks(for item: ItemInfoDto, handler: @escaping (Response<[PublicLinkDto]>) -> ()) {
@@ -518,7 +518,7 @@ public enum HttpClient {
 			.set(contentType: .xml)
 			.set(body: StringFormatter.getPublicLinks(at: item.path))
 		
-		handle(request: req, { try [PublicLinkDto].fromFormatted(json: $0) }, handler: handler)
+		handle(request: req, { try [PublicLinkDto].fromFormatted(json: $0, dateStrategy: PublicLinkDto.dateStrategy) }, handler: handler)
 	}
 	
 	public static func createPublicLink(with link: PublicLinkDto, handler: @escaping (Response<PublicLinkDto>) -> ()) {
@@ -528,7 +528,7 @@ public enum HttpClient {
 			.set(contentType: .xml)
 			.set(body: StringFormatter.createPublicLink(from: link))
 		
-		handle(request: req, { try PublicLinkDto.fromFormatted(json: $0) }, handler: handler)
+		handle(request: req, { try PublicLinkDto.fromFormatted(json: $0, dateStrategy: PublicLinkDto.dateStrategy) }, handler: handler)
 	}
 	
 	public static func modifyPublicLink(with link: PublicLinkDto, remove: Bool, handler: @escaping (Response<Data>) -> ()) {
@@ -598,7 +598,7 @@ public enum HttpClient {
 			.set(contentType: .xml)
 			.set(body: StringFormatter.fileVersions(for: item))
 		
-		handle(request: req, { try [VersionDto].fromFormatted(json: $0) }, handler: handler)
+		handle(request: req, [VersionDto].fromFormatted(json:), handler: handler)
 	}
 	
 	// MARK: - Private methods

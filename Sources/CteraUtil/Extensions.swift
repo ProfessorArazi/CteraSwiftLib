@@ -20,6 +20,7 @@ public extension DateFormatter {
 	static let standardFormat = DateFormatter(format: "yyyy-MM-dd'T'HH:mm:ss")
 	static let hourFormat = DateFormatter(format: "HH:mm")
 	static let dayFormat = DateFormatter(format: "d MMM HH:mm")
+	static let dateOnlyFormat = DateFormatter(format: "yyyy-MM-dd")
 }
 
 public extension Int64 {
@@ -100,9 +101,13 @@ public extension Encodable {
 }
 
 public extension Decodable {
-	static func fromFormatted<T: Decodable>(json: Data) throws -> T {
+	static func fromFormatted<T: Decodable>(json: Data, dateStrategy: JSONDecoder.DateDecodingStrategy = .formatted(.standardFormat)) throws -> T {
 		let decoder = JSONDecoder()
-		decoder.dateDecodingStrategy = .formatted(.standardFormat)
+		decoder.dateDecodingStrategy = dateStrategy
 		return try decoder.decode(T.self, from: json)
+	}
+	
+	static func fromFormatted<T: Decodable>(json: Data) throws -> T {
+		try fromFormatted(json: json, dateStrategy: .formatted(.standardFormat))
 	}
 }
