@@ -44,11 +44,11 @@ public enum Response<T> {
 public protocol BackgroundTaskHandler {
 	func onTaskStart()
 	
-	func onTaskConflict(json: JsonObject)
+	func onTaskConflict(task: BgTaskDto)
 	
-	func onTaskError()
+	func onTaskError(error: Error)
 	
-	func onTaskProgress(_ percentage: Int)
+	func onTaskProgress(task: BgTaskDto)
 	
 	func onTaskDone()
 }
