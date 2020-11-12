@@ -42,15 +42,15 @@ public enum Response<T> {
 }
 
 public protocol BackgroundTaskHandler {
-	func onTaskStart()
+	mutating func onTaskStart()
 	
-	func onTaskConflict(json: JsonObject)
+	mutating func onTaskConflict(json: JsonObject)
 	
-	func onTaskError()
+	mutating func onTaskError()
 	
-	func onTaskProgress(_ percentage: Int)
+	mutating func onTaskProgress(_ percentage: Int)
 	
-	func onTaskDone()
+	mutating func onTaskDone()
 }
 
 public protocol ThumbnailDelegate {
