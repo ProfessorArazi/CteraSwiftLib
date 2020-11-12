@@ -9,7 +9,6 @@ import Foundation
 import StorageExtensions
 import CteraModels
 
-
 public enum FolderCache {
 	private static let queue = DispatchQueue(label: "Folder Cache", qos: .background)
 	private static var cache: [String: FolderDto] = [:]

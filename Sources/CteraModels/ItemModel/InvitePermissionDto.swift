@@ -8,4 +8,9 @@
 public struct InvitePermissionDto: Codable, Equatable {
 	public var allowedAccess: String
 	public var invitationSettings: InvitationSettingsDto
+	
+	public init(allowedAccess: String, invitationSettings: InvitationSettingsDto) {
+		self.allowedAccess = allowedAccess
+		self.invitationSettings = invitationSettings
+	}
 }

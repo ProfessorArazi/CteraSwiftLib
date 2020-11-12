@@ -9,4 +9,9 @@ import Foundation
 public struct PreviewStatusDto: Codable, Equatable {
 	public var preview: Bool
 	public var failure: String
+	
+	public init(preview: Bool, failure: String) {
+		self.preview = preview
+		self.failure = failure
+	}
 }

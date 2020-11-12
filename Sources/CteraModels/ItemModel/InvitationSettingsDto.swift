@@ -14,6 +14,8 @@ public struct InvitationSettingsDto: Codable, Equatable {
 	public var defaultProtectionLevel: ProtectionLevelDto?
 	public var protectionLevels: [ProtectionLevelDto]?
 	
+	public init() {}
+	
 	public enum CodingKeys: String, CodingKey {
 		case allowCollaboratorsToReshareContent
 		case invitationMaxValidityDuration
