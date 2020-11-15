@@ -7,13 +7,25 @@
 
 import Foundation
 public struct VersionDto: Codable, Equatable {
-	let timestamp: String
-	let fullUrl: String
-	let modifier: String
-	let restorable: Bool
-	let deleted: Bool
-	let size: Int64
-	let relativeTime: String
+	public let timestamp: String
+	public let fullUrl: String
+	public let modifier: String
+	public let restorable: Bool
+	public let deleted: Bool
+	public let size: Int64
+	public let relativeTime: String
+	
+	public init(timestamp: String = "", fullUrl: String = "", modifier: String = "",
+				restorable: Bool = false, deleted: Bool = false,
+				size: Int64 = 0, relativeTime: String = "") {
+		self.timestamp = timestamp
+		self.fullUrl = fullUrl
+		self.modifier = modifier
+		self.restorable = restorable
+		self.deleted = deleted
+		self.size = size
+		self.relativeTime = relativeTime
+	}
 	
 	private enum CodingKeys: String, CodingKey {
 		case timestamp
