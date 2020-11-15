@@ -43,6 +43,11 @@ public struct ItemInfoDto: Codable, Equatable, Hashable {
 	
 	public init() { }
 	
+	public init(path: String) {
+		self.path = path
+		self.name = path.suffix(from: "/")!
+	}
+	
 	public var parentPath: String {
 		String(path.prefix(upTo: path.lastIndex(of: "/")!))
 	}
