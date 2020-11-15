@@ -25,10 +25,18 @@ public struct UserSettingsDto: Codable {
 	
 	public struct SLA: Codable {
 		public var calculatedQuota: Int64?
+		
+		public init(calculatedQuota: Int64? = nil) {
+			self.calculatedQuota = calculatedQuota
+		}
 	}
 	
 	public struct UserStats: Codable {
 		public var foldersSize: Int64
+		
+		public init(foldersSize: Int64) {
+			self.foldersSize = foldersSize
+		}
 	}
 	
 	public var abbreviation: String {
