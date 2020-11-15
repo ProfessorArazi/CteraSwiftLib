@@ -43,9 +43,11 @@ public struct ItemInfoDto: Codable, Equatable, Hashable {
 	
 	public init() { }
 	
-	public init(path: String) {
+	public init(path: String, isFolder: Bool = false) {
 		self.path = path
-		self.name = path.suffix(from: "/")!
+		self.name = path.suffix(from: "/")!.removingPercentEncoding!
+		self.ext = path.suffix(from: ".")
+		self.isFolder = isFolder
 	}
 	
 	public var parentPath: String {
