@@ -6,7 +6,7 @@
 //
 
 import Foundation
-public struct ItemInfoDto: Codable, Equatable {
+public struct ItemInfoDto: Codable, Equatable, Hashable {
 	public var path: String = ""
 	public var name: String = ""
 	public var ext: String?

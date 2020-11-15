@@ -5,7 +5,7 @@
 //  Created by Gal Yedidovich on 22/10/2020.
 //
 
-public struct CloudFolderInfoDto: Codable, Equatable {
+public struct CloudFolderInfoDto: Codable, Equatable, Hashable {
 	public var uid: Int
 	public var groupUid: Int
 	public var name: String

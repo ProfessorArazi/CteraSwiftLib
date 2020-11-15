@@ -6,7 +6,7 @@
 //
 
 import Foundation
-public struct PreviewStatusDto: Codable, Equatable {
+public struct PreviewStatusDto: Codable, Equatable, Hashable {
 	public var preview: Bool
 	public var failure: String
 	

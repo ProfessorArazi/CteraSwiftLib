@@ -5,7 +5,7 @@
 //  Created by Gal Yedidovich on 22/10/2020.
 //
 
-public struct InvitationSettingsDto: Codable, Equatable {
+public struct InvitationSettingsDto: Codable, Equatable, Hashable {
 	public var allowCollaboratorsToReshareContent: Bool = false
 	public var invitationMaxValidityDuration: Int?
 	public var allowedFrequentContactsTime: Int64 = 0

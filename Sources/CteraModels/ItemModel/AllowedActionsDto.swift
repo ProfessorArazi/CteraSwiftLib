@@ -5,7 +5,7 @@
 //  Created by Gal Yedidovich on 22/10/2020.
 //
 
-public struct AllowedActionsDto: Codable, Equatable {
+public struct AllowedActionsDto: Codable, Equatable, Hashable {
 	public var delete: Bool = false
 	public var copy: Bool = false
 	public var move: Bool = false
