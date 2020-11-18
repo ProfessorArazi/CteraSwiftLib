@@ -383,10 +383,10 @@ public enum HttpClient {
 		post { handler.onTaskStart() }
 		
 		func checkStatus() {
-			handle(request: req, BgTaskDto.fromFormatted(json:)) { (result: Response<BgTaskDto>) in
+			handle(request: req, JsonObject.init(data:)) { (result: Response<JsonObject>) in
 				switch result {
 				case .success(let task):
-					if let errorType = task.errorType, !errorType.isEmpty {
+					if let errorType = task.string(key: "errorType"), !errorType.isEmpty {
 						Console.log(tag: TAG, msg: "followServerTask, error in action: \(errorType)")
 						post {
 							if errorType.lowercased() == "conflict" {
@@ -396,7 +396,7 @@ public enum HttpClient {
 							}
 						}
 					} else {
-						if task.percentage < 100 {
+						if task.int(key: "percentage")! < 100 {
 							post { handler.onTaskProgress(task: task) }
 							//wait 1 second than try again
 							post(delay: 1) { checkStatus() }
@@ -434,7 +434,9 @@ public enum HttpClient {
 			switch result {
 			case .success(let (taskUrl, _)):
 				followServerTask(at: taskUrl, handler: handler)
-			case .error(let error): Console.log(tag: Self.TAG, msg: "\(#function) error, \(error)")
+			case .error(let error):
+				Console.log(tag: Self.TAG, msg: "\(#function) error, \(error)")
+				handler.onTaskError(error: error)
 			}
 		}
 	}

@@ -87,13 +87,9 @@ enum StringFormatter {
 				.with(key: "src", pair.src)
 				.with(key: "dest", pair.dest)
 		}
-		var json = JsonObject()
-			.with(key: "type", "user-defined")
-			.with(key: "name", payload.action)
-			.with(key: "param", JsonObject()
-					.with(key: "$class", "ActionResourcesParam")
-					.with(key: "urls", urls)
-			)
+		var param = JsonObject()
+			.with(key: "$class", "ActionResourcesParam")
+			.with(key: "urls", urls)
 		
 		if let taskJson = payload.taskJson {
 			var cursor = taskJson.jsonObject(key: "cursor")!
@@ -113,9 +109,14 @@ enum StringFormatter {
 			
 			cursor.remove(key: "handler")
 			cursor.remove(key: "applyAll")
-			json["startFrom"] = cursor
+			param["startFrom"] = cursor
 		}
-		return json.xmlString
+		
+		return JsonObject()
+			.with(key: "type", "user-defined")
+			.with(key: "name", payload.action)
+			.with(key: "param", param)
+			.xmlString
 	}
 	
 	static func getStatus(for task: String) -> String {
@@ -306,6 +307,11 @@ internal extension JsonObject {
 		
 		for (key, value) in self {
 			if key == "$class" { continue }
+			
+			if value as? String == "" {
+				body.append("<att id=\"\(key)\" />")
+				continue
+			}
 			
 			body.append("<att id=\"\(key)\">")
 			if let dict = value as? [String: Any] { body.append(JsonObject(from: dict).xmlString) }  //build inner object

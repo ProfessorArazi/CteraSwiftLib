@@ -15,7 +15,7 @@ import CteraUtil
 
 final class BackgroundTaskTests: BaseNetworkTest {
 	
-	func testDelete() {
+	func testMove() {
 		let e = XCTestExpectation(description: "Waiting for requests")
 		HttpClient.createFolder(at: HttpClient.SERVICE_WEBDAV, name: "Bubu") { response in
 			switch response {
@@ -25,8 +25,8 @@ final class BackgroundTaskTests: BaseNetworkTest {
 				item.path = HttpClient.SERVICE_WEBDAV + "/Bubu"
 				HttpClient.copyMove(isCopy: false, items: [item], folderPath: HttpClient.SERVICE_WEBDAV + "/a") { response in
 					switch response {
-					case .success((let taskUrl, _)):
-						HttpClient.followServerTask(at: taskUrl, handler: TestHandler(e, expectedResult: .conflict))
+					case .success((let taskUrl, let payload)):
+						HttpClient.followServerTask(at: taskUrl, handler: TestHandler(e, expectedResult: .conflict(.Override), payload))
 					case .error(let error):
 						fatalError("error: \(error)")
 					}
@@ -42,28 +42,49 @@ final class BackgroundTaskTests: BaseNetworkTest {
 
 
 class TestHandler: BackgroundTaskHandler {
-	enum ExpectedResult {
-		case conflict
+	enum ConflictHandler: String {
+		case Override
+		case Skip
+		case Rename
+	}
+	
+	enum ExpectedResult: Equatable {
+		case conflict(ConflictHandler?)
 		case error
 		case done
 	}
 	
+	private var resolved = false
+	
 	let e: XCTestExpectation
 	let expected: ExpectedResult
+	let payload: SrcDestData
 	
-	internal init(_ e: XCTestExpectation, expectedResult result: ExpectedResult = .done) {
+	internal init(_ e: XCTestExpectation, expectedResult result: ExpectedResult = .done, _ payload: SrcDestData) {
 		self.e = e
 		self.expected = result
+		self.payload = payload
 	}
 	
 	func onTaskStart() {
 		print(#function)
 	}
 	
-	func onTaskConflict(task: BgTaskDto) {
+	func onTaskConflict(task: JsonObject) {
 		print(#function)
-		check(result: .conflict)
-		e.fulfill()
+		guard case .conflict(.some(let handler)) = expected else {
+			check(result: .conflict(nil))
+			e.fulfill()
+			return
+		}
+		
+		var sd = payload
+		sd.taskJson = task
+		sd.taskJson.put(key: "cursor", task.jsonObject(key: "cursor")!.with(key: "handler", handler.rawValue))
+		
+		resolved = true
+		
+		HttpClient.resolveConflict(sd, handler: self)
 	}
 	
 	func onTaskError(error: Error) {
@@ -72,15 +93,15 @@ class TestHandler: BackgroundTaskHandler {
 		e.fulfill()
 	}
 	
-	func onTaskProgress(task: BgTaskDto) {
+	func onTaskProgress(task: JsonObject) {
 		print(#function)
 		print(task)
 	}
 	
 	func onTaskDone() {
 		print(#function)
-//		if expected != .done { XCTFail("expected Done but got \(expected)")}
-		check(result: .done)
+		
+		if !resolved { check(result: .done) }
 		e.fulfill()
 	}
 	
