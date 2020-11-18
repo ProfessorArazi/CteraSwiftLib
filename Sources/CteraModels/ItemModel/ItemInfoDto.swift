@@ -39,10 +39,6 @@ public struct ItemInfoDto: Codable, Equatable, Hashable {
 		case itemPermission = "permission"
 		case cloudFolderInfo
 		case lastActionBy
-		
-		case isCompleted
-		case isInEdit
-		case isAttachmentsFolder
 	}
 	
 	public init() { }
