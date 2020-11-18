@@ -13,16 +13,16 @@ enum StringFormatter {
 	
 	static func attachMobileDevice(server: String, password pass: String?, activationCode code: String?, deviceID: String, deviceName: String) -> String {
 		JsonObject()
-			.put(key: "type", "user-defined")
-			.put(key: "name", "attachMobileDevice")
-			.put(key: "param", JsonObject()
-					.put(key: "$class", "AttachedMobileDeviceParams")
-					.put(key: "hostname", deviceName)
-					.put(key: "deviceMac", deviceID)
-					.put(key: "deviceType", "Mobile")
-					.put(key: "serverName", server)
-					.put(key: "password", pass?.escaped ?? "")
-					.put(key: "ssoActivationCode", code?.escaped ?? "")
+			.with(key: "type", "user-defined")
+			.with(key: "name", "attachMobileDevice")
+			.with(key: "param", JsonObject()
+					.with(key: "$class", "AttachedMobileDeviceParams")
+					.with(key: "hostname", deviceName)
+					.with(key: "deviceMac", deviceID)
+					.with(key: "deviceType", "Mobile")
+					.with(key: "serverName", server)
+					.with(key: "password", pass?.escaped ?? "")
+					.with(key: "ssoActivationCode", code?.escaped ?? "")
 			)
 			.xmlString
 	}
@@ -33,35 +33,35 @@ enum StringFormatter {
 	
 	static func updateMobileInfo(deviceID: String, deviceName: String) -> String {
 		JsonObject()
-			.put(key: "type", "user-defined")
-			.put(key: "name", "updateMobileInfo")
-			.put(key: "param", JsonObject()
-					.put(key: "$class", "UpdateMobileInfoParams")
-					.put(key: "cteraMobileVersion", Bundle.main.infoDictionary!["CFBundleShortVersionString"] as! String)
-					.put(key: "hostname", deviceName)
-					.put(key: "platform", "iOS") //TODO: Check with PM (Ron)
-					.put(key: "osName", ProcessInfo.processInfo.operatingSystemVersionString)
-					.put(key: "uniqueId", deviceID)
+			.with(key: "type", "user-defined")
+			.with(key: "name", "updateMobileInfo")
+			.with(key: "param", JsonObject()
+					.with(key: "$class", "UpdateMobileInfoParams")
+					.with(key: "cteraMobileVersion", Bundle.main.infoDictionary!["CFBundleShortVersionString"] as! String)
+					.with(key: "hostname", deviceName)
+					.with(key: "platform", "iOS") //TODO: Check with PM (Ron)
+					.with(key: "osName", ProcessInfo.processInfo.operatingSystemVersionString)
+					.with(key: "uniqueId", deviceID)
 			)
 			.xmlString
 	}
 	
 	static func getMulticommand() -> String {
 		JsonObject()
-			.put(key: "type", "db")
-			.put(key: "name", "get-multi")
-			.put(key: "param", ["/currentSession", "/currentTime", "/general"])
+			.with(key: "type", "db")
+			.with(key: "name", "get-multi")
+			.with(key: "param", ["/currentSession", "/currentTime", "/general"])
 			.xmlString
 	}
 	
 	static func createNewFolder(folderPath: String, folderName: String) -> String {
 		JsonObject()
-			.put(key: "type", "user-defined")
-			.put(key: "name", "makeCollection")
-			.put(key: "param", JsonObject()
-					.put(key: "$class", "makeCollectionParam")
-					.put(key: "name", folderName.escaped)
-					.put(key: "parentPath", folderPath.escaped)
+			.with(key: "type", "user-defined")
+			.with(key: "name", "makeCollection")
+			.with(key: "param", JsonObject()
+					.with(key: "$class", "makeCollectionParam")
+					.with(key: "name", folderName.escaped)
+					.with(key: "parentPath", folderPath.escaped)
 			)
 			.xmlString
 	}
@@ -83,16 +83,16 @@ enum StringFormatter {
 	static func sourceDestCommand(with payload: SrcDestData) -> String {
 		let urls = payload.pairs.map { pair in
 			JsonObject()
-				.put(key: "$class", "SrcDstParam")
-				.put(key: "src", pair.src)
-				.put(key: "dest", pair.dest)
+				.with(key: "$class", "SrcDstParam")
+				.with(key: "src", pair.src)
+				.with(key: "dest", pair.dest)
 		}
 		var json = JsonObject()
-			.put(key: "type", "user-defined")
-			.put(key: "name", payload.action)
-			.put(key: "param", JsonObject()
-					.put(key: "$class", "ActionResourcesParam")
-					.put(key: "urls", urls)
+			.with(key: "type", "user-defined")
+			.with(key: "name", payload.action)
+			.with(key: "param", JsonObject()
+					.with(key: "$class", "ActionResourcesParam")
+					.with(key: "urls", urls)
 			)
 		
 		if let taskJson = payload.taskJson {
@@ -101,47 +101,48 @@ enum StringFormatter {
 			
 			if cursor.bool(key: "applyAll") ?? false { //add json properties to "apply all" request
 				cursor.remove(key: "skipHandler")
-					.put(key: "fileMoveConflictResolutaion", [
-							JsonObject()
-								.put(key: "$class", "FileMoveConflictResolutaion")
-								.put(key: "errorType", taskJson.string(key: "errorType")!)
-								.put(key: "handler", handler)
-					])
+				cursor.put(key: "fileMoveConflictResolutaion", [
+					JsonObject()
+						.with(key: "$class", "FileMoveConflictResolutaion")
+						.with(key: "errorType", taskJson.string(key: "errorType")!)
+						.with(key: "handler", handler)
+				])
 			} else {
-				cursor = cursor.put(key: "skipHandler", handler)
+				cursor["skipHandler"] = handler
 			}
 			
-			cursor = cursor.remove(key: "handler").remove(key: "applyAll")
-			json = json.put(key: "startFrom", cursor)
+			cursor.remove(key: "handler")
+			cursor.remove(key: "applyAll")
+			json["startFrom"] = cursor
 		}
 		return json.xmlString
 	}
 	
 	static func getStatus(for task: String) -> String {
 		JsonObject()
-			.put(key: "type", "user-defined")
-			.put(key: "name", "getTaskStatus")
-			.put(key: "param", task)
+			.with(key: "type", "user-defined")
+			.with(key: "name", "getTaskStatus")
+			.with(key: "param", task)
 			.xmlString
 	}
 	
 	//MARK: - public links
 	static func getPublicLinks(at itemPath: String) -> String {
 		JsonObject()
-			.put(key: "type", "user-defined")
-			.put(key: "name", "listPublicShares")
-			.put(key: "param", itemPath)
+			.with(key: "type", "user-defined")
+			.with(key: "name", "listPublicShares")
+			.with(key: "param", itemPath)
 			.xmlString
 	}
 	
 	static func createPublicLink(from link: PublicLinkDto) -> String {
 		var shareJson: JsonObject = JsonObject()
-			.put(key: "$class", "ShareConfig")
-			.put(key: "accessMode", link.permission.rawValue)
-			.put(key: "protectionLevel", "publicLink")
-			.put(key: "invitee", JsonObject()
-					.put(key: "$class", "Collaborator")
-					.put(key: "type", "external")
+			.with(key: "$class", "ShareConfig")
+			.with(key: "accessMode", link.permission.rawValue)
+			.with(key: "protectionLevel", "publicLink")
+			.with(key: "invitee", JsonObject()
+					.with(key: "$class", "Collaborator")
+					.with(key: "type", "external")
 			)
 		
 		if let experation = link.expiration {
@@ -149,12 +150,12 @@ enum StringFormatter {
 		}
 		
 		return JsonObject()
-			.put(key: "type", "user-defined")
-			.put(key: "name", "createShare")
-			.put(key: "param", JsonObject()
-					.put(key: "$class", "CreateShareParam")
-					.put(key: "url", link.href)
-					.put(key: "share", shareJson)
+			.with(key: "type", "user-defined")
+			.with(key: "name", "createShare")
+			.with(key: "param", JsonObject()
+					.with(key: "$class", "CreateShareParam")
+					.with(key: "url", link.href)
+					.with(key: "share", shareJson)
 			)
 			.xmlString
 	}
@@ -162,21 +163,21 @@ enum StringFormatter {
 	static func modifyPublicLink(from link: PublicLinkDto, remove: Bool) -> String {
 		let createDate = DateFormatter.standardFormat.string(from: link.creationDate!)
 		var shareJson: JsonObject = JsonObject()
-			.put(key: "$class", "Share")
-			.put(key: "accessMode", link.permission.rawValue)
-			.put(key: "canEdit", false)
-			.put(key: "createDate", createDate)
-			.put(key: "href", link.href.escaped)
-			.put(key: "id", link.id!)
-			.put(key: "isDirectory", link.isFolder)
-			.put(key: "key", link.key!)
-			.put(key: "protectionLevel", link.protectionLevel!)
-			.put(key: "publicLink", link.link!)
-			.put(key: "resourceName", link.resourceName!)
-			.put(key: "isRemove", remove)
-			.put(key: "invitee", JsonObject()
-					.put(key: "$class", "Collaborator")
-					.put(key: "type", "external")
+			.with(key: "$class", "Share")
+			.with(key: "accessMode", link.permission.rawValue)
+			.with(key: "canEdit", false)
+			.with(key: "createDate", createDate)
+			.with(key: "href", link.href.escaped)
+			.with(key: "id", link.id!)
+			.with(key: "isDirectory", link.isFolder)
+			.with(key: "key", link.key!)
+			.with(key: "protectionLevel", link.protectionLevel!)
+			.with(key: "publicLink", link.link!)
+			.with(key: "resourceName", link.resourceName!)
+			.with(key: "isRemove", remove)
+			.with(key: "invitee", JsonObject()
+					.with(key: "$class", "Collaborator")
+					.with(key: "type", "external")
 			)
 			
 		if let expiration = link.expiration {
@@ -185,18 +186,18 @@ enum StringFormatter {
 		}
 		
 		return JsonObject()
-			.put(key: "type", "user-defined")
-			.put(key: "name", remove ? "deleteShare" : "updateShare")
-			.put(key: "param", shareJson)
+			.with(key: "type", "user-defined")
+			.with(key: "name", remove ? "deleteShare" : "updateShare")
+			.with(key: "param", shareJson)
 			.xmlString
 	}
 	
 	//MARK: - Collaboration
 	static func listShares(for path: String) -> String {
 		JsonObject()
-			.put(key: "type", "user-defined")
-			.put(key: "name", "listShares")
-			.put(key: "param", path)
+			.with(key: "type", "user-defined")
+			.with(key: "name", "listShares")
+			.with(key: "param", path)
 			.xmlString
 	}
 	
@@ -206,7 +207,7 @@ enum StringFormatter {
 		if var shares = collJson.jsonArray(key: "shares") {
 			for i in 0..<shares.count {
 				let share = shares.jsonObject(at: i)!
-					.put(key: "$class", "ShareConfig")
+					.with(key: "$class", "ShareConfig")
 
 				shares[i] = share
 			}
@@ -215,64 +216,64 @@ enum StringFormatter {
 		}
 		
 		return JsonObject()
-			.put(key: "name", "shareResource")
-			.put(key: "type", "user-defined")
-			.put(key: "param", collJson
-					.put(key: "$class", "ShareResourceParam")
-					.put(key: "url", path)
+			.with(key: "name", "shareResource")
+			.with(key: "type", "user-defined")
+			.with(key: "param", collJson
+					.with(key: "$class", "ShareResourceParam")
+					.with(key: "url", path)
 			)
 			.xmlString
 	}
 	
 	static func verifyCollaborator(for item: ItemInfoDto, _ invitee: CollaboratorDto) -> String {
 		JsonObject()
-			.put(key: "type", "user-defined")
-			.put(key: "name", "preVerifySingleShare")
-			.put(key: "param", JsonObject()
-					.put(key: "$class", "PreVerifyShareParam")
-					.put(key: "url", item.path)
-					.put(key: "invitee", invitee)
+			.with(key: "type", "user-defined")
+			.with(key: "name", "preVerifySingleShare")
+			.with(key: "param", JsonObject()
+					.with(key: "$class", "PreVerifyShareParam")
+					.with(key: "url", item.path)
+					.with(key: "invitee", invitee)
 			)
 			.xmlString
 	}
 	
 	static func searchCollaborators(_ query: String, _ type: String, _ uid: Int, _ count: Int) -> String {
 		JsonObject()
-			.put(key: "type", "user-defined")
-			.put(key: "name", "searchCollaborationMembers")
-			.put(key: "param", JsonObject()
-					.put(key: "searchType", type)
-					.put(key: "searchTerm", query)
-					.put(key: "resourceUid", uid)
-					.put(key: "countLimit", count)
+			.with(key: "type", "user-defined")
+			.with(key: "name", "searchCollaborationMembers")
+			.with(key: "param", JsonObject()
+					.with(key: "searchType", type)
+					.with(key: "searchTerm", query)
+					.with(key: "resourceUid", uid)
+					.with(key: "countLimit", count)
 			)
 			.xmlString
 	}
 	
 	static func leaveShared(items: [ItemInfoDto]) -> String {
 		JsonObject()
-			.put(key: "type", "user-defined")
-			.put(key: "name", "leaveShare")
-			.put(key: "param", items.map(\.path))
+			.with(key: "type", "user-defined")
+			.with(key: "name", "leaveShare")
+			.with(key: "param", items.map(\.path))
 			.xmlString
 	}
 	
 	static func fileVersions(for item: ItemInfoDto) -> String {
 		JsonObject()
-			.put(key: "name", "listVersions")
-			.put(key: "param", item.path)
+			.with(key: "name", "listVersions")
+			.with(key: "param", item.path)
 			.xmlString
 	}
 	
 	static func lastModified(items: [ItemInfoDto]) -> String {
 		JsonObject()
-			.put(key: "type", "user-defined")
-			.put(key: "name", "getLastModifiedOfFiles")
-			.put(key: "param", items.map({ item in
+			.with(key: "type", "user-defined")
+			.with(key: "name", "getLastModifiedOfFiles")
+			.with(key: "param", items.map({ item in
 				JsonObject()
-					.put(key: "$class", "getLastModifiedOfFilesParam")
-					.put(key: "folderUID", item.cloudFolderInfo!.uid)
-					.put(key: "path", item.path)
+					.with(key: "$class", "getLastModifiedOfFilesParam")
+					.with(key: "folderUID", item.cloudFolderInfo!.uid)
+					.with(key: "path", item.path)
 			}))
 			.xmlString
 	}

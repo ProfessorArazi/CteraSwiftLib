@@ -30,25 +30,25 @@ public struct FetchRequestDto {
 	}
 	
 	public func toJson() -> JsonObject {
-		var param = JsonObject().put(key: "$class", "FetchResourcesParam")
-			.put(key: "root", path)
-			.put(key: "depth", depth)
-			.put(key: "includeDeleted", Self.includeDeleted)
-			.put(key: "sharedItems", includeShared)
-			.put(key: "quickNavigationPane", navigationPane)
-			.put(key: "cloudFolderType", [folderType])
-			.put(key: "start", startIndex)
-			.put(key: "limit", 200)
-			.put(key: "sort", [JsonObject().put(key: "$class", "Sort")
-								.put(key: "field", SortMethod.stored.rawValue)
-								.put(key: "ascending", Self.sortAscending)])
+		var param = JsonObject().with(key: "$class", "FetchResourcesParam")
+			.with(key: "root", path)
+			.with(key: "depth", depth)
+			.with(key: "includeDeleted", Self.includeDeleted)
+			.with(key: "sharedItems", includeShared)
+			.with(key: "quickNavigationPane", navigationPane)
+			.with(key: "cloudFolderType", [folderType])
+			.with(key: "start", startIndex)
+			.with(key: "limit", 200)
+			.with(key: "sort", [JsonObject().with(key: "$class", "Sort")
+								.with(key: "field", SortMethod.stored.rawValue)
+								.with(key: "ascending", Self.sortAscending)])
 		
 		if includeShared { param["ownedBy"] = -1 }
 		if let pass = userPassword { param["userPassword"] = pass }
 		if let query = query { param["searchCriteria"] = query }
 		if let passPhrase = passPhrase { param["passphrase"] = passPhrase }
 		
-		return JsonObject().put(key: "type", "user-defined").put(key: "name", "fetchResources").put(key: "param", param);
+		return JsonObject().with(key: "type", "user-defined").with(key: "name", "fetchResources").with(key: "param", param);
 	}
 	
 	public func with(cachePath: String) -> FetchRequestDto {
