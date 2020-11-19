@@ -6,10 +6,10 @@
 //
 
 public struct InvitePermissionDto: Codable, Equatable, Hashable {
-	public var allowedAccess: String
+	public var allowedAccess: ItemPermissionDto
 	public var invitationSettings: InvitationSettingsDto
 	
-	public init(allowedAccess: String, invitationSettings: InvitationSettingsDto) {
+	public init(allowedAccess: ItemPermissionDto, invitationSettings: InvitationSettingsDto) {
 		self.allowedAccess = allowedAccess
 		self.invitationSettings = invitationSettings
 	}
