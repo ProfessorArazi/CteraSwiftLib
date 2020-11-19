@@ -6,7 +6,7 @@
 //
 
 import Foundation
-public struct ShareDto: Codable {
+public struct ShareDto: Codable, Hashable, Equatable {
 	public var id: Int
 	public var href: String
 	public var invitee: CollaboratorDto

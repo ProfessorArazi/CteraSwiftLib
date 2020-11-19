@@ -6,7 +6,7 @@
 //
 
 import Foundation
-public struct PublicLinkDto: Codable {
+public struct PublicLinkDto: Codable, Hashable, Equatable {
 	public var href: String
 	public var isFolder: Bool
 	

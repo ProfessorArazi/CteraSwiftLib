@@ -6,7 +6,7 @@
 //
 
 import Foundation
-public struct CollaboratorDto: Codable {
+public struct CollaboratorDto: Codable, Hashable, Equatable {
 	public let type: CollaboratorType
 	public let uid: Int?
 	public let email: String?
