@@ -182,8 +182,8 @@ enum StringFormatter {
 			)
 			
 		if let expiration = link.expiration {
-//			let str = DateFormatter.dateOnlyFormat.string(from: expiration)
-			shareJson["expiration"] = expiration
+			let str = DateFormatter.dateOnlyFormat.string(from: expiration)
+			shareJson["expiration"] = str
 		}
 		
 		return JsonObject()

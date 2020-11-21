@@ -20,7 +20,7 @@ public extension DateFormatter {
 	static let standardFormat = DateFormatter(format: "yyyy-MM-dd'T'HH:mm:ss")
 	static let hourFormat = DateFormatter(format: "HH:mm")
 	static let dayFormat = DateFormatter(format: "d MMM HH:mm")
-	static let dateOnlyFormat = DateFormatter(format: "yyyy-MM-dd")
+	static let dateOnlyFormat = DateFormatter(format: "yyyy-dd-MM")
 }
 
 public extension Int64 {
