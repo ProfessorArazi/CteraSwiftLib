@@ -532,14 +532,14 @@ public enum HttpClient {
 		handle(request: req, { try .fromFormatted(json: $0, dateStrategy: PublicLinkDto.dateStrategy) }, handler: handler)
 	}
 	
-	public static func modifyPublicLink(with link: PublicLinkDto, remove: Bool, handler: @escaping (Response<PublicLinkDto>) -> ()) {
+	public static func modifyPublicLink(with link: PublicLinkDto, remove: Bool, handler: @escaping (Response<Data>) -> ()) {
 		Console.log(tag: Self.TAG, msg: #function)
 		let req = URLRequest(to: serverAddress, SERVICES_PORTAL_API)
 			.set(method: .POST)
 			.set(contentType: .xml)
 			.set(body: StringFormatter.modifyPublicLink(from: link, remove: remove))
 		
-		handle(request: req, { try .fromFormatted(json: $0, dateStrategy: PublicLinkDto.dateStrategy) }, handler: handler)
+		handle(request: req, handler: handler)
 	}
 	
 	public static func requestCollaboration(for item: ItemInfoDto, handler: @escaping (Response<CollaborationDto>) -> ()) {
