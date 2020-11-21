@@ -11,7 +11,7 @@ let package = Package(
 		// Products define the executables and libraries a package produces, and make them visible to other packages.
 		.library(
 			name: "CteraSwiftLib",
-			targets: ["CteraNetwrok", "CteraModels", "CteraUtil", "CteraCache"]),
+			targets: ["CteraNetwork", "CteraModels", "CteraUtil", "CteraCache"]),
 	],
 	dependencies: [
 		// Dependencies declare other packages that this package depends on.
@@ -47,7 +47,7 @@ let package = Package(
 			]
 		),
 		.target(
-			name: "CteraNetwrok",
+			name: "CteraNetwork",
 			dependencies: [
 				.product(name: "BasicExtensions", package: "SwiftExtensions"),
 				.product(name: "StorageExtensions", package: "SwiftExtensions"),
@@ -57,6 +57,6 @@ let package = Package(
 		),
 		.testTarget(
 			name: "CteraNetworkTests",
-			dependencies: ["CteraNetwrok", "CteraCache"]),
+			dependencies: ["CteraNetwork", "CteraCache"]),
 	]
 )
