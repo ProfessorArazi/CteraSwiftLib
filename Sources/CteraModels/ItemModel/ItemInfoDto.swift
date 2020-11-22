@@ -19,8 +19,8 @@ public struct ItemInfoDto: Codable, Equatable, Hashable {
 	
 	public var lastModified: Date?
 	public var size: Int64?
-	public var actions: AllowedActionsDto?
-	public var itemPermission: ItemPermissionDto?
+	public var actions = AllowedActionsDto()
+	public var itemPermission: ItemPermissionDto = .None
 	public var cloudFolderInfo: CloudFolderInfoDto?
 	public var lastActionBy: LastActionDto?
 	

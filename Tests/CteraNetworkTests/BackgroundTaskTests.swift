@@ -11,7 +11,7 @@ import BasicExtensions
 import StorageExtensions
 import CteraModels
 import CteraUtil
-@testable import CteraNetwrok
+@testable import CteraNetwork
 
 final class BackgroundTaskTests: BaseNetworkTest {
 	

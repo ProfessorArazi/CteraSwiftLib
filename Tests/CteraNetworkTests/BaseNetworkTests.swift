@@ -8,7 +8,7 @@
 import XCTest
 import StorageExtensions
 import CteraUtil
-import CteraNetwrok
+import CteraNetwork
 
 class BaseNetworkTest: XCTestCase {
 	override class func setUp() {

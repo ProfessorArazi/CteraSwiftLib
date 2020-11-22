@@ -10,7 +10,7 @@ import Foundation
 import BasicExtensions
 import CteraModels
 import CteraUtil
-@testable import CteraNetwrok
+@testable import CteraNetwork
 
 final class LoginTests: BaseNetworkTest {
 	func testRenewSessionConcurrent() throws {

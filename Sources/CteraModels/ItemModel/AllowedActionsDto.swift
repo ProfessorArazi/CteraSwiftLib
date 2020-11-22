@@ -40,11 +40,5 @@ public struct AllowedActionsDto: Codable, Equatable, Hashable {
 		
 		case invitePermissions
 		case previewStatus
-		
-		
-		
-		
-		
-		
 	}
 }
