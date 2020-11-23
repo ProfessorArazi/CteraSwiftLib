@@ -31,9 +31,9 @@ public class ProgressTask {
 }
 
 public struct SrcDestData {
-	let action: String
-	let pairs: [(src: String, dest: String)]
-	var taskJson: JsonObject! = nil
+	public let action: String
+	public let pairs: [(src: String, dest: String)]
+	public var taskJson: JsonObject! = nil
 }
 
 public enum Response<T> {
