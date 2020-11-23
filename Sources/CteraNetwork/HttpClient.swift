@@ -320,18 +320,14 @@ public enum HttpClient {
 		}
 	}
 	
-	public static func requestLastModified(for items: [ItemInfoDto], userRef: String,
-										   handler: @escaping (Response<[JsonObject]>)->()) {
+	public static func requestLastModified(for items: [ItemInfoDto], userRef: String, handler: @escaping (Response<[LastModifiedDto]>)->()) {
 		Console.log(tag: TAG, msg: "\(#function), items: \(items.map(\.name))")
 		let req = URLRequest(to: serverAddress, "ServicesPortal/api/\(userRef)?format=jsonext")
 			.set(method: .POST)
 			.set(contentType: .xml)
 			.set(body: StringFormatter.lastModified(items: items))
 		
-		handle(request: req, { data in
-			let arr = try JSONSerialization.jsonObject(with: data) as! [[String: Any]]
-			return arr.map { dict in JsonObject(from: dict) }
-		}, handler: handler)
+		handle(request: req, [LastModifiedDto].fromFormatted(json:), handler: handler)
 	}
 	
 	public static func rename(item: ItemInfoDto, to newName: String, handler: @escaping (Response<(String, SrcDestData)>) -> ()) {
