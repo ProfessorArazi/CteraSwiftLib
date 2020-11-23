@@ -7,17 +7,17 @@
 
 import Foundation
 public struct VersionDto: Codable, Equatable {
-	public let timestamp: String
+	public let timestamp: Date
 	public let fullUrl: String
 	public let modifier: String
 	public let restorable: Bool
 	public let deleted: Bool
 	public let size: Int64
-	public let relativeTime: String
+	public let relativeTime: Int64
 	
-	public init(timestamp: String = "", fullUrl: String = "", modifier: String = "",
+	public init(timestamp: Date = Date(), fullUrl: String = "", modifier: String = "",
 				restorable: Bool = false, deleted: Bool = false,
-				size: Int64 = 0, relativeTime: String = "") {
+				size: Int64 = 0, relativeTime: Int64 = 0) {
 		self.timestamp = timestamp
 		self.fullUrl = fullUrl
 		self.modifier = modifier
