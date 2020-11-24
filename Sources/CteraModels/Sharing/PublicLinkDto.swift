@@ -10,19 +10,30 @@ public struct PublicLinkDto: Codable, Hashable, Equatable {
 	public var href: String
 	public var isFolder: Bool
 	
-	public var id: Int!
-	public var key: String!
-	public var protectionLevel: String!
-	public var link: String!
-	public var resourceName: String!
-	public var permission: ItemPermissionDto!
+	public var id: Int
+	public var key: String
+	public var protectionLevel: ProtectionLevelDto
+	public var link: String
+	public var resourceName: String
+	public var permission: ItemPermissionDto
 	
 	public var expiration: Date?  //format 'yyyy-dd-MM'
-	public var creationDate: Date!
+	public var creationDate: Date
 	
-	public init(href: String, isFolder: Bool) {
+	public init(href: String = "", isFolder: Bool = false, id: Int = -1, key: String = "",
+				  protectionLevel: ProtectionLevelDto = .publicLink, link: String = "",
+				  resourceName: String = "", permission: ItemPermissionDto = .None,
+				  expiration: Date? = nil, creationDate: Date = Date()) {
 		self.href = href
 		self.isFolder = isFolder
+		self.id = id
+		self.key = key
+		self.protectionLevel = protectionLevel
+		self.link = link
+		self.resourceName = resourceName
+		self.permission = permission
+		self.expiration = expiration
+		self.creationDate = creationDate
 	}
 	
 	private enum CodingKeys: String, CodingKey {

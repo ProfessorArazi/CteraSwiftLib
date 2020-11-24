@@ -94,8 +94,12 @@ public extension Filename {
 
 public extension Encodable {
 	func json(format: DateFormatter) -> Data {
+		json(dateStrategy: .formatted(format))
+	}
+	
+	func json(dateStrategy: JSONEncoder.DateEncodingStrategy) -> Data {
 		let encoder = JSONEncoder()
-		encoder.dateEncodingStrategy = .formatted(format)
+		encoder.dateEncodingStrategy = dateStrategy
 		return try! encoder.encode(self)
 	}
 }
