@@ -19,7 +19,7 @@ public struct AllowedActionsDto: Codable, Equatable, Hashable {
 	public var versioning: Bool = false
 	public var undelete: Bool = false
 	
-	public var invitePermissions: InvitePermissionDto?
+	public var invitePermissions = InvitePermissionDto()
 	public var previewStatus: PreviewStatusDto?
 	
 	public init() {}

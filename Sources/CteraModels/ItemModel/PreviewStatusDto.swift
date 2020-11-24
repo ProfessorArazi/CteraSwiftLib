@@ -7,11 +7,8 @@
 
 import Foundation
 public struct PreviewStatusDto: Codable, Equatable, Hashable {
-	public var preview: Bool
-	public var failure: String
+	public var preview: Bool = false
+	public var failure: String = ""
 	
-	public init(preview: Bool, failure: String) {
-		self.preview = preview
-		self.failure = failure
-	}
+	public init() {}
 }

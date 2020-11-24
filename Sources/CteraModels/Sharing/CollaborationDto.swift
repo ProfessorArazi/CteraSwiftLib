@@ -1,5 +1,5 @@
 //
-//  CollaborationDTOs.swift
+//  CollaborationDto.swift
 //  
 //
 //  Created by Gal Yedidovich on 24/10/2020.

@@ -6,11 +6,8 @@
 //
 
 public struct LastActionDto: Codable, Equatable, Hashable {
-	public var user: String
-	public var action: String
+	public var user: String = ""
+	public var action: String = ""
 	
-	public init(user: String = "", action: String = "") {
-		self.user = user
-		self.action = action
-	}
+	public init() {}
 }

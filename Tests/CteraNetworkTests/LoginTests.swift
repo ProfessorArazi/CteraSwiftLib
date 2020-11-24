@@ -34,4 +34,31 @@ final class LoginTests: BaseNetworkTest {
 		
 		wait(for: [e], timeout: 60 * 60)
 	}
+	
+	func testSessionInfoAndUserSettings() {
+		let e = XCTestExpectation(description: "Waiting for requests")
+		
+		HttpClient.requestSessionInfo { response in
+			switch response {
+			case .success(let session):
+				let ref = session.currentSession.userRef
+				
+				HttpClient.requestUserSettings(userRef: ref) { response in
+					switch response {
+					case .success(let settings):
+						print(settings)
+					case .error(let error):
+						fatalError("error: \(error)")
+					}
+				}
+			case .error(let error):
+				XCTFail("\(error)")
+			}
+			
+			e.fulfill()
+		}
+		
+		
+		wait(for: [e], timeout: 10)
+	}
 }

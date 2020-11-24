@@ -24,6 +24,15 @@ public struct ItemInfoDto: Codable, Equatable, Hashable {
 	public var cloudFolderInfo: CloudFolderInfoDto?
 	public var lastActionBy: LastActionDto?
 	
+	public init() { }
+	
+	public init(path: String, isFolder: Bool = false) {
+		self.path = path
+		self.name = path.suffix(from: "/")!.removingPercentEncoding!
+		self.ext = path.suffix(from: ".")
+		self.isFolder = isFolder
+	}
+	
 	private enum CodingKeys: String, CodingKey {
 		case name
 		case path = "href"
@@ -39,15 +48,6 @@ public struct ItemInfoDto: Codable, Equatable, Hashable {
 		case itemPermission = "permission"
 		case cloudFolderInfo
 		case lastActionBy
-	}
-	
-	public init() { }
-	
-	public init(path: String, isFolder: Bool = false) {
-		self.path = path
-		self.name = path.suffix(from: "/")!.removingPercentEncoding!
-		self.ext = path.suffix(from: ".")
-		self.isFolder = isFolder
 	}
 	
 	public var parentPath: String {

@@ -6,11 +6,8 @@
 //
 
 public struct FolderDto: Codable, Equatable {
-	
-	public static var navigationItems: FolderDto?
-	
 	public var items: [ItemInfoDto] = []
-	public var folderItem: ItemInfoDto! = ItemInfoDto()
+	public var folderItem: ItemInfoDto = ItemInfoDto()
 	public var errorType: String?
 	public var hasMore: Bool = false
 	

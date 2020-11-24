@@ -10,41 +10,29 @@ import StorageExtensions
 import CteraUtil
 
 public struct SessionInfoDto: Codable {
-	public let currentSession: CurrentSession
-	public let currentTime: CurrentTime
-	public let general: General
+	public var currentSession = CurrentSession()
+	public var currentTime = CurrentTime()
+	public var general = General()
 	
-	public init(currentSession: CurrentSession, currentTime: CurrentTime, general: General) {
-		self.currentSession = currentSession
-		self.currentTime = currentTime
-		self.general = general
-	}
+	public init() {}
 	
 	public struct CurrentSession: Codable {
-		public let userRef: String
-		public let showSharedByMe: Bool
+		public var userRef: String = ""
+		public var showSharedByMe: Bool = false
 		
-		public init(userRef: String, showSharedByMe: Bool) {
-			self.userRef = userRef
-			self.showSharedByMe = showSharedByMe
-		}
+		public init() {}
 	}
 	
 	public struct CurrentTime: Codable {
-		public let LocalTime: String
-		public let GMTTime: String
+		public var LocalTime: String = ""
+		public var GMTTime: String = ""
 		
-		public init(LocalTime: String, GMTTime: String) {
-			self.LocalTime = LocalTime
-			self.GMTTime = GMTTime
-		}
+		public init() {}
 	}
 	
 	public struct General: Codable {
-		public let invitationSettings: InvitationSettingsDto
+		public var invitationSettings = InvitationSettingsDto()
 		
-		public init(invitationSettings: InvitationSettingsDto) {
-			self.invitationSettings = invitationSettings
-		}
+		public init() {}
 	}
 }

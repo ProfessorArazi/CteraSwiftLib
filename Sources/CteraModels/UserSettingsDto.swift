@@ -7,36 +7,25 @@
 
 public struct UserSettingsDto: Codable {
 	public var userAvatarName: String?
-	public var firstName, lastName, displayName, email: String!
-	public var sla: SLA
-	public var userStats: UserStats
+	public var firstName: String = ""
+	public var lastName: String = ""
+	public var displayName: String = ""
+	public var email: String = ""
+	public var sla = SLA()
+	public var userStats = UserStats()
 	
-	public init(userAvatarName: String? = nil, firstName: String? = nil,
-				lastName: String? = nil, displayName: String? = nil,
-				email: String? = nil, sla: SLA, userStats: UserStats) {
-		self.userAvatarName = userAvatarName
-		self.firstName = firstName
-		self.lastName = lastName
-		self.displayName = displayName
-		self.email = email
-		self.sla = sla
-		self.userStats = userStats
-	}
+	public init() {}
 	
 	public struct SLA: Codable {
 		public var calculatedQuota: Int64?
 		
-		public init(calculatedQuota: Int64? = nil) {
-			self.calculatedQuota = calculatedQuota
-		}
+		public init() {}
 	}
 	
 	public struct UserStats: Codable {
-		public var foldersSize: Int64
+		public var foldersSize: Int64 = 0
 		
-		public init(foldersSize: Int64) {
-			self.foldersSize = foldersSize
-		}
+		public init() {}
 	}
 	
 	public var abbreviation: String {

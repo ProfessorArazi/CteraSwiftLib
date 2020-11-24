@@ -11,8 +11,8 @@ public struct InvitationSettingsDto: Codable, Equatable, Hashable {
 	public var allowedFrequentContactsTime: Int64 = 0
 	public var inviteLifetime: Int64 = 0
 	
-	public var defaultProtectionLevel: ProtectionLevelDto?
-	public var protectionLevels: [ProtectionLevelDto]?
+	public var defaultProtectionLevel: ProtectionLevelDto = .publicLink
+	public var protectionLevels: [ProtectionLevelDto] = []
 	
 	public init() {}
 	
