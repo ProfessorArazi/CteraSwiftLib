@@ -9,7 +9,7 @@ import Foundation
 public struct ShareDto: Codable, Hashable, Equatable {
 	public var id: Int
 	public var href: String
-	public var phoneNumber: String
+	public var phoneNumber: String?
 	public var invitee: CollaboratorDto
 	public var createdBy: CollaboratorDto
 	public var accessMode: ItemPermissionDto
@@ -20,7 +20,7 @@ public struct ShareDto: Codable, Hashable, Equatable {
 	public var createDate: Date
 	public var expiration: Date?
 	
-	public init(id: Int = 0, href: String = "", phoneNumber: String = "", invitee: CollaboratorDto, createdBy: CollaboratorDto, accessMode: ItemPermissionDto = .None, protectionLevel: ProtectionLevelDto = .publicLink, collaborationPolicyData: CollaborationPolicyDto, isDirectory: Bool = false, canEdit: Bool = false, createDate: Date = Date(), expiration: Date? = nil) {
+	public init(id: Int = 0, href: String = "", phoneNumber: String? = nil, invitee: CollaboratorDto, createdBy: CollaboratorDto, accessMode: ItemPermissionDto = .None, protectionLevel: ProtectionLevelDto = .publicLink, collaborationPolicyData: CollaborationPolicyDto, isDirectory: Bool = false, canEdit: Bool = false, createDate: Date = Date(), expiration: Date? = nil) {
 		self.id = id
 		self.href = href
 		self.phoneNumber = phoneNumber

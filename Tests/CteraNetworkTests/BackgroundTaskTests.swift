@@ -106,6 +106,6 @@ class TestHandler: BackgroundTaskHandler {
 	}
 	
 	private func check(result: ExpectedResult) {
-		if self.expected != result { XCTFail("expected '\(self.expected)' but got '\(result)'")}
+		if self.expected != result { XCTFail("expected '\(self.expected)' but got '\(result)'") }
 	}
 }

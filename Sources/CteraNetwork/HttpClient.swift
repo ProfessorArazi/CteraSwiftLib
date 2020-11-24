@@ -525,7 +525,7 @@ public enum HttpClient {
 			.set(contentType: .xml)
 			.set(body: StringFormatter.createPublicLink(from: link))
 		
-		handle(request: req, { try .fromFormatted(json: $0, dateStrategy: PublicLinkDto.dateStrategy) }, handler: handler)
+		handle(request: req, { try PublicLinkDto.fromFormatted(json: $0, dateStrategy: PublicLinkDto.dateStrategy) }, handler: handler)
 	}
 	
 	public static func modifyPublicLink(with link: PublicLinkDto, remove: Bool, handler: @escaping (Response<Data>) -> ()) {

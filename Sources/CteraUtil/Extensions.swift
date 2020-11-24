@@ -105,7 +105,7 @@ public extension Encodable {
 }
 
 public extension Decodable {
-	static func fromFormatted<T: Decodable>(json: Data, dateStrategy: JSONDecoder.DateDecodingStrategy = .formatted(.standardFormat)) throws -> T {
+	static func fromFormatted<T: Decodable>(json: Data, dateStrategy: JSONDecoder.DateDecodingStrategy) throws -> T {
 		let decoder = JSONDecoder()
 		decoder.dateDecodingStrategy = dateStrategy
 		return try decoder.decode(T.self, from: json)
