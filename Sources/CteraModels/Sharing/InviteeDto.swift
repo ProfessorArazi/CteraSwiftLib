@@ -8,7 +8,7 @@
 import Foundation
 public struct CollaboratorDto: Codable, Hashable, Equatable {
 	public let type: CollaboratorType
-	public let uid: Int
+	public let uid: Int?
 	public let email: String?
 	public let firstName: String?
 	public let lastName: String?
