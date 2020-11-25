@@ -54,9 +54,7 @@ public protocol BackgroundTaskHandler {
 }
 
 public protocol ThumbnailDelegate {
-	func thumbnail(receivedFile url: URL, for item: ItemInfoDto)
-	
-	func thumbnail(removedItem: ItemInfoDto, from url: URL, completion: @escaping ()->())
+	func thumbnail(receivedFile url: URL, for item: ItemInfoDto, completion: @escaping ()->())
 }
 
 extension Encryptor {

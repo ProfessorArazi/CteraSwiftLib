@@ -156,7 +156,7 @@ public enum HttpClient {
 			
 			async {
 				Encryptor.decrypt(file: cacheItem.localUrl, to: tempFile, task: task)
-				thumbnailDelegate?.thumbnail(receivedFile: tempFile, for: item)
+				thumbnailDelegate?.thumbnail(receivedFile: tempFile, for: item, completion: {})
 				post { handler(.success(tempFile)) }
 			}
 			
@@ -200,7 +200,7 @@ public enum HttpClient {
 				if let clearFileUrl = tempFile {
 					FileCache.save(file: clearFileUrl, with: item)
 					
-					thumbnailDelegate?.thumbnail(removedItem: item, from: clearFileUrl) {
+					thumbnailDelegate?.thumbnail(receivedFile: clearFileUrl, for: item) {
 						if autoDeleteTempFile {
 							try? fm.removeItem(at: clearFileUrl)
 						}
