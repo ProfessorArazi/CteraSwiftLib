@@ -53,6 +53,7 @@ let package = Package(
 				.product(name: "StorageExtensions", package: "SwiftExtensions"),
 				"CteraModels",
 				"CteraUtil",
+				"CteraCache",
 			]
 		),
 		.testTarget(
