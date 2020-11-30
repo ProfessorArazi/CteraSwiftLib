@@ -19,7 +19,28 @@ class FolderTests: BaseNetworkTest {
 				print(folder)
 				break
 			case .error(let error):
-				fatalError("error: \(error)")
+				XCTFail("\(error)")
+			}
+			
+			e.fulfill()
+		}
+		wait(for: [e], timeout: 10)
+	}
+	
+	func testFetchShareByMe() {
+		let e = XCTestExpectation(description: "Waiting for requests")
+		let req = FetchRequestDto(path: HttpClient.SERVICE_WEBDAV)
+			.with(depth: "Infinity")
+			.with(cachePath: "SharedByMe")
+			.with(includeShared: true)
+		
+		HttpClient.fetchFolder(req) { response in
+			switch response {
+			case .success(let folder):
+				print(folder)
+				break
+			case .error(let error):
+				XCTFail("\(error)")
 			}
 			
 			e.fulfill()
