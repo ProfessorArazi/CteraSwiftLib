@@ -63,13 +63,6 @@ public extension Bundle {
 	static var appGroup: String { ctera["AppGroup"]! }
 }
 
-public extension URL {
-	var isDirectory: Bool {
-		let values = try? resourceValues(forKeys: [.isDirectoryKey])
-		return values?.isDirectory ?? false
-	}
-}
-
 public extension String {
 	/// fetches a suffix sub string from given string, starting after the last index of given character.
 	/// - Parameter char: character to start suffix from (exlucive).
