@@ -15,7 +15,7 @@ public struct ShareDto: Codable, Hashable, Equatable {
 	public var invitee = CollaboratorDto()
 	public var createdBy = CollaboratorDto()
 	public var accessMode = ItemPermissionDto.None
-	public var protectionLevel = ProtectionLevelDto.publicLink
+	public var protectionLevel: ProtectionLevelDto?
 	public var collaborationPolicyData = CollaborationPolicyDto(protectionLevels: [], maxPermission: .None, defaultProtectionLevel: .publicLink)
 
 	public var isDirectory: Bool = false
