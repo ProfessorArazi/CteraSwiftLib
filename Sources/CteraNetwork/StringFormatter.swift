@@ -147,7 +147,8 @@ enum StringFormatter {
 			)
 		
 		if let expiration = link.expiration {
-			shareJson["expiration"] = expiration
+			let str = DateFormatter.dateOnlyFormat.string(from: expiration)
+			shareJson["expiration"] = str
 		}
 		
 		return JsonObject()
@@ -203,7 +204,7 @@ enum StringFormatter {
 	}
 	
 	static func saveCollaboration(at path: String, _ collaboration: CollaborationDto) -> String {
-		var collJson = try! JsonObject(encodable: collaboration)
+		var collJson = try! JsonObject(data: collaboration.json(format: .standardFormat))
 
 		if var shares = collJson.jsonArray(key: "shares") {
 			for i in 0..<shares.count {
