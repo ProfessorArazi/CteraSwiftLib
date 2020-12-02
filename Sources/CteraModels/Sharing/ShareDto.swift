@@ -29,12 +29,14 @@ public struct ShareDto: Codable, Hashable, Equatable {
 		case className = "$class"
 		case id
 		case href
-		case phoneNumber
+		case resourceName
+		
 		case invitee
 		case createdBy
 		case accessMode
 		case protectionLevel
 		case collaborationPolicyData
+		
 		case isDirectory
 		case canEdit
 		case createDate
