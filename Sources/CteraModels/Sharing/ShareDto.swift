@@ -8,33 +8,22 @@
 import Foundation
 public struct ShareDto: Codable, Hashable, Equatable {
 	private let className = "ShareConfig"
-	public var id: Int
-	public var href: String
-	public var phoneNumber: String?
-	public var invitee: CollaboratorDto
-	public var createdBy: CollaboratorDto
-	public var accessMode: ItemPermissionDto
-	public var protectionLevel: ProtectionLevelDto
-	public var collaborationPolicyData: CollaborationPolicyDto
-	public var isDirectory: Bool
-	public var canEdit: Bool
-	public var createDate: Date
+	public var id: Int = 0
+	public var href: String = ""
+	public var resourceName: String = ""
+
+	public var invitee = CollaboratorDto()
+	public var createdBy = CollaboratorDto()
+	public var accessMode = ItemPermissionDto.None
+	public var protectionLevel = ProtectionLevelDto.publicLink
+	public var collaborationPolicyData = CollaborationPolicyDto(protectionLevels: [], maxPermission: .None, defaultProtectionLevel: .publicLink)
+
+	public var isDirectory: Bool = false
+	public var canEdit: Bool = false
+	public var createDate: Date = Date()
 	public var expiration: Date?
 	
-	public init(id: Int = 0, href: String = "", phoneNumber: String? = nil, invitee: CollaboratorDto, createdBy: CollaboratorDto, accessMode: ItemPermissionDto = .None, protectionLevel: ProtectionLevelDto = .publicLink, collaborationPolicyData: CollaborationPolicyDto, isDirectory: Bool = false, canEdit: Bool = false, createDate: Date = Date(), expiration: Date? = nil) {
-		self.id = id
-		self.href = href
-		self.phoneNumber = phoneNumber
-		self.invitee = invitee
-		self.createdBy = createdBy
-		self.accessMode = accessMode
-		self.protectionLevel = protectionLevel
-		self.collaborationPolicyData = collaborationPolicyData
-		self.isDirectory = isDirectory
-		self.canEdit = canEdit
-		self.createDate = createDate
-		self.expiration = expiration
-	}
+	public init() {}
 	
 	private enum CodingKeys: String, CodingKey {
 		case className = "$class"
