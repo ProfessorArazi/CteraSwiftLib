@@ -7,6 +7,7 @@
 
 import Foundation
 public struct CollaboratorDto: Codable, Hashable, Equatable {
+	private let className = "Collaborator"
 	public let type: CollaboratorType
 	public let uid: Int?
 	public let email: String?
@@ -27,5 +28,17 @@ public struct CollaboratorDto: Codable, Hashable, Equatable {
 		self.name = name
 		self.frequentlyUsed = frequentlyUsed
 		self.userAvatarName = userAvatarName
+	}
+	
+	private enum CodingKeys: String, CodingKey {
+		case className = "$class"
+		case type
+		case uid
+		case email
+		case firstName
+		case lastName
+		case name
+		case frequentlyUsed
+		case userAvatarName
 	}
 }

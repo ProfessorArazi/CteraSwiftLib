@@ -6,6 +6,7 @@
 //
 
 public struct CollaborationPolicyDto: Codable, Hashable, Equatable {
+	private let className = "PreVerifySingleShareResult"
 	public let protectionLevels: [ProtectionLevelDto]
 	public let maxPermission: ItemPermissionDto
 	public let defaultProtectionLevel: ProtectionLevelDto
@@ -17,6 +18,7 @@ public struct CollaborationPolicyDto: Codable, Hashable, Equatable {
 	}
 	
 	enum CodingKeys: String, CodingKey {
+		case className = "$class"
 		case protectionLevels
 		case maxPermission
 		case defaultProtectionLevel = "deafaultProtectionLevel"
