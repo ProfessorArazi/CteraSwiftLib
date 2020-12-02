@@ -204,26 +204,12 @@ enum StringFormatter {
 	}
 	
 	static func saveCollaboration(at path: String, _ collaboration: CollaborationDto) -> String {
-		var collJson = try! JsonObject(data: collaboration.json(format: .standardFormat))
-
-		if var shares = collJson.jsonArray(key: "shares") {
-			for i in 0..<shares.count {
-				let share = shares.jsonObject(at: i)!
-					.with(key: "$class", "ShareConfig")
-
-				shares[i] = share
-			}
-			
-			collJson["shares"] = shares
-		}
+		let collJson = try! JsonObject(data: collaboration.json(format: .standardFormat))
 		
 		return JsonObject()
 			.with(key: "name", "shareResource")
 			.with(key: "type", "user-defined")
-			.with(key: "param", collJson
-					.with(key: "$class", "ShareResourceParam")
-					.with(key: "url", path)
-			)
+			.with(key: "param", collJson.with(key: "url", path))
 			.xmlString
 	}
 	

@@ -6,9 +6,10 @@
 //
 
 public struct CollaborationDto: Codable, Equatable {
+	private let className = "ShareResourceParam"
 	public var shares: [ShareDto]
 	public var owner: CollaboratorDto
-
+	
 	public var allowReshare: Bool
 	public var teamProject: Bool
 	public var shouldSync: Bool
@@ -34,5 +35,19 @@ public struct CollaborationDto: Codable, Equatable {
 		self.showAllowReshare = showAllowReshare
 		self.canModifyShouldSync = canModifyShouldSync
 		self.canModifySyncWinNtAcl = canModifySyncWinNtAcl
+	}
+	
+	private enum CodingKeys: String, CodingKey {
+		case className = "$class"
+		case shares
+		case owner
+		case allowReshare
+		case teamProject
+		case shouldSync
+		case enableSyncWinNtExtendedAttributes
+		case canModifyTeamProject
+		case showAllowReshare
+		case canModifyShouldSync
+		case canModifySyncWinNtAcl
 	}
 }

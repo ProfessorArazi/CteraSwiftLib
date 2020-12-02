@@ -7,6 +7,7 @@
 
 import Foundation
 public struct ShareDto: Codable, Hashable, Equatable {
+	private let className = "ShareConfig"
 	public var id: Int
 	public var href: String
 	public var phoneNumber: String?
@@ -35,7 +36,8 @@ public struct ShareDto: Codable, Hashable, Equatable {
 		self.expiration = expiration
 	}
 	
-	private enum CodingKeys : CodingKey {
+	private enum CodingKeys: String, CodingKey {
+		case className = "$class"
 		case id
 		case href
 		case phoneNumber
