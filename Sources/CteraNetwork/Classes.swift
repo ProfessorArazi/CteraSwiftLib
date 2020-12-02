@@ -12,7 +12,7 @@ import CteraModels
 
 public class ProgressTask {
 	public let progress: Progress
-	private let task: URLSessionTask?
+	public let task: URLSessionTask?
 	
 	public init(totalUnitCount count: Int64) {
 		progress = Progress(totalUnitCount: count)
