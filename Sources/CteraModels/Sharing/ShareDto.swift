@@ -48,4 +48,5 @@ public enum CollaboratorType: String, Codable {
 	case external
 	case group
 	case localUser
+	case adUser
 }
