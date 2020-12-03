@@ -23,6 +23,21 @@ public extension DateFormatter {
 	static let dateOnlyFormat = DateFormatter(format: "yyyy-MM-dd")
 }
 
+public extension JSONDecoder.DateDecodingStrategy {
+	/// decoding strategy for multiple date formats where only "expiration" is formatted by date.
+	///other date are formatted with the `standardFormat`.
+	static var expirationStrategy: JSONDecoder.DateDecodingStrategy {
+		return .custom { decoder -> Date in
+			let container = try decoder.singleValueContainer()
+			let str = try container.decode(String.self)
+			let key = decoder.codingPath.last!.stringValue.lowercased()
+			
+			let format: DateFormatter = key == "expiration" ? .dateOnlyFormat : .standardFormat
+			return format.date(from: str)!
+		}
+	}
+}
+
 public extension Int64 {
 	/// calculates and returns a string representation of this value in byte units.
 	var sizeFormat: String {

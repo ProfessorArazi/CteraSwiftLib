@@ -515,7 +515,7 @@ public enum HttpClient {
 			.set(contentType: .xml)
 			.set(body: StringFormatter.getPublicLinks(at: item.path))
 		
-		handle(request: req, { try [PublicLinkDto].fromFormatted(json: $0, dateStrategy: PublicLinkDto.dateStrategy) }, handler: handler)
+		handle(request: req, { try [PublicLinkDto].fromFormatted(json: $0, dateStrategy: .expirationStrategy) }, handler: handler)
 	}
 	
 	public static func createPublicLink(with link: PublicLinkDto, handler: @escaping (Response<PublicLinkDto>) -> ()) {
@@ -525,7 +525,7 @@ public enum HttpClient {
 			.set(contentType: .xml)
 			.set(body: StringFormatter.createPublicLink(from: link))
 		
-		handle(request: req, { try PublicLinkDto.fromFormatted(json: $0, dateStrategy: PublicLinkDto.dateStrategy) }, handler: handler)
+		handle(request: req, { try PublicLinkDto.fromFormatted(json: $0, dateStrategy: .expirationStrategy) }, handler: handler)
 	}
 	
 	public static func modifyPublicLink(with link: PublicLinkDto, remove: Bool, handler: @escaping (Response<Data>) -> ()) {
@@ -545,7 +545,7 @@ public enum HttpClient {
 			.set(contentType: .xml)
 			.set(body: StringFormatter.listShares(for: item.path))
 		
-		handle(request: req, CollaborationDto.fromFormatted(json:), handler: handler)
+		handle(request: req, { try CollaborationDto.fromFormatted(json: $0, dateStrategy: .expirationStrategy) }, handler: handler)
 	}
 	
 	public static func saveCollaboration(at path: String, _ collaboration: CollaborationDto, handler: @escaping (Response<Data>) -> ()) {

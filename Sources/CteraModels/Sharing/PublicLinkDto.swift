@@ -50,14 +50,4 @@ public struct PublicLinkDto: Codable, Hashable, Equatable {
 		case expiration
 		case creationDate = "createDate"
 	}
-	
-	/// decoding strategy for both date formats (createDate & expiration)
-	public static var dateStrategy: JSONDecoder.DateDecodingStrategy = .custom { decoder -> Date in
-		let key = decoder.codingPath.last! as! PublicLinkDto.CodingKeys
-		let container = try decoder.singleValueContainer()
-		let str = try container.decode(String.self)
-		
-		let format: DateFormatter = key == .expiration ?  .dateOnlyFormat : .standardFormat
-		return format.date(from: str)!
-	}
 }
