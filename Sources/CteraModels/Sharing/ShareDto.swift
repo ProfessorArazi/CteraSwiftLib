@@ -46,7 +46,7 @@ public struct ShareDto: Codable, Hashable, Equatable {
 
 public enum CollaboratorType: String, Codable {
 	case external
-	case group
+	case localGroup
 	case localUser
 	case adUser
 }
