@@ -37,4 +37,24 @@ class CollaborationTests: BaseNetworkTest {
 		
 		wait(for: [e], timeout: 60)
 	}
+	
+	func testValidation() {
+		let e = XCTestExpectation(description: "Waiting for requests")
+		let item = ItemInfoDto(path: HttpClient.SERVICE_WEBDAV + "/big1")
+		
+		var collaborator = CollaboratorDto()
+		collaborator.type = .external
+		collaborator.email = "Bubu@bubu.com"
+		HttpClient.validateCollaborator(for: item, invitee: collaborator) { response in
+			switch response {
+			case .success:
+				break
+			case .error(let error):
+				XCTFail(error.localizedDescription)
+			}
+			e.fulfill()
+		}
+		
+		wait(for: [e], timeout: 60)
+	}
 }

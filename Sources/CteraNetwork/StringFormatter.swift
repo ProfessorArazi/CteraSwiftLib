@@ -220,7 +220,7 @@ enum StringFormatter {
 			.with(key: "param", JsonObject()
 					.with(key: "$class", "PreVerifyShareParam")
 					.with(key: "url", item.path)
-					.with(key: "invitee", invitee)
+					.with(key: "invitee", try! JsonObject(encodable: invitee))
 			)
 			.xmlString
 	}

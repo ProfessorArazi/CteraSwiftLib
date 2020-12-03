@@ -30,7 +30,7 @@ public enum TrustManager {
 class Session: NSObject, URLSessionTaskDelegate {
 	func urlSession(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
 		guard let serverTrust = challenge.protectionSpace.serverTrust,
-			  let publicKey = SecTrustCopyPublicKey(serverTrust) else {
+			  let publicKey = SecTrustCopyKey(serverTrust) else {
 			completionHandler(.performDefaultHandling, nil)
 			return
 		}
