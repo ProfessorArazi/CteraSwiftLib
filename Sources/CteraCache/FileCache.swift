@@ -67,8 +67,9 @@ public enum FileCache {
 	public static subscript(key: String) -> CacheItem? { cache[key] }
 	
 	private static func updateJson() {
+		let copy = cache //using copy to avoid manipulation while queue is busy
 		queue.async {
-			try! FileSystem.write(data: cache.json(format: .standardFormat), to: .fileCache)
+			try! FileSystem.write(data: copy.json(), to: .fileCache)
 		}
 	}
 }

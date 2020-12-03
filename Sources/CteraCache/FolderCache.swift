@@ -32,7 +32,9 @@ public enum FolderCache {
 	}
 	
 	private static func update() {
-		let copy = cache //using copy to avoid manipulation while queue is budy
-		queue.async { try! FileSystem.write(data: copy.json(format: .standardFormat), to: .folderCache) }
+		let copy = cache //using copy to avoid manipulation while queue is busy
+		queue.async {
+			try! FileSystem.write(data: copy.json(), to: .folderCache)
+		}
 	}
 }
