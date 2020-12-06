@@ -13,7 +13,7 @@ public struct VersionDto: Codable, Equatable {
 	public var restorable: Bool = false
 	public var deleted: Bool = false
 	public var size: Int64 = 0
-	public var relativeTime: Int64 = 0
+	public var relativeTimeStr: String = ""
 	
 	public init() {}
 	
@@ -24,6 +24,6 @@ public struct VersionDto: Codable, Equatable {
 		case restorable
 		case deleted
 		case size = "getcontentlength"
-		case relativeTime = "fileRelativeTime"
+		case relativeTimeStr = "fileRelativeTime"
 	}
 }
