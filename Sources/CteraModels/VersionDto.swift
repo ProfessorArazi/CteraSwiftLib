@@ -14,6 +14,8 @@ public struct VersionDto: Codable, Equatable {
 	public var deleted: Bool = false
 	public var size: Int64 = 0
 	public var relativeTimeStr: String = ""
+	public var snapshotTimeStr: String = ""
+	public var lastActionBy = LastActionDto()
 	
 	public init() {}
 	
@@ -25,5 +27,7 @@ public struct VersionDto: Codable, Equatable {
 		case deleted
 		case size = "getcontentlength"
 		case relativeTimeStr = "fileRelativeTime"
+		case snapshotTimeStr = "snapshotTime"
+		case lastActionBy
 	}
 }
