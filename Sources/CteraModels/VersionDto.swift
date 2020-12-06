@@ -10,6 +10,7 @@ public struct VersionDto: Codable, Equatable {
 	public var timestamp: Date = Date()
 	public var fullUrl: String = ""
 	public var modifier: String = ""
+	public var current: Bool = false
 	public var restorable: Bool = false
 	public var deleted: Bool = false
 	public var size: Int64 = 0
@@ -23,6 +24,7 @@ public struct VersionDto: Codable, Equatable {
 		case timestamp
 		case fullUrl
 		case modifier
+		case current
 		case restorable
 		case deleted
 		case size = "getcontentlength"
