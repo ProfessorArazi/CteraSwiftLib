@@ -58,7 +58,7 @@ class TestHandler: BackgroundTaskHandler {
 	
 	let e: XCTestExpectation
 	let expected: ExpectedResult
-	let payload: SrcDestData
+	var payload: SrcDestData
 	
 	internal init(_ e: XCTestExpectation, expectedResult result: ExpectedResult = .done, _ payload: SrcDestData) {
 		self.e = e
@@ -78,13 +78,11 @@ class TestHandler: BackgroundTaskHandler {
 			return
 		}
 		
-		var sd = payload
-		sd.taskJson = task
-		sd.taskJson.put(key: "cursor", task.jsonObject(key: "cursor")!.with(key: "handler", handler.rawValue))
+		payload.taskJson = task.with(key: "cursor", task.jsonObject(key: "cursor")!.with(key: "handler", handler.rawValue))
 		
 		resolved = true
 		
-		HttpClient.resolveConflict(sd, handler: self)
+		HttpClient.resolveConflict(payload, handler: self)
 	}
 	
 	func onTaskError(error: Error) {
