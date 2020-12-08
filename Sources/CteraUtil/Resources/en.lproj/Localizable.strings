@@ -34,3 +34,8 @@
 "permissionReadOnly" = "Read Only";
 "permissionReadWrite" = "Read Write";
 "permissionDenied" = "No Access";
+
+//MARK: - Protection Level
+"publicLink" = "Public Link";
+"email" = "Email";
+"sms" = "SMS";

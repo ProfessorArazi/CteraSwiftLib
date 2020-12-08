@@ -37,6 +37,11 @@ public extension String {
 	static let permissionReadOnly = "permissionReadOnly".localizedModule
 	static let permissionReadWrite = "permissionReadWrite".localizedModule
 	static let permissionDenied = "permissionDenied".localizedModule
+	
+	//MARK: - Protection Level
+	static let publicLink = "publicLink".localizedModule
+	static let email = "email".localizedModule
+	static let sms = "sms".localizedModule
 
 	//MARK: - Error Messages
 	static let noConnectionMsg = "noConnectionMsg".localizedModule
