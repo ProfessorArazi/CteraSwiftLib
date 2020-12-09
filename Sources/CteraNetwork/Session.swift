@@ -27,8 +27,8 @@ public enum TrustManager {
 	}
 }
 
-class Session: NSObject, URLSessionTaskDelegate {
-	func urlSession(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
+public class Session: NSObject, URLSessionTaskDelegate {
+	public func urlSession(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
 		guard let serverTrust = challenge.protectionSpace.serverTrust,
 			  let publicKey = SecTrustCopyPublicKey(serverTrust) else {
 			completionHandler(.performDefaultHandling, nil)
@@ -43,33 +43,33 @@ class Session: NSObject, URLSessionTaskDelegate {
 		}
 	}
 	
-	func urlSession(_ session: URLSession, task: URLSessionTask, willPerformHTTPRedirection response: HTTPURLResponse, newRequest request: URLRequest, completionHandler: @escaping (URLRequest?) -> Void) {
+	public func urlSession(_ session: URLSession, task: URLSessionTask, willPerformHTTPRedirection response: HTTPURLResponse, newRequest request: URLRequest, completionHandler: @escaping (URLRequest?) -> Void) {
 		completionHandler(nil)
 	}
 }
 
-class BackgroundSession: Session, URLSessionDownloadDelegate, URLSessionDataDelegate {
+public class BackgroundSession: Session, URLSessionDownloadDelegate, URLSessionDataDelegate {
 	/**
 	completion handler for finishing background work.
 	when a background task is completed the session awakes the app and we get a "done" completion handler to tell the system when we are done.
 	
 	we call this handler when all the current donwloads are done, to close the app.
 	*/
-	static var backgroundCompletionHandler: (()->())?
+	public static var backgroundCompletionHandler: (()->())?
 	
 	var downloadHandlers: [URLSessionDownloadTask: (URL?, URLResponse?, Error?) -> ()] = [:]
 	var uploadHandlers: [URLSessionTask: (Data?, URLResponse?, Error?) -> ()] = [:]
 	private var uploadResponseData: [URLSessionTask: Data] = [:]
 	
 	//finished download
-	func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL) {
+	public func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL) {
 		if let handler = downloadHandlers.removeValue(forKey: downloadTask) {
 			handler(location, downloadTask.response, downloadTask.error)
 		}
 	}
 	
 	//receive upload response data
-	func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive data: Data) {
+	public func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive data: Data) {
 		uploadResponseData[dataTask] = data
 	}
 	
