@@ -34,6 +34,17 @@ public enum FileCache {
 			try? FileManager.default.removeItem(at: cacheItem.localUrl)
 			cache.removeValue(forKey: path)
 		}
+		
+		updateJson()
+	}
+	
+	public static func removeAll(where predicate: @escaping (String) -> Bool) {
+		for (path, cacheItem) in cache.filter({ predicate($0.key) }) {
+			try? FileManager.default.removeItem(at: cacheItem.localUrl)
+			cache.removeValue(forKey: path)
+		}
+		
+		updateJson()
 	}
 	
 	public static func clear() {
