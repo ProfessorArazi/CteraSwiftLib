@@ -12,6 +12,7 @@ public struct ShareDto: Codable, Hashable, Equatable {
 	public var href: String = ""
 	public var resourceName: String = ""
 
+	public var phoneNumber: String?
 	public var invitee = CollaboratorDto()
 	public var createdBy = CollaboratorDto()
 	public var accessMode = ItemPermissionDto.None
@@ -31,6 +32,7 @@ public struct ShareDto: Codable, Hashable, Equatable {
 		case href
 		case resourceName
 		
+		case phoneNumber
 		case invitee
 		case createdBy
 		case accessMode
