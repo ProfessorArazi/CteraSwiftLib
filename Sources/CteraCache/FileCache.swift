@@ -29,10 +29,12 @@ public enum FileCache {
 		}
 	}
 	
-	public static func remove(at path: String) {
-		if let cacheItem = FileCache[path] {
-			try? FileManager.default.removeItem(at: cacheItem.localUrl)
-			cache.removeValue(forKey: path)
+	public static func remove(at paths: [String]) {
+		for path in paths {
+			if let cacheItem = FileCache[path] {
+				try? FileManager.default.removeItem(at: cacheItem.localUrl)
+				cache.removeValue(forKey: path)
+			}
 		}
 		
 		updateJson()
