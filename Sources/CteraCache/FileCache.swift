@@ -35,6 +35,11 @@ public struct CacheItem: Codable {
 	public var item: ItemInfoDto
 	public var localUrl: URL
 	
+	public init(item: ItemInfoDto, localUrl: URL) {
+		self.item = item
+		self.localUrl = localUrl
+	}
+	
 	public mutating func isUpToDate(comparedTo item: ItemInfoDto) -> Bool {
 		guard let compareLastModified = item.lastModified else { return true }
 		
