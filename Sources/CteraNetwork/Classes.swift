@@ -10,26 +10,6 @@ import BasicExtensions
 import StorageExtensions
 import CteraModels
 
-public class ProgressTask {
-	public let progress: Progress
-	public let task: URLSessionTask?
-	
-	public init(totalUnitCount count: Int64) {
-		progress = Progress(totalUnitCount: count)
-		task = nil
-	}
-	
-	public init(from task: URLSessionTask) {
-		progress = task.progress
-		self.task = task
-	}
-	
-	public func cancel() {
-		task?.cancel()
-		progress.cancel()
-	}
-}
-
 public struct SrcDestData {
 	public var action: String
 	public var pairs: [(src: String, dest: String)]
@@ -60,38 +40,7 @@ public protocol BackgroundTaskHandler {
 }
 
 public protocol ThumbnailDelegate {
-	func thumbnail(receivedFile url: URL, for item: ItemInfoDto, completion: @escaping ()->())
-}
-
-extension Encryptor {
-	static func decrypt(file src: URL, to dest: URL, task: ProgressTask? = nil) {
-		FileManager.default.createFile(atPath: dest.path, contents: nil)
-		
-		let readHandle = try! FileHandle(forReadingFrom: src)
-		let writeHandle = try! FileHandle(forWritingTo: dest)
-		
-		let SIZE = (32 * 1024) + 28
-		var offset: UInt64 = 0
-		var chunck: Data = readHandle.readData(ofLength: SIZE)
-		
-		while chunck.count > 0 {
-			 if task?.progress.isCancelled ?? false {
-				try! FileManager.default.removeItem(at: dest)
-				break
-			}
-			
-			autoreleasepool {
-				writeHandle.write(try! decrypt(data: chunck))
-				offset += UInt64(chunck.count)
-				readHandle.seek(toFileOffset: offset)
-				chunck = readHandle.readData(ofLength: SIZE)
-				task?.progress.completedUnitCount += Int64(chunck.count)
-			}
-		}
-		
-		readHandle.closeFile()
-		writeHandle.closeFile()
-	}
+	func thumbnail(receivedFile url: URL, for item: ItemInfoDto)
 }
 
 class ParserDelegate: NSObject, XMLParserDelegate {

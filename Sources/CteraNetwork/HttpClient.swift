@@ -42,6 +42,7 @@ public enum HttpClient {
 //	public static var isPortalReadOnly = false
 	public static var onConnectionChanged: [(Bool)->()] = []
 	public static var thumbnailDelegate: ThumbnailDelegate?
+	public static var fileCache: FileCache?
 	
 	public static let SERVICE_WEBDAV = "/ServicesPortal/webdav"
 	
@@ -139,27 +140,22 @@ public enum HttpClient {
 		handle(request: req, handler: handler)
 	}
 	
-	public static func requestFile(for item: ItemInfoDto, autoDeleteTempFile: Bool = false, config: @escaping (ProgressTask)->(), handler: @escaping (Response<URL>) -> ()) {
+	public static func requestFile(for item: ItemInfoDto, config: @escaping (ProgressTask)->(), handler: @escaping (Response<URL>) -> ()) {
 		Console.log(tag: TAG, msg: "\(#function), \(item.name)")
 		let fm = FileManager.default
 		
-		if var cacheItem = FileCache[item.path],
-		   fm.fileExists(atPath: cacheItem.localUrl.path)
-			&& cacheItem.isUpToDate(comparedTo: item) {
-			let tempFile = fm.temporaryDirectory.appendingPathComponent(UUID().uuidString).appendingPathExtension(item.ext ?? "")
-			if fm.fileExists(atPath: tempFile.path) {
-				try! fm.removeItem(at: tempFile)
+		if let fileCache = fileCache, let cacheItem = fileCache.item(for: item) {
+			let task = fileCache.provide(item: cacheItem) { result in
+				switch result {
+				case .success(let url):
+					thumbnailDelegate?.thumbnail(receivedFile: url, for: item)
+					post { handler(.success(url)) }
+				case .failure(let error):
+					post { handler(.error(error)) }
+				}
 			}
 			
-			let task = ProgressTask(totalUnitCount: item.size ?? 0)
 			config(task)
-			
-			async {
-				Encryptor.decrypt(file: cacheItem.localUrl, to: tempFile, task: task)
-				thumbnailDelegate?.thumbnail(receivedFile: tempFile, for: item, completion: {})
-				post { handler(.success(tempFile)) }
-			}
-			
 			return
 		}
 		
@@ -185,26 +181,20 @@ public enum HttpClient {
 				}
 				
 				Console.log(tag: TAG, msg: "download done, success: " + (e == nil && status == 200  ? "Yes" : "No"))
-				var tempFile: URL? = nil
 				if let url = u {
-					tempFile = fm.temporaryDirectory.appendingPathComponent(UUID().uuidString).appendingPathExtension(item.ext ?? "")
-					if fm.fileExists(atPath: tempFile!.path) {
-						try! fm.removeItem(at: tempFile!)
+					let tempFile = fm.temporaryDirectory.appendingPathComponent(UUID().uuidString).appendingPathExtension(item.ext ?? "")
+					
+					if fm.fileExists(atPath: tempFile.path) {
+						try! fm.removeItem(at: tempFile)
 					}
-					try! fm.moveItem(at: url, to: tempFile!)
-					post { handler(.success(tempFile!)) }
+					try! fm.moveItem(at: url, to: tempFile)
+					
+					fileCache?.save(file: tempFile, with: item)
+					thumbnailDelegate?.thumbnail(receivedFile: tempFile, for: item)
+					
+					post { handler(.success(tempFile)) }
 				} else {
 					post { handler(.error(e ?? Errors.text(.error))) }
-				}
-				
-				if let clearFileUrl = tempFile {
-					FileCache.save(file: clearFileUrl, with: item)
-					
-					thumbnailDelegate?.thumbnail(receivedFile: clearFileUrl, for: item) {
-						if autoDeleteTempFile {
-							try? fm.removeItem(at: clearFileUrl)
-						}
-					}
 				}
 			}
 			
