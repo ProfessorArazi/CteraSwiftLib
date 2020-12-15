@@ -9,7 +9,7 @@ import Foundation
 public enum ProtectionLevelDto: String, Codable { //2 step verification types
 	case publicLink, textMessage, email
 	
-	var prettyString: String {
+	public var prettyString: String {
 		switch self {
 		case .publicLink: 	return .publicLink
 		case .textMessage:	return .sms
