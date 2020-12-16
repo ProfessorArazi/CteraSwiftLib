@@ -90,7 +90,6 @@ public extension String {
 }
 
 public extension Folder {
-	static let downloads =	Folder(name: "_______________-")
 	static let logs =		Folder(name: "______________--")
 }
 
