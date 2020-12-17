@@ -43,6 +43,17 @@ public protocol ThumbnailDelegate {
 	func thumbnail(receivedFile url: URL, for item: ItemInfoDto)
 }
 
+public enum Errors: LocalizedError {
+	case text(String), offline
+	
+	public var errorDescription: String? {
+		switch self {
+		case .text(let msg): return msg
+		case .offline: return .noConnectionMsg
+		}
+	}
+}
+
 class ParserDelegate: NSObject, XMLParserDelegate {
 	
 	static func parse(data: Data) -> String {
@@ -76,18 +87,6 @@ class ParserDelegate: NSObject, XMLParserDelegate {
 		}
 	}
 }
-
-enum Errors: LocalizedError {
-	case text(String), offline
-	
-	var errorDescription: String? {
-		switch self {
-		case .text(let msg): return msg
-		case .offline: return .noConnectionMsg
-		}
-	}
-}
-
 
 struct Auth {
 	let semaphore = DispatchSemaphore(value: 1)
