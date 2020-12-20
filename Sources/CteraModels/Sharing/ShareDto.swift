@@ -12,7 +12,7 @@ public struct ShareDto: Codable, Hashable, Equatable {
 	public var href: String = ""
 	public var resourceName: String = ""
 
-	public var phoneNumber: String?
+	public var phoneNumber: PhoneNumberDto?
 	public var invitee = CollaboratorDto()
 	public var createdBy = CollaboratorDto()
 	public var accessMode = ItemPermissionDto.None
