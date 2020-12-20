@@ -44,6 +44,27 @@ public struct ShareDto: Codable, Hashable, Equatable {
 		case createDate
 		case expiration
 	}
+	
+	public func encode(to encoder: Encoder) throws {
+		var values = encoder.container(keyedBy: CodingKeys.self)
+		
+		try values.encode(className, forKey: .className)
+		try values.encode(id, forKey: .id)
+		try values.encode(href, forKey: .href)
+		try values.encode(resourceName, forKey: .resourceName)
+		
+		try values.encodeIfPresent(phoneNumber?.phoneNumber, forKey: .phoneNumber) //all for this
+		try values.encode(invitee, forKey: .invitee)
+		try values.encode(createdBy, forKey: .createdBy)
+		try values.encode(accessMode, forKey: .accessMode)
+		try values.encodeIfPresent(protectionLevel, forKey: .protectionLevel)
+		try values.encode(collaborationPolicyData, forKey: .collaborationPolicyData)
+		
+		try values.encode(isDirectory, forKey: .isDirectory)
+		try values.encode(canEdit, forKey: .canEdit)
+		try values.encode(createDate, forKey: .createDate)
+		try values.encodeIfPresent(expiration, forKey: .expiration)
+	}
 }
 
 public enum CollaboratorType: String, Codable {

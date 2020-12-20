@@ -13,11 +13,12 @@ import CteraModels
 class CollaborationTests: BaseNetworkTest {
 	func testSaveCollaboration() {
 		let e = XCTestExpectation(description: "Waiting for requests")
-		let item = ItemInfoDto(path: HttpClient.SERVICE_WEBDAV + "/big1")
+		let item = ItemInfoDto(path: HttpClient.SERVICE_WEBDAV + "/A1")
 		HttpClient.requestCollaboration(for: item) { fetchRes in
 			switch fetchRes {
 			case .success(var coll):
 				coll.shares[0].accessMode = .PreviewOnly
+//				coll.shares[0].phoneNumber = PhoneNumberDto(phoneNumber: "+972123456789")
 				
 				HttpClient.saveCollaboration(at: item.path, coll) { saveRes in
 					switch saveRes {
