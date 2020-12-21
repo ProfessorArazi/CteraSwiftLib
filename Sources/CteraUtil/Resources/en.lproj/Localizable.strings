@@ -39,3 +39,7 @@
 "publicLink" = "Public Link";
 "email" = "Email";
 "sms" = "SMS";
+
+//MARK: - Error Messages
+"noConnectionMsg" = "There is no network connectivity. Please try again later.";
+"fileNotFoundErrorMsg" = "File not found";
