@@ -89,14 +89,24 @@ public extension String {
 	}
 }
 
+public extension FileSystem {
+	static func create(folder: Folder, withIntermediateDirectories: Bool = true) throws {
+		try FileManager.default.createDirectory(at: url(of: folder), withIntermediateDirectories: withIntermediateDirectories)
+	}
+}
+
 public extension Folder {
 	static let logs =		Folder(name: "______________--")
+	static let downloads =	Folder(name: "_____________---")
+	static let uploads =	Folder(name: "____________----")
 }
 
 public extension Filename {
 	//Prefs.standard filename is "_", defined in SwiftExtensions Package
 	static let fileCache = 			Filename(name: "-_______________")
 	static let folderCache = 		Filename(name: "--______________")
+	static let downloadTasks = 		Filename(name: "___-------------")
+	static let uploadTasks = 		Filename(name: "____------------")
 }
 
 public extension Encodable {

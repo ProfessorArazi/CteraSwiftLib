@@ -31,8 +31,13 @@ public enum HttpClient {
 		
 		let queue = OperationQueue()
 		queue.maxConcurrentOperationCount = 5
-		return URLSession(configuration: config, delegate: BackgroundSession(), delegateQueue: queue)
+		return URLSession(configuration: config, delegate: backgroundSessionDelegate, delegateQueue: queue)
 	}()
+	
+	static let backgroundSessionDelegate = BackgroundSession()
+	
+	public static var downloadDelegate: DownloadDelegate { backgroundSessionDelegate.downloadDelegate }
+	public static var uploadDelegate: UploadDelegate { backgroundSessionDelegate.uploadDelegate }
 	
 	//MARK: Public API
 	public private(set) static var hasConnection = true
@@ -142,7 +147,6 @@ public enum HttpClient {
 	
 	public static func requestFile(for item: ItemInfoDto, config: @escaping (ProgressTask)->(), handler: @escaping (Response<URL>) -> ()) {
 		Console.log(tag: TAG, msg: "\(#function), \(item.name)")
-		let fm = FileManager.default
 		
 		if let fileCache = fileCache, let cacheItem = fileCache.item(for: item) {
 			let task = fileCache.provide(item: cacheItem) { result in
@@ -165,43 +169,15 @@ public enum HttpClient {
 		}
 		
 		verifySession { //must verify session before creating download task.
-			var path = item.path
-			path.remove(at: item.path.startIndex)
+			let path = String(item.path.dropFirst())
 			let req = URLRequest(to: serverAddress, path)
 			
 			let task = backgroundSession.downloadTask(with: req)
-			
-			if let size = item.size { task.countOfBytesClientExpectsToReceive = size } //for background downloads
-			let handler = { (u: URL?, r: URLResponse?, e: Error?) in
-				guard let status = (r as? HTTPURLResponse)?.statusCode else { return }
-				guard status != 404 else {
-					if let tempFile = u { try? fm.removeItem(at: tempFile) }
-					post { handler(.error(Errors.text(.fileNotFoundErrorMsg))) }
-					return
-				}
-				
-				Console.log(tag: TAG, msg: "download done, success: " + (e == nil && status == 200  ? "Yes" : "No"))
-				if let url = u {
-					let tempFile = fm.temporaryDirectory.appendingPathComponent(UUID().uuidString).appendingPathExtension(item.ext ?? "")
-					
-					if fm.fileExists(atPath: tempFile.path) {
-						try! fm.removeItem(at: tempFile)
-					}
-					try! fm.moveItem(at: url, to: tempFile)
-					
-					fileCache?.save(file: tempFile, with: item)
-					thumbnailDelegate?.thumbnail(receivedFile: tempFile, for: item)
-					
-					post { handler(.success(tempFile)) }
-				} else {
-					post { handler(.error(e ?? Errors.text(.error))) }
-				}
-			}
-			
-			(backgroundSession.delegate as! BackgroundSession).downloadHandlers[task] = handler
 			task.resume()
-			
 			config(ProgressTask(from: task))
+			if let size = item.size { task.countOfBytesClientExpectsToReceive = size }
+			
+			downloadDelegate.onStart(task, item, handler)
 		}
 	}
 	
@@ -250,7 +226,7 @@ public enum HttpClient {
 	
 	public static func uploadRequest(_ fileUrl: URL, to itemPath: String,
 									 onStart: @escaping (URLSessionUploadTask)->() = { $0.resume() },
-									 handler: @escaping ()->()) {
+									 handler: @escaping Handler<Void>) {
 		Console.log(tag: Self.TAG, msg: #function)
 		async {
 			let boundary = "----MobileBoundaryRRD29pvBCUWyLIg"
@@ -258,54 +234,11 @@ public enum HttpClient {
 				.set(method: .POST)
 				.set(contentType: ContentType(stringLiteral: "multipart/form-data; boundary=\(boundary)"))
 			
-			let uploadFileUrl = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
-			
-			let bodyStart = Data(StringFormatter.multipartData(filePath: itemPath).utf8)
-			let bodyEnd = Data("\r\n--\(boundary)--\r\n".utf8)
-			try! bodyStart.write(to: uploadFileUrl)
-			
-			//Prepare file with boundaries
-			let readHandle = try! FileHandle(forReadingFrom: fileUrl)
-			let writeHandle = try! FileHandle(forWritingTo: uploadFileUrl)
-			writeHandle.seekToEndOfFile() //append to bodyStart
-			
-			let SIZE = 32 * 1000
-			var offset: UInt64 = 0
-			var chunck: Data = readHandle.readData(ofLength: SIZE)
-			
-			while chunck.count > 0 {
-				autoreleasepool {
-					writeHandle.write(chunck)
-					offset += UInt64(chunck.count)
-					
-					readHandle.seek(toFileOffset: offset)
-					chunck = readHandle.readData(ofLength: SIZE)
-				}
-			}
-			writeHandle.write(bodyEnd)
-			
-			readHandle.closeFile()
-			writeHandle.closeFile()
+			let uploadFileUrl = uploadDelegate.multipartDataFile(fileUrl, boundary: boundary, for: itemPath)
 			
 			//upload
 			let task = backgroundSession.uploadTask(with: req, fromFile: uploadFileUrl)
-			let del = (backgroundSession.delegate as! BackgroundSession)
-			
-			del.uploadHandlers[task] = { (d, r, e) in
-				try! FileManager.default.removeItem(at: uploadFileUrl)
-				
-				if e == nil {
-					let str = String(decoding: d!, as: UTF8.self)
-					Console.log(tag: TAG, msg: str)
-					post { handler() }
-				} else {
-					Console.log(tag: TAG, msg: "error: \(e!.localizedDescription)")
-				}
-			}
-			
-			let _ = task.progress.observe(\.fractionCompleted) { progress, _ in
-				Console.log(tag: TAG, msg: "\(round(progress.fractionCompleted * 100))")
-			}
+			uploadDelegate.onStart(task, path: itemPath, filename: uploadFileUrl.lastPathComponent, handler)
 			onStart(task)
 		}
 	}
@@ -586,6 +519,10 @@ public enum HttpClient {
 			.set(body: StringFormatter.fileVersions(for: item))
 		
 		handle(request: req, [VersionDto].fromFormatted(json:), handler: handler)
+	}
+	
+	public static func getTasks(completion: @escaping ([URLSessionDataTask], [URLSessionUploadTask], [URLSessionDownloadTask])->()) {
+		backgroundSession.getTasksWithCompletionHandler(completion)
 	}
 	
 	// MARK: - Private methods

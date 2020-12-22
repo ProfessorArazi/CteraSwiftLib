@@ -69,7 +69,7 @@ enum StringFormatter {
 	static func multipartData(filePath: String) -> String {
 		let line = "\r\n",
 			boundary = "------MobileBoundaryRRD29pvBCUWyLIg",
-			name = filePath.suffix(from: "/")!
+			name = filePath.suffix(from: "/")!.removingPercentEncoding!
 		
 		return "\(boundary)\(line)" +
 			"Content-Disposition: form-data; name=\"fullpath\"\(line)\(line)" +
@@ -174,7 +174,7 @@ enum StringFormatter {
 			.with(key: "isDirectory", link.isFolder)
 			.with(key: "key", link.key)
 			.with(key: "protectionLevel", link.protectionLevel)
-			.with(key: "publicLink", link.link)
+			.with(key: "publicLink", link.link.escaped)
 			.with(key: "resourceName", link.resourceName)
 			.with(key: "isRemove", remove)
 			.with(key: "invitee", JsonObject()

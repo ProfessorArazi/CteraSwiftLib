@@ -10,6 +10,8 @@ import BasicExtensions
 import StorageExtensions
 import CteraModels
 
+public typealias Handler<T> = (Response<T>) -> ()
+
 public struct SrcDestData {
 	public var action: String
 	public var pairs: [(src: String, dest: String)]

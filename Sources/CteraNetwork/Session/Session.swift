@@ -57,15 +57,14 @@ public class BackgroundSession: Session, URLSessionDownloadDelegate, URLSessionD
 	*/
 	public static var backgroundCompletionHandler: (()->())?
 	
-	var downloadHandlers: [URLSessionDownloadTask: (URL?, URLResponse?, Error?) -> ()] = [:]
-	var uploadHandlers: [URLSessionTask: (Data?, URLResponse?, Error?) -> ()] = [:]
 	private var uploadResponseData: [URLSessionTask: Data] = [:]
+	
+	let downloadDelegate = DownloadDelegate()
+	let uploadDelegate = UploadDelegate()
 	
 	//finished download
 	public func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL) {
-		if let handler = downloadHandlers.removeValue(forKey: downloadTask) {
-			handler(location, downloadTask.response, downloadTask.error)
-		}
+		downloadDelegate.onComplete(location, task: downloadTask)
 	}
 	
 	//receive upload response data
@@ -75,10 +74,8 @@ public class BackgroundSession: Session, URLSessionDownloadDelegate, URLSessionD
 	
 	//upload did complete
 	func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
-		if let handler = uploadHandlers[task] {
-			let data = uploadResponseData.removeValue(forKey: task)
-			handler(data, task.response, error)
-		}
+		let data = uploadResponseData.removeValue(forKey: task)
+		uploadDelegate.onComplete(task, with: data)
 	}
 	
 	func urlSessionDidFinishEvents(forBackgroundURLSession session: URLSession) {
