@@ -63,6 +63,10 @@ public class DownloadDelegate {
 	}
 	
 	public func clear() {
+		for task in tasks.values {
+			task.cancel()
+		}
+		
 		items = [:]
 		tasks = [:]
 		handlers = [:]

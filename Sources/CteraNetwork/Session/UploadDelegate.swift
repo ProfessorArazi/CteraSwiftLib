@@ -73,6 +73,10 @@ public class UploadDelegate {
 	}
 	
 	public func clear() {
+		for task in tasks.values {
+			task.cancel()
+		}
+		
 		items = [:]
 		tasks = [:]
 		handlers = [:]
@@ -132,7 +136,7 @@ public class UploadDelegate {
 		
 		defer {
 			if let filename = filename {
-				try? fm.removeItem(at: self.uploadFolder.appendingPathComponent(filename))
+				try? fm.removeItem(at: uploadFolder.appendingPathComponent(filename))
 			}
 			items.removeValue(forKey: task.taskIdentifier)
 			updateJson()
