@@ -97,27 +97,12 @@ public class UploadDelegate {
 		let input = InputStream(url: contentUrl)!
 		let output = OutputStream(url: uploadFile, append: false)!
 
-		input.open()
 		output.open()
+		defer { output.close() }
 		
-		defer {
-			input.close()
-			output.close()
-		}
-		
-		output.write(bodyStart)
-		
-		let maxLength = 32 * 1024
-		let buffer = UnsafeMutablePointer<UInt8>.allocate(capacity: maxLength)
-		
-		while input.hasBytesAvailable {
-			let bytesRead = input.read(buffer, maxLength: maxLength)
-			if bytesRead > 0 {
-				output.write(buffer, maxLength: bytesRead)
-			}
-		}
-		
-		output.write(bodyEnd)
+		output.write(data: Data(bodyStart.utf8))
+		input.readAll { output.write($0, maxLength: $1) }
+		output.write(data: Data(bodyEnd.utf8))
 		
 		return uploadFile
 	}
@@ -174,13 +159,5 @@ public class UploadDelegate {
 		queue.async {
 			try! FileSystem.write(data: ud.json(), to: .uploadTasks)
 		}
-	}
-}
-
-fileprivate extension OutputStream {
-	@discardableResult
-	func write(_ string: String) -> Int {
-		let bytes = [UInt8](string.utf8)
-		return self.write(bytes, maxLength: bytes.count)
 	}
 }
