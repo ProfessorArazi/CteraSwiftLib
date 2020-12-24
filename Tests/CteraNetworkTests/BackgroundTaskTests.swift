@@ -28,12 +28,12 @@ final class BackgroundTaskTests: BaseNetworkTest {
 					case .success((let taskUrl, let payload)):
 						HttpClient.followServerTask(at: taskUrl, handler: TestHandler(e, expectedResult: .conflict(.Override), payload))
 					case .error(let error):
-						fatalError("error: \(error)")
+						XCTFail("error: \(error)")
 					}
 				}
 				
 			case .error(let error):
-				fatalError("error: \(error)")
+				XCTFail("error: \(error)")
 			}
 		}
 		wait(for: [e], timeout: 60 * 60)
