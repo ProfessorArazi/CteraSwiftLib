@@ -20,9 +20,7 @@ final class BackgroundTaskTests: BaseNetworkTest {
 		HttpClient.createFolder(at: HttpClient.SERVICE_WEBDAV, name: "Bubu") { response in
 			switch response {
 			case .success:
-				var item = ItemInfoDto()
-				item.name = "Bubu"
-				item.path = HttpClient.SERVICE_WEBDAV + "/Bubu"
+				let item = ItemInfoDto(path: HttpClient.SERVICE_WEBDAV + "/Bubu")
 				HttpClient.copyMove(isCopy: false, items: [item], folderPath: HttpClient.SERVICE_WEBDAV + "/a") { response in
 					switch response {
 					case .success((let taskUrl, let payload)):
