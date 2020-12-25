@@ -12,16 +12,6 @@
 "error" = "Error";
 "trust" = "Trust";
 
-//MARK: - Sizes
-"zeroBytes" = "0 Bytes";
-"oneByte" = "1 Byte";
-"bytes" = "Bytes";
-"kb" = "KB";
-"mb" = "MB";
-"gb" = "GB";
-"tb" = "TB";
-"pb" = "PB";
-
 //MARK: - Pretty Time
 "lessThanMinuteAgo" = "Less than a minute ago";
 "oneMinuteAgo" = "One minute ago";

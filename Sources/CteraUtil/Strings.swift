@@ -15,16 +15,6 @@ public extension String {
 	static let ok = "ok".localizedModule
 	static let trust = "trust".localizedModule
 
-	//MARK: - Sizes
-	static let zeroBytes = "zeroBytes".localizedModule
-	static let oneByte = "oneByte".localizedModule
-	static let bytes = "bytes".localizedModule
-	static let kb = "kb".localizedModule
-	static let mb = "mb".localizedModule
-	static let gb = "gb".localizedModule
-	static let tb = "tb".localizedModule
-	static let pb = "pb".localizedModule
-
 	//MARK: - Pretty Time
 	static let lessThanMinuteAgo = "lessThanMinuteAgo".localizedModule
 	static let oneMinuteAgo = "oneMinuteAgo".localizedModule

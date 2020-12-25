@@ -48,7 +48,7 @@ public enum Console {
 	}
 	
 	private static func getLogFile() -> URL {
-		try! fm.createDirectory(at: FileSystem.url(of: .logs), withIntermediateDirectories: true, attributes: nil)
+		try! FileSystem.create(folder: .logs)
 		
 		if let lastLog = logFiles().last,
 		   let lastLogSize = lastLog.fileSize, lastLogSize < MAX_LOG_SIZE, //use old log file

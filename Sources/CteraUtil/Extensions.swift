@@ -41,19 +41,7 @@ public extension JSONDecoder.DateDecodingStrategy {
 public extension Int64 {
 	/// calculates and returns a string representation of this value in byte units.
 	var sizeFormat: String {
-		if self == 0 { return .zeroBytes }
-		if self == 1 { return .oneByte }
-		
-		let sizes: [String] = [ .bytes, .kb, .mb, .gb, .tb, .pb ]
-		var index = 0;
-		
-		var prettySize: Double = Double(self);
-		while (prettySize > 1024 && index < sizes.count) {
-			index += 1
-			prettySize /= 1024
-		}
-		
-		return String(format: "%.0f %@", prettySize, sizes[index])
+		ByteCountFormatter.string(fromByteCount: self, countStyle: .file)
 	}
 }
 
