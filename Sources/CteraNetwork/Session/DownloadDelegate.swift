@@ -86,7 +86,7 @@ public class DownloadDelegate {
 	func onComplete(_ url: URL, task: DownloadTask) {
 		guard let item = items[task.taskIdentifier] else {
 			let path = task.originalRequest?.url?.path ?? "No Path"
-			Console.log(tag: Self.TAG, msg: "\(#function), no item found for donwload: \"\(path)\"")
+			Console.log(tag: Self.TAG, msg: "\(#function), no item found for download: \"\(path)\"")
 			return
 		}
 		

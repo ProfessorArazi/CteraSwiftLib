@@ -17,7 +17,7 @@ fileprivate struct UploadData: Codable {
 }
 
 public class UploadDelegate {
-	public typealias UploadTask = URLSessionTask
+	public typealias UploadTask = URLSessionUploadTask
 	
 	private static let TAG = String(describing: UploadDelegate.self)
 	private let queue = DispatchQueue(label: "UploadDelegate")
@@ -116,7 +116,7 @@ public class UploadDelegate {
 		updateJson()
 	}
 	
-	func onComplete(_ task: URLSessionTask, with responseData: Data?) {
+	func onComplete(_ task: URLSessionUploadTask, with responseData: Data?) {
 		let filename = ids.removeValue(forKey: task.taskIdentifier)
 		
 		defer {

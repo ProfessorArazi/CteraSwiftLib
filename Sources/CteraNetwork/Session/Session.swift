@@ -53,7 +53,7 @@ public class BackgroundSession: Session, URLSessionDownloadDelegate, URLSessionD
 	completion handler for finishing background work.
 	when a background task is completed the session awakes the app and we get a "done" completion handler to tell the system when we are done.
 	
-	we call this handler when all the current donwloads are done, to close the app.
+	we call this handler when all the current downloads are done, to close the app.
 	*/
 	public static var backgroundCompletionHandler: (()->())?
 	
@@ -74,6 +74,7 @@ public class BackgroundSession: Session, URLSessionDownloadDelegate, URLSessionD
 	
 	//upload did complete
 	func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
+		guard let task = task as? URLSessionUploadTask else { return }
 		let data = uploadResponseData.removeValue(forKey: task)
 		uploadDelegate.onComplete(task, with: data)
 	}
