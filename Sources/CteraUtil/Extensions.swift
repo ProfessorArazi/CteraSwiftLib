@@ -41,7 +41,7 @@ public extension JSONDecoder.DateDecodingStrategy {
 public extension Int64 {
 	/// calculates and returns a string representation of this value in byte units.
 	var sizeFormat: String {
-		ByteCountFormatter.string(fromByteCount: self, countStyle: .file)
+		ByteCountFormatter.string(fromByteCount: self, countStyle: .memory)
 	}
 }
 
