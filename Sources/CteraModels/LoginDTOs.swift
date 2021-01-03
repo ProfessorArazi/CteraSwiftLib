@@ -6,7 +6,9 @@
 //
 
 public struct PublicInfoDto: Decodable {
+	public let name: String
 	public let hasWebSSO: Bool
+	public let version: String
 }
 
 public struct CredentialsDto: Codable {
