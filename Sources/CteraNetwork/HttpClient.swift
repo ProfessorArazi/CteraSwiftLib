@@ -24,6 +24,7 @@ public enum HttpClient {
 		let bundleID = Bundle.main.infoDictionary!["CFBundleIdentifier"] as! String
 		
 		let config = URLSessionConfiguration.background(withIdentifier: "BackgroundSession-" + bundleID)
+		config.networkServiceType = .default
 		config.sharedContainerIdentifier = Bundle.appGroup
 		#if os(iOS)
 		config.sessionSendsLaunchEvents = true
