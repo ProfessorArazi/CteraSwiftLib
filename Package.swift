@@ -6,7 +6,7 @@ import PackageDescription
 let package = Package(
 	name: "CteraSwiftLib",
 	defaultLocalization: "en",
-	platforms: [.iOS("13.2"), .macOS(.v10_15)],
+	platforms: [.iOS("13.2"), .macOS(.v11)],
 	products: [
 		// Products define the executables and libraries a package produces, and make them visible to other packages.
 		.library(
@@ -59,5 +59,8 @@ let package = Package(
 		.testTarget(
 			name: "CteraNetworkTests",
 			dependencies: ["CteraNetwork", "CteraCache"]),
+		.testTarget(
+			name: "CteraUtilTests",
+			dependencies: ["CteraUtil"]),
 	]
 )

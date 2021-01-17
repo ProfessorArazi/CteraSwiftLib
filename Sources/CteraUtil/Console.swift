@@ -10,6 +10,7 @@ import BasicExtensions
 import StorageExtensions
 
 public enum Console {
+	private static let TAG = String(describing: Console.self)
 	private static let queue = DispatchQueue(label: "Console Queue", qos: .background)
 	private static let fm = FileManager.default
 	private static let MAX_LOG_SIZE = 5 * 1024
@@ -47,6 +48,48 @@ public enum Console {
 		}
 	}
 	
+	/// create a populate a clear text file with all the current logs.
+	/// - Parameters:
+	///   - name: the name of the log file, defaults to "logs.txt"
+	///   - completion: a completion handler, passes the result log url or an error
+	public static func exportLogs(name: String = "logs.txt", completion: @escaping (Swift.Result<URL, Error>)->()) {
+		Console.log(tag: Self.TAG, msg: #function)
+		queue.async {
+			do {
+				try FileSystem.create(folder: .logs)
+				let clearLogURL = FileSystem.url(of: .logs).appendingPathComponent(name)
+				if fm.fileExists(atPath: clearLogURL.path) {
+					try fm.removeItem(at: clearLogURL)
+				}
+				
+				let logs = logFiles() //get log files before creating the "clear text" file
+				try Data().write(to: clearLogURL, options: .completeFileProtection)
+				let handle = try FileHandle(forWritingTo: clearLogURL)
+				defer {
+					handle.closeFile()
+				}
+				
+				for log in logs {
+					autoreleasepool {
+						do {
+							let encryptedData = try Data(contentsOf: log)
+							let clearLogsData = try Encryptor.decrypt(data: encryptedData)
+							
+							handle.write(clearLogsData)
+						} catch {
+							handle.write(Data("Could not read log file: \(log.pathComponents.last!)".utf8))
+						}
+						handle.write(Data("\n\n".utf8))
+					}
+				}
+				
+				post { completion(.success(clearLogURL)) }
+			} catch {
+				post { completion(.failure(error)) }
+			}
+		}
+	}
+	
 	private static func getLogFile() -> URL {
 		try! FileSystem.create(folder: .logs)
 		
@@ -61,7 +104,7 @@ public enum Console {
 	}
 	
 	private static func newLogUrl() -> URL {
-		FileSystem.url(of: .logs).appendingPathComponent("\(Int(Date().timeIntervalSince1970))")
+		FileSystem.url(of: .logs).appendingPathComponent("\(Date().timeIntervalSince1970)")
 	}
 	
 	private static func logFiles() -> [URL] {
