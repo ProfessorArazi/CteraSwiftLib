@@ -14,7 +14,7 @@ final class PublicLinksTests: BaseNetworkTest {
 	func testFetch() {
 		let e = XCTestExpectation(description: "Waiting for requests")
 		
-		let item = ItemInfoDto(path: HttpClient.SERVICE_WEBDAV + "/b", isFolder: true)
+		let item = ItemInfoDto(path: HttpClient.SERVICE_WEBDAV + "/a", isFolder: true)
 		HttpClient.requestPublicLinks(for: item) { response in
 			switch response {
 			case .success(let links):

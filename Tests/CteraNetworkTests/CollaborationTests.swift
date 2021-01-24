@@ -13,7 +13,7 @@ import CteraModels
 class CollaborationTests: BaseNetworkTest {
 	func testSaveCollaboration() {
 		let e = XCTestExpectation(description: "Waiting for requests")
-		let item = ItemInfoDto(path: HttpClient.SERVICE_WEBDAV + "/A1")
+		let item = ItemInfoDto(path: HttpClient.SERVICE_WEBDAV + "/a")
 		HttpClient.requestCollaboration(for: item) { fetchRes in
 			switch fetchRes {
 			case .success(var coll):
@@ -41,7 +41,7 @@ class CollaborationTests: BaseNetworkTest {
 	
 	func testValidation() {
 		let e = XCTestExpectation(description: "Waiting for requests")
-		let item = ItemInfoDto(path: HttpClient.SERVICE_WEBDAV + "/big1")
+		let item = ItemInfoDto(path: HttpClient.SERVICE_WEBDAV + "/a")
 		
 		var collaborator = CollaboratorDto()
 		collaborator.type = .external

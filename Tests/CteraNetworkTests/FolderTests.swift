@@ -17,7 +17,6 @@ class FolderTests: BaseNetworkTest {
 			switch response {
 			case .success(let folder):
 				print(folder)
-				break
 			case .error(let error):
 				XCTFail("\(error)")
 			}

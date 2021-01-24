@@ -16,18 +16,24 @@ import CteraUtil
 //TODO: handle Info.plist: (`CTERA` key) for unit tests
 
 final class UploadTests: BaseNetworkTest {
+	let file = FileManager.default.temporaryDirectory.appendingPathComponent("test.txt")
+	
+	override func tearDownWithError() throws {
+		try FileManager.default.removeItem(at: file)
+	}
+	
 	func testUpload() throws {
-		let file = FileManager.default.temporaryDirectory.appendingPathComponent("test.txt")
 		try Data("Bubu is the king".utf8).write(to: file)
 		
 		let e = XCTestExpectation(description: "Waiting for request")
-		HttpClient.uploadRequest(file, to: HttpClient.SERVICE_WEBDAV + "/A1/test.txt") { response in
+		HttpClient.uploadRequest(self.file, to: HttpClient.SERVICE_WEBDAV + "/myFiles/test.txt") { response in
 			switch response {
 			case .success:
-				e.fulfill()
+				break
 			case .error(let error):
-				fatalError("error: \(error)") //TODO: remove
+				XCTFail(error.localizedDescription)
 			}
+			e.fulfill()
 		}
 		
 		wait(for: [e], timeout: 100)

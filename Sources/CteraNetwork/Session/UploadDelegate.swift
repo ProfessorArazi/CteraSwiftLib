@@ -68,7 +68,10 @@ public class UploadDelegate {
 	}
 	
 	public func setHandler(taskID: Int, handler: @escaping Handler<Void>) {
-		precondition(items[taskID] != nil)
+		guard items[taskID] != nil else {
+			Console.log(tag: Self.TAG, msg: "\(#function), no item found for handler, task: \(taskID)")
+			return
+		}
 		handlers[taskID] = handler
 	}
 	
@@ -140,17 +143,31 @@ public class UploadDelegate {
 			return
 		}
 		
-		if let status = (task.response as? HTTPURLResponse)?.statusCode, status != 200 {
-			let error = ParserDelegate.parse(data: responseData!)
-			post { handler?(.error(Errors.text(error))) }
+		guard let responseData = responseData else {
+			post { handler?(.error(Errors.text("Did not received Response"))) }
 			return
 		}
 		
-		//success
-		if let responseData = responseData {
-			let msg = String(decoding: responseData, as: UTF8.self)
-			Console.log(tag: Self.TAG, msg: "\(#function), upload completed: \(msg)")
+		if let status = (task.response as? HTTPURLResponse)?.statusCode, status != 200 {
+			let msg = ParserDelegate.parse(data: responseData)?.msg ?? .error
+			post { handler?(.error(Errors.text(msg))) }
+			return
 		}
+		
+		guard let (rc, msg) = ParserDelegate.parse(data: responseData) else {
+			let resBody = String(decoding: responseData, as: UTF8.self).prefix(100)
+			Console.log(tag: Self.TAG, msg: "\(#function), Could not Parse response, starts with: \(resBody)")
+			post { handler?(.error(Errors.text("Could not parse Response"))) }
+			return
+		}
+		
+		guard rc == 0 else {
+			Console.log(tag: Self.TAG, msg: "\(#function), Upload Error: \(msg)")
+			post { handler?(.error(Errors.text(msg))) }
+			return
+		}
+		
+		Console.log(tag: Self.TAG, msg: "\(#function), upload completed: \(msg)")
 		post { handler?(.success(())) }
 	}
 	

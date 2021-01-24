@@ -377,7 +377,7 @@ public enum HttpClient {
 					handler(.success(nil))
 				case .failure(let status, let data):
 					Console.log(tag: TAG, msg: "Failure - status: \(status), msg:" + String(decoding: data, as: UTF8.self))
-					let errorMsg = ParserDelegate.parse(data: data)
+					let errorMsg = ParserDelegate.parse(data: data)?.msg ?? .error
 					handler(.error(Errors.text(errorMsg)))
 				case .error(let error):
 					handler(.error(error))
@@ -575,7 +575,7 @@ public enum HttpClient {
 			case .failure(let status, let data):
 				//read XML for error message and pass it to handler
 				Console.log(tag: TAG, msg: "Failure - status: \(status), msg:" + String(decoding: data, as: UTF8.self))
-				let errorMsg = ParserDelegate.parse(data: data)
+				let errorMsg = ParserDelegate.parse(data: data)?.msg ?? .error
 				post { handler(.error(Errors.text(errorMsg))) }
 			case .error(let error): post { handler(.error(error)) }
 			}

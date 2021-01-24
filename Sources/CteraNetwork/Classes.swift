@@ -58,15 +58,16 @@ public enum Errors: LocalizedError {
 
 class ParserDelegate: NSObject, XMLParserDelegate {
 	
-	static func parse(data: Data) -> String {
+	static func parse(data: Data) -> (rc: Int, msg: String)? {
 		let parser = XMLParser(data: data)
 		let delegate = ParserDelegate()
 		parser.delegate = delegate
-		return parser.parse() ? delegate.msg : .error
+		return parser.parse() ? (delegate.rc, delegate.msg) : nil
 	}
 	
 	private var currentElement = ""
-	var rc = "", msg = ""
+	var rc = -1
+	var  msg = ""
 	
 	func parser(_ parser: XMLParser, didStartElement elementName: String, namespaceURI: String?, qualifiedName qName: String?, attributes attributeDict: [String : String] = [:]) {
 		if let id = attributeDict["id"] {
@@ -80,7 +81,7 @@ class ParserDelegate: NSObject, XMLParserDelegate {
 		if !str.isEmpty {
 			switch currentElement {
 			case "rc":
-				rc = str
+				rc = Int(str) ?? -1
 			case "msg":
 				msg = str
 			default:
