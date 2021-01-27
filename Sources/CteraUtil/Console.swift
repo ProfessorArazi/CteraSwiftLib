@@ -26,6 +26,14 @@ public enum Console {
 		
 		let queueLabel = String(validatingUTF8: __dispatch_queue_get_label(nil))
 		queue.async {
+			if !fm.fileExists(atPath: FileSystem.url(of: .logs).path) {
+				do {
+					try FileSystem.create(folder: .logs)
+				} catch {
+					return
+				}
+			}
+			
 			let timestamp = DateFormatter(format: "yyyy MMM dd HH:mm:ss.SSS").string(from: Date())
 			logs += "\(timestamp): "
 			if let queueLabel = queueLabel { logs += "\(queueLabel) - " }
@@ -90,6 +98,15 @@ public enum Console {
 		}
 	}
 	
+	/// synchronize logging queue, to make sure there are not pending writes before continuing
+	public static func sync() {
+		log(tag: String(describing: Console.self), msg: "Syncing with console")
+		queue.sync {
+			logs = ""
+			currentLog = newLogUrl()
+		}
+	}
+	
 	private static func getLogFile() -> URL {
 		try! FileSystem.create(folder: .logs)
 		
@@ -108,15 +125,8 @@ public enum Console {
 	}
 	
 	private static func logFiles() -> [URL] {
-		try! fm.contentsOfDirectory(at: FileSystem.url(of: .logs), includingPropertiesForKeys: nil)
-			.sorted(by: { $0.path < $1.path })
-	}
-	
-	static func sync() {
-		log(tag: String(describing: Console.self), msg: "Syncing with console")
-		queue.sync {
-			logs = ""
-			currentLog = newLogUrl()
-		}
+		guard let urls = try? fm.contentsOfDirectory(at: FileSystem.url(of: .logs), includingPropertiesForKeys: nil) else { return [] }
+		
+		return urls.sorted(by: { $0.path < $1.path })
 	}
 }
