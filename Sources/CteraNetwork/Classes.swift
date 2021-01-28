@@ -29,6 +29,12 @@ public enum Response<T> {
 	case error(Error)
 }
 
+public enum PreviewError: String, LocalizedError {
+	case noPreviewServer = "NoPreviewServer"
+	case typeNotSupported = "TypeNotSupported"
+	case unknown
+}
+
 public protocol BackgroundTaskHandler {
 	func onTaskStart()
 	

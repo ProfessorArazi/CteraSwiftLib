@@ -188,11 +188,18 @@ public enum HttpClient {
 		let path = item.path.dropFirst()
 		let req = URLRequest(to: serverAddress, path + "?preview=true&showDeleted=true")
 		
-		let middleware = { (d: Data) -> String in
-			let json: [String: String] = try .from(json: d)
+		func middleware(data: Data) throws -> String {
+			let json: [String: String] = try .from(json: data)
 			return json["viewingSessionId"]!
 		}
-		handle(request: req, middleware, handler: handler)
+		
+		func errorParser(data: Data) throws -> PreviewError {
+			let json: [String: String] = try .from(json: data)
+			guard let str = json["previewFailure"] else { return .unknown }
+			return PreviewError(rawValue: str) ?? .unknown
+		}
+		
+		handle(request: req, middleware, errorParser: errorParser, handler: handler)
 	}
 	
 	public static func requestPreview(page: Int, viewingSession: String, handler: @escaping Handler<Data>) {
@@ -204,8 +211,8 @@ public enum HttpClient {
 	public static func requestPreviewPageCount(viewingSession: String, handler: @escaping Handler<Int>) {
 		let req = URLRequest(to: serverAddress, "ServicesPortal/pcc/Document/q/Attributes?DocumentID=u\(viewingSession)&DesiredPageCountConfidence=50")
 		
-		let middleware = { (d: Data) -> Int in
-			let json: [String: Int] = try .fromFormatted(json: d)
+		func middleware(data: Data) throws -> Int {
+			let json: [String: Int] = try .fromFormatted(json: data)
 			return json["pageCount"]!
 		}
 		
@@ -555,7 +562,10 @@ public enum HttpClient {
 	}
 	
 	// MARK: handling requests
-	private static func handle<T>(request: URLRequest, _ middleware: @escaping (Data) throws -> T, handler: Handler<T>?) {
+	private static func handle<T>(request: URLRequest,
+								  _ middleware: @escaping (Data) throws -> T,
+								  errorParser: @escaping (Data) throws -> Error = parseXml(error:),
+								  handler: Handler<T>?) {
 		if !hasConnection {
 			post { handler?(.error(Errors.offline)) }
 			return
@@ -573,10 +583,13 @@ public enum HttpClient {
 					post { handler(.error(error)) }
 				}
 			case .failure(let status, let data):
-				//read XML for error message and pass it to handler
 				Console.log(tag: TAG, msg: "Failure - status: \(status), msg:" + String(decoding: data, as: UTF8.self))
-				let errorMsg = ParserDelegate.parse(data: data)?.msg ?? .error
-				post { handler(.error(Errors.text(errorMsg))) }
+				do {
+					let error = try errorParser(data)
+					post { handler(.error(error)) }
+				} catch {
+					post { handler(.error(error)) }
+				}
 			case .error(let error): post { handler(.error(error)) }
 			}
 		}
@@ -584,6 +597,15 @@ public enum HttpClient {
 	
 	private static func handle(request: URLRequest, handler: Handler<Data>?) {
 		handle(request: request, { $0 }, handler: handler)
+	}
+	
+	///Reads XML for error message
+	/// - Parameter data: Response data from portal, should contain the error message
+	/// - Returns: the error from the portal on a generic "error" as fallback
+	private static func parseXml(error data: Data) -> Errors {
+		let msg = ParserDelegate.parse(data: data)?.msg ?? .error
+		
+		return .text(msg)
 	}
 	
 	private static func send(request: URLRequest,  handler: @escaping (Result<Data, Data>) -> ()) {
