@@ -24,6 +24,7 @@ public struct FetchRequestDto {
 	private(set) var includeShared = false
 	private(set) var navigationPane = false
 	private(set) var startIndex = 0
+	private(set) var limit = 200
 	
 	public init(path: String) {
 		self.path = path
@@ -38,7 +39,7 @@ public struct FetchRequestDto {
 			.with(key: "quickNavigationPane", navigationPane)
 			.with(key: "cloudFolderType", [folderType])
 			.with(key: "start", startIndex)
-			.with(key: "limit", 200)
+			.with(key: "limit", limit)
 			.with(key: "sort", [JsonObject().with(key: "$class", "Sort")
 								.with(key: "field", SortMethod.stored.rawValue)
 								.with(key: "ascending", Self.sortAscending)])
@@ -102,6 +103,12 @@ public struct FetchRequestDto {
 	public func with(startIndex: Int) -> FetchRequestDto {
 		var copy = self
 		copy.startIndex = startIndex
+		return copy
+	}
+	
+	public func with(limit: Int) -> FetchRequestDto {
+		var copy = self
+		copy.limit = limit
 		return copy
 	}
 	
