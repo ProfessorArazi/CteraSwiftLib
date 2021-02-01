@@ -19,7 +19,7 @@ final class PublicLinksTests: BaseNetworkTest {
 			switch response {
 			case .success(let links):
 				print(links)
-			case .error(let error):
+			case .failure(let error):
 				XCTFail("error: \(error.localizedDescription)")
 			}
 			e.fulfill()

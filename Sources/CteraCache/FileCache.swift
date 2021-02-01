@@ -15,7 +15,7 @@ public protocol FileCache {
 	
 	func save(file: URL, with item: ItemInfoDto)
 	
-	func provide(item: CacheItem, handler: @escaping (Swift.Result<URL, Error>)->()) -> ProgressTask
+	func provide(item: CacheItem, handler: @escaping (Result<URL, Error>)->()) -> ProgressTask
 }
 
 public struct CacheItem: Codable {

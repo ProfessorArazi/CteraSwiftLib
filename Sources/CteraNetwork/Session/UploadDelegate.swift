@@ -137,33 +137,37 @@ public class UploadDelegate {
 		
 		let handler = handlers.removeValue(forKey: task.taskIdentifier)
 		//failure
+		func handle(error: String) {
+			post { handler?(.failure(Errors.text(error))) }
+		}
+		
 		if let error = task.error {
 			Console.log(tag: Self.TAG, msg: "\(#function), error uploading to \"\(path)\". \(error.localizedDescription)")
-			post { handler?(.error(error)) }
+			post { handler?(.failure(error)) }
 			return
 		}
 		
 		guard let responseData = responseData else {
-			post { handler?(.error(Errors.text("Did not received Response"))) }
+			handle(error: "Did not received Response")
 			return
 		}
 		
 		if let status = (task.response as? HTTPURLResponse)?.statusCode, status != 200 {
 			let msg = ParserDelegate.parse(data: responseData)?.msg ?? .error
-			post { handler?(.error(Errors.text(msg))) }
+			handle(error: msg)
 			return
 		}
 		
 		guard let (rc, msg) = ParserDelegate.parse(data: responseData) else {
 			let resBody = String(decoding: responseData, as: UTF8.self).prefix(100)
 			Console.log(tag: Self.TAG, msg: "\(#function), Could not Parse response, starts with: \(resBody)")
-			post { handler?(.error(Errors.text("Could not parse Response"))) }
+			handle(error: "Could not parse Response")
 			return
 		}
 		
 		guard rc == 0 else {
 			Console.log(tag: Self.TAG, msg: "\(#function), Upload Error: \(msg)")
-			post { handler?(.error(Errors.text(msg))) }
+			handle(error: msg)
 			return
 		}
 		

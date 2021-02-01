@@ -25,12 +25,12 @@ final class BackgroundTaskTests: BaseNetworkTest {
 					switch response {
 					case .success((let taskUrl, let payload)):
 						HttpClient.followServerTask(at: taskUrl, handler: TestHandler(e, expectedResult: .conflict(.Override), payload))
-					case .error(let error):
+					case .failure(let error):
 						XCTFail("error: \(error)")
 					}
 				}
 				
-			case .error(let error):
+			case .failure(let error):
 				XCTFail("error: \(error)")
 			}
 		}

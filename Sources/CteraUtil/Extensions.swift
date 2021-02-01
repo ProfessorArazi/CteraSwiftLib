@@ -91,10 +91,10 @@ public extension Folder {
 
 public extension Filename {
 	//Prefs.standard filename is "_", defined in SwiftExtensions Package
-	static let fileCache = 			Filename(name: "-_______________")
-	static let folderCache = 		Filename(name: "--______________")
-	static let downloadTasks = 		Filename(name: "---_____________")
-	static let uploadTasks = 		Filename(name: "----____________")
+	static let fileCache = 		Filename(name: "-_______________")
+	static let folderCache =	Filename(name: "--______________")
+	static let downloadTasks =	Filename(name: "---_____________")
+	static let uploadTasks =	Filename(name: "----____________")
 }
 
 public extension Encodable {

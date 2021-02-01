@@ -30,7 +30,7 @@ class BaseNetworkTest: XCTestCase {
 			switch response {
 			case .success:
 				Self.loggedIn = true
-			case .error(let error):
+			case .failure(let error):
 				XCTFail("error: \(error)")
 			}
 			e.fulfill()

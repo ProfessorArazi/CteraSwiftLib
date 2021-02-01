@@ -30,7 +30,7 @@ final class UploadTests: BaseNetworkTest {
 			switch response {
 			case .success:
 				break
-			case .error(let error):
+			case .failure(let error):
 				XCTFail(error.localizedDescription)
 			}
 			e.fulfill()
