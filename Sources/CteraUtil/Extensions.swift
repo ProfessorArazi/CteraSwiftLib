@@ -77,12 +77,6 @@ public extension String {
 	}
 }
 
-public extension FileSystem {
-	static func create(folder: Folder, withIntermediateDirectories: Bool = true) throws {
-		try FileManager.default.createDirectory(at: url(of: folder), withIntermediateDirectories: withIntermediateDirectories)
-	}
-}
-
 public extension Folder {
 	static let logs =		Folder(name: "______________--")
 	static let downloads =	Folder(name: "_____________---")
