@@ -60,7 +60,7 @@ public enum Console {
 	/// - Parameters:
 	///   - name: the name of the log file, defaults to "logs.txt"
 	///   - completion: a completion handler, passes the result log url or an error
-	public static func exportLogs(name: String = "logs.txt", completion: @escaping (Swift.Result<URL, Error>)->()) {
+	public static func exportLogs(name: String = "logs.txt", completion: @escaping (Result<URL, Error>)->()) {
 		Console.log(tag: Self.TAG, msg: #function)
 		queue.async {
 			do {

@@ -47,17 +47,34 @@ final class LoginTests: BaseNetworkTest {
 					switch response {
 					case .success(let settings):
 						print(settings)
-					case .error(let error):
+					case .failure(let error):
 						fatalError("error: \(error)")
 					}
 				}
-			case .error(let error):
+			case .failure(let error):
 				XCTFail("\(error)")
 			}
 			
 			e.fulfill()
 		}
 		
+		
+		wait(for: [e], timeout: 10)
+	}
+	
+	func testGlobalStatus() throws {
+		let e = XCTestExpectation(description: "Waiting for requests")
+		
+		HttpClient.requestGlobalStatus { result in
+			switch result {
+			case .success(let status):
+				XCTAssert(status.status == .ok)
+				break
+			case .failure(let error):
+				XCTFail("error: \(error)")
+			}
+			e.fulfill()
+		}
 		
 		wait(for: [e], timeout: 10)
 	}

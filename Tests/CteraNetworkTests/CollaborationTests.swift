@@ -24,13 +24,13 @@ class CollaborationTests: BaseNetworkTest {
 					switch saveRes {
 					case .success:
 						print("Success!")
-					case .error(let error):
+					case .failure(let error):
 						XCTFail(error.localizedDescription)
 					}
 					e.fulfill()
 				}
 				
-			case .error(let error):
+			case .failure(let error):
 				XCTFail(error.localizedDescription)
 				e.fulfill()
 			}
@@ -50,7 +50,7 @@ class CollaborationTests: BaseNetworkTest {
 			switch response {
 			case .success:
 				break
-			case .error(let error):
+			case .failure(let error):
 				XCTFail(error.localizedDescription)
 			}
 			e.fulfill()

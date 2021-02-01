@@ -100,13 +100,13 @@ public class DownloadDelegate {
 		let handler = handlers.removeValue(forKey: task.taskIdentifier)
 		guard let status = (task.response as? HTTPURLResponse)?.statusCode else { return }
 		guard status != 404 else {
-			post { handler?(.error(Errors.text(.fileNotFoundErrorMsg))) }
+			post { handler?(.failure(Errors.text(.fileNotFoundErrorMsg))) }
 			return
 		}
 		
 		Console.log(tag: Self.TAG, msg: "download done, success: " + (task.error == nil && status == 200  ? "Yes" : "No"))
 		if let error = task.error {
-			post { handler?(.error(error)) }
+			post { handler?(.failure(error)) }
 			return
 		}
 		

@@ -17,8 +17,8 @@ final class PreviewTests: BaseNetworkTest {
 		HttpClient.requestPreviewSession(for: item) { response in
 			switch response {
 			case .success: break
-			case .error(let error) where error is PreviewError: break
-			case .error(let error):
+			case .failure(let error) where error is PreviewError: break
+			case .failure(let error):
 				XCTFail(error.localizedDescription)
 			}
 			

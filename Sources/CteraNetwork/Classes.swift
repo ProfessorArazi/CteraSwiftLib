@@ -10,7 +10,7 @@ import BasicExtensions
 import StorageExtensions
 import CteraModels
 
-public typealias Handler<T> = (Response<T>) -> ()
+public typealias Handler<Res> = (Result<Res, Error>)->()
 
 public struct SrcDestData {
 	public var action: String
@@ -22,17 +22,6 @@ public struct SrcDestData {
 		self.pairs = pairs
 		self.taskJson = taskJson
 	}
-}
-
-public enum Response<T> {
-	case success(T)
-	case error(Error)
-}
-
-public enum PreviewError: String, LocalizedError {
-	case noPreviewServer = "NoPreviewServer"
-	case typeNotSupported = "TypeNotSupported"
-	case unknown
 }
 
 public protocol BackgroundTaskHandler {
@@ -49,17 +38,6 @@ public protocol BackgroundTaskHandler {
 
 public protocol ThumbnailDelegate {
 	func thumbnail(receivedFile url: URL, for item: ItemInfoDto)
-}
-
-public enum Errors: LocalizedError {
-	case text(String), offline
-	
-	public var errorDescription: String? {
-		switch self {
-		case .text(let msg): return msg
-		case .offline: return .noConnectionMsg
-		}
-	}
 }
 
 class ParserDelegate: NSObject, XMLParserDelegate {
