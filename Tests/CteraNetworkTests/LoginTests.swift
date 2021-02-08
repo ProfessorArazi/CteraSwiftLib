@@ -13,6 +13,20 @@ import CteraUtil
 @testable import CteraNetwork
 
 final class LoginTests: BaseNetworkTest {
+	func testPublicInfo() {
+		let e = XCTestExpectation(description: "Waiting for request")
+		
+		HttpClient.requestPublicInfo(address: HttpClient.serverAddress) { result in
+			switch result {
+			case .success:
+				break
+			case .failure(let error):
+				XCTFail(error.localizedDescription)
+			}
+			e.fulfill()
+		}
+	}
+	
 	func testRenewSessionConcurrent() throws {
 		let e = XCTestExpectation(description: "Waiting for requests")
 		e.expectedFulfillmentCount = 40
@@ -48,16 +62,15 @@ final class LoginTests: BaseNetworkTest {
 					case .success(let settings):
 						print(settings)
 					case .failure(let error):
-						fatalError("error: \(error)")
+						XCTFail("\(error)")
 					}
+					e.fulfill()
 				}
 			case .failure(let error):
 				XCTFail("\(error)")
+				e.fulfill()
 			}
-			
-			e.fulfill()
 		}
-		
 		
 		wait(for: [e], timeout: 10)
 	}
@@ -69,7 +82,6 @@ final class LoginTests: BaseNetworkTest {
 			switch result {
 			case .success(let status):
 				XCTAssert(status.status == .ok)
-				break
 			case .failure(let error):
 				XCTFail("error: \(error)")
 			}
