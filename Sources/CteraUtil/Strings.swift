@@ -36,6 +36,8 @@ public extension String {
 	//MARK: - Error Messages
 	static let noConnectionMsg = "noConnectionMsg".localizedModule
 	static let fileNotFoundErrorMsg = "fileNotFoundErrorMsg".localizedModule
+	static let previewOnlyError = "previewOnlyError".localizedModule
+	static let cannotDownloadFileError = "cannotDownloadFileError".localizedModule
 	
 //	static let  = "".localizedModule
 

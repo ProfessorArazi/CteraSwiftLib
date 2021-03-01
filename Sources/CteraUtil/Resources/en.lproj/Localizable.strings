@@ -33,3 +33,5 @@
 //MARK: - Error Messages
 "noConnectionMsg" = "There is no network connectivity. Please try again later.";
 "fileNotFoundErrorMsg" = "File not found";
+"previewOnlyError" = "Cannot download files with \"Preview Only\" permission";
+"cannotDownloadFileError" = "Cannot download file";
