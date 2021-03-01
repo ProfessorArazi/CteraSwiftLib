@@ -127,6 +127,12 @@ extension HttpClient {
 			return
 		}
 		
+		guard item.actions.download else {
+			let errMsg: String = item.itemPermission == .PreviewOnly ? .previewOnlyError : .cannotDownloadFileError
+			handler(.failure(Errors.text(errMsg)))
+			return
+		}
+		
 		verifySession { //must verify session before creating download task.
 			let path = String(item.path.dropFirst())
 			let req = URLRequest(to: serverAddress, path)
