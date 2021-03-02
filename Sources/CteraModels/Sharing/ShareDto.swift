@@ -9,16 +9,20 @@ import Foundation
 public struct ShareDto: Codable, Hashable, Equatable {
 	private let className = "ShareConfig"
 	public var id: Int = 0
+	
 	public var href: String = ""
 	public var resourceName: String = ""
-
+	public var message: String?
+	public var key: String?
+	public var publicLink: String?
+	
 	public var phoneNumber: PhoneNumberDto?
 	public var invitee = CollaboratorDto()
 	public var createdBy = CollaboratorDto()
 	public var accessMode = ItemPermissionDto.None
 	public var protectionLevel: ProtectionLevelDto?
-	public var collaborationPolicyData = CollaborationPolicyDto(protectionLevels: [], maxPermission: .None, defaultProtectionLevel: .publicLink)
-
+	public var collaborationPolicyData = CollaborationPolicyDto(protectionLevels: [], defaultProtectionLevel: .publicLink, maxPermission: .None)
+	
 	public var isDirectory: Bool = false
 	public var canEdit: Bool = false
 	public var createDate: Date = Date()
@@ -29,8 +33,12 @@ public struct ShareDto: Codable, Hashable, Equatable {
 	private enum CodingKeys: String, CodingKey {
 		case className = "$class"
 		case id
+		
 		case href
 		case resourceName
+		case message
+		case key
+		case publicLink
 		
 		case phoneNumber
 		case invitee
@@ -52,6 +60,9 @@ public struct ShareDto: Codable, Hashable, Equatable {
 		try values.encode(id, forKey: .id)
 		try values.encode(href, forKey: .href)
 		try values.encode(resourceName, forKey: .resourceName)
+		try values.encodeIfPresent(message, forKey: .message)
+		try values.encodeIfPresent(key, forKey: .key)
+		try values.encodeIfPresent(publicLink, forKey: .publicLink)
 		
 		try values.encodeIfPresent(phoneNumber?.phoneNumber, forKey: .phoneNumber) //all for this
 		try values.encode(invitee, forKey: .invitee)

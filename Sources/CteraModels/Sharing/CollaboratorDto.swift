@@ -17,6 +17,7 @@ public struct CollaboratorDto: Codable, Hashable, Equatable {
 	public var frequentlyUsed: Bool = false
 	public var userAvatarName: String?
 	public var domain: String?
+	public var dn: String?
 	
 	public init() {}
 	
@@ -31,5 +32,6 @@ public struct CollaboratorDto: Codable, Hashable, Equatable {
 		case frequentlyUsed
 		case userAvatarName
 		case domain
+		case dn
 	}
 }
