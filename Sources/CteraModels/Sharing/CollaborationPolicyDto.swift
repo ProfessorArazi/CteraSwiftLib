@@ -7,14 +7,19 @@
 
 public struct CollaborationPolicyDto: Codable, Hashable, Equatable {
 	private let className = "PreVerifySingleShareResult"
-	public let protectionLevels: [ProtectionLevelDto]
-	public let maxPermission: ItemPermissionDto
-	public let defaultProtectionLevel: ProtectionLevelDto
+	public var protectionLevels: [ProtectionLevelDto]?
+	public var defaultProtectionLevel: ProtectionLevelDto?
+	public var maxPermission: ItemPermissionDto?
+	public var error: String?
 	
-	public init(protectionLevels: [ProtectionLevelDto], maxPermission: ItemPermissionDto, defaultProtectionLevel: ProtectionLevelDto) {
+	public init(protectionLevels: [ProtectionLevelDto]? = nil,
+				defaultProtectionLevel: ProtectionLevelDto? = nil,
+				maxPermission: ItemPermissionDto? = nil,
+				error: String? = nil) {
 		self.protectionLevels = protectionLevels
 		self.maxPermission = maxPermission
 		self.defaultProtectionLevel = defaultProtectionLevel
+		self.error = error
 	}
 	
 	enum CodingKeys: String, CodingKey {
@@ -22,5 +27,6 @@ public struct CollaborationPolicyDto: Codable, Hashable, Equatable {
 		case protectionLevels
 		case maxPermission
 		case defaultProtectionLevel = "deafaultProtectionLevel"
+		case error
 	}
 }
