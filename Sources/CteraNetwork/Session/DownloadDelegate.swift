@@ -23,7 +23,9 @@ public class DownloadDelegate {
 	private var handlers: [Int: Handler<URL>] = [:]
 	
 	init() {
-		items = FileSystem.load(json: .downloadTasks) ?? [:]
+		if let items: [Int: ItemInfoDto] = try? FileSystem.load(json: .downloadTasks) {
+			self.items = items
+		}
 	}
 	
 	public func invalidateTasks(completion: @escaping ([String: DownloadTask])->()) {

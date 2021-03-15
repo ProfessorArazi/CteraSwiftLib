@@ -14,7 +14,9 @@ public enum FolderCache {
 	private static var cache: [String: FolderDto] = [:]
 	
 	public static func initialize() {
-		cache = FileSystem.load(json: .folderCache) ?? [:]
+		if let cache: [String: FolderDto] = try? FileSystem.load(json: .folderCache) {
+			Self.cache = cache
+		}
 	}
 	
 	public static func clearCache() { cache = [:] }

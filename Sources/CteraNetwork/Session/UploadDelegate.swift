@@ -30,7 +30,7 @@ public class UploadDelegate {
 	private var ids: [Int: String] = [:] //links from task ID to upload file
 	
 	init() {
-		guard let ud: UploadData = FileSystem.load(json: .uploadTasks) else { return }
+		guard let ud: UploadData = try? FileSystem.load(json: .uploadTasks) else { return }
 		
 		items = ud.items
 		ids = ud.ids

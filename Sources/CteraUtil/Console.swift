@@ -81,7 +81,7 @@ public enum Console {
 					autoreleasepool {
 						do {
 							let encryptedData = try Data(contentsOf: log)
-							let clearLogsData = try Encryptor.decrypt(data: encryptedData)
+							let clearLogsData = try FileSystem.encryptor.decrypt(data: encryptedData)
 							
 							handle.write(clearLogsData)
 						} catch {
@@ -112,7 +112,7 @@ public enum Console {
 		
 		if let lastLog = logFiles().last,
 		   let lastLogSize = lastLog.fileSize, lastLogSize < MAX_LOG_SIZE, //use old log file
-		   let data = try? Encryptor.decrypt(data: Data(contentsOf: lastLog)) {
+		   let data = try? FileSystem.encryptor.decrypt(data: Data(contentsOf: lastLog)) {
 			logs = String(decoding: data, as: UTF8.self)
 			return lastLog
 		} else { //new log file
