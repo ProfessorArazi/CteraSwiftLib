@@ -26,7 +26,7 @@ class BaseNetworkTest: XCTestCase {
 		if Self.loggedIn { return }
 		
 		let e = XCTestExpectation(description: "Waiting for requests")
-		HttpClient.login("galy", "password1!", deviceID: "0", deviceName: "Test device") { response in
+		HttpClient.login("loren", "password1!", deviceID: "0", deviceName: "Test device") { response in
 			switch response {
 			case .success:
 				Self.loggedIn = true

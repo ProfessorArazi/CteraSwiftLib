@@ -127,6 +127,17 @@ enum StringFormatter {
 			.xmlString
 	}
 	
+	static func preVerifyDownload(at path: String) -> String {
+		JsonObject()
+			.with(key: "type", "user-defined")
+			.with(key: "name", "preVerifyDownloadFile")
+			.with(key: "param", JsonObject()
+					.with(key: "$class", "PreVerifyDownloadFileParam")
+					.with(key: "href", path)
+			)
+			.xmlString
+	}
+	
 	//MARK: - public links
 	static func getPublicLinks(at itemPath: String) -> String {
 		JsonObject()

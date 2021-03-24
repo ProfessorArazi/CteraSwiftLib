@@ -133,4 +133,14 @@ extension HttpClient {
 	public static func getTasks(completion: @escaping ([URLSessionDataTask], [URLSessionUploadTask], [URLSessionDownloadTask])->()) {
 		backgroundSession.getTasksWithCompletionHandler(completion)
 	}
+	
+	public static func preVerifyDownload(for itemPath: String, handler: @escaping Handler<PreVerifyDownloadDto>) {
+		Console.log(tag: TAG, msg: "\(#function)")
+		let req = URLRequest(to: serverAddress, "ServicesPortal/api?format=jsonext")
+			.set(method: .POST)
+			.set(contentType: .xml)
+			.set(body: StringFormatter.preVerifyDownload(at: itemPath))
+		
+		handle(request: req, PreVerifyDownloadDto.fromFormatted(json:), handler: handler)
+	}
 }
