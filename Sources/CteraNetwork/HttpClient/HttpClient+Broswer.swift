@@ -133,17 +133,33 @@ extension HttpClient {
 			return
 		}
 		
-		verifySession { //must verify session before creating download task.
-			let path = String(item.path.dropFirst())
-			let req = URLRequest(to: serverAddress, path)
-			
-			let task = backgroundSession.downloadTask(with: req)
-			task.resume()
-			config(ProgressTask(from: task))
-			if let size = item.size { task.countOfBytesClientExpectsToReceive = size }
-			
-			downloadDelegate.onStart(task, item, handler)
+		preVerifyDownload(for: item.path) { result in
+			switch result {
+			case .success(let preVerifyRes):
+				let rc = preVerifyRes.status
+				guard rc == .ok else {
+					let error = preVerifyRes.message ?? rc.rawValue
+					handler(.failure(Errors.text(error)))
+					return
+				}
+				self.downloadFile(for: item, config: config, handler: handler)
+				
+			case .failure(let error):
+				handler(.failure(Errors.text(error.localizedDescription)))
+			}
 		}
+	}
+	
+	private static func downloadFile(for item: ItemInfoDto, config: @escaping (ProgressTask)->(), handler: @escaping Handler<URL>) {
+		let path = String(item.path.dropFirst())
+		let req = URLRequest(to: serverAddress, path)
+		
+		let task = backgroundSession.downloadTask(with: req)
+		task.resume()
+		config(ProgressTask(from: task))
+		if let size = item.size { task.countOfBytesClientExpectsToReceive = size }
+		
+		downloadDelegate.onStart(task, item, handler)
 	}
 	
 	public static func uploadRequest(_ fileUrl: URL, to itemPath: String,

@@ -24,7 +24,7 @@ public enum HttpClient {
 		
 		let config = URLSessionConfiguration.background(withIdentifier: "BackgroundSession-" + bundleID)
 		config.networkServiceType = .default
-		config.sharedContainerIdentifier = Bundle.appGroup
+		config.sharedContainerIdentifier = getAppGroup()
 		#if os(iOS)
 		config.sessionSendsLaunchEvents = true
 		#endif
@@ -55,6 +55,17 @@ public enum HttpClient {
 		hasConnection = connection
 		Console.log(tag: TAG, msg: "connection changed, hasConnection: \(connection)")
 		for observer in onConnectionChanged { observer(connection) }
+	}
+	
+	/// get the appGroup from info.plist or use hard coded value for testing
+	/// - Returns: the appGroup string
+	private static func getAppGroup() -> String {
+		#if DEBUG
+		if ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil {
+			return "group.com.ctera"
+		}
+		#endif
+		return Bundle.appGroup
 	}
 }
 
