@@ -22,7 +22,13 @@ extension HttpClient {
 	
 	public static func login(_ user: String? = nil, _ pass: String? = nil, activationCode code: String? = nil, deviceID: String, deviceName: String, handler: @escaping Handler<CredentialsDto>) {
 		Console.log(tag: Self.TAG, msg: #function)
-		let req = URLRequest(to: serverAddress, "ServicesPortal/public/users\(user != nil ? "/\(user!)" : "")?format=jsonext")
+		
+		guard let encodedUser = encode(user: user) else {
+			handler(.failure(Errors.text(.invalidUsernameError)))
+			return
+		}
+		
+		let req = URLRequest(to: serverAddress, "ServicesPortal/public/users" + encodedUser + "?format=jsonext")
 			.set(method: .POST)
 			.set(contentType: .xml)
 			.set(body: StringFormatter.attachMobileDevice(server: serverAddress, password: pass, activationCode: code, deviceID: deviceID, deviceName: deviceName))
@@ -73,6 +79,16 @@ extension HttpClient {
 		let req = URLRequest(to: serverAddress, "/ServicesPortal/avatar/getUserAtar/\(avatarName)?format=jsonext")
 		
 		handle(request: req, { $0 }, handler: handler)
+	}
+	
+	private static func encode(user: String?) -> String? {
+		guard let user = user else { return "" }
+		
+		guard let encoded = user.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) else {
+			return nil
+		}
+		
+		return "/" + encoded
 	}
 }
 

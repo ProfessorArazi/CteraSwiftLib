@@ -35,3 +35,4 @@
 "fileNotFoundErrorMsg" = "File not found";
 "previewOnlyError" = "Cannot download files with \"Preview Only\" permission";
 "cannotDownloadFileError" = "Cannot download file";
+"invalidUsernameError" = "Invalid username, please try to re-enter your username";

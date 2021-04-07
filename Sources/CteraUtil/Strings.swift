@@ -38,6 +38,7 @@ public extension String {
 	static let fileNotFoundErrorMsg = "fileNotFoundErrorMsg".localizedModule
 	static let previewOnlyError = "previewOnlyError".localizedModule
 	static let cannotDownloadFileError = "cannotDownloadFileError".localizedModule
+	static let invalidUsernameError = "invalidUsernameError".localized
 	
 //	static let  = "".localizedModule
 
