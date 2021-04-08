@@ -5,23 +5,29 @@
 //  Created by Gal Yedidovich on 08/04/2021.
 //
 
-//import Foundation
 import CteraModels
 public struct BgTaskPayload {
-	public enum Action: String {
+	public var action: Action
+	public var paths: [SrcDest]
+	
+	public init(action: Action, paths: [SrcDest]) {
+		self.action = action
+		self.paths = paths
+	}
+}
+
+public extension BgTaskPayload {
+	enum Action: String {
 		case delete = "deleteResources"
 		case copy = "copyResources"
 		case move = "moveResources"
 		case restore = "restoreResources"
 	}
 	
-	public struct SrcDest {
+	struct SrcDest {
 		public var source: String
 		public var destination: String = ""
 	}
-	
-	public var action: Action
-	public var paths: [SrcDest]
 }
 
 public extension BgTaskPayload {
