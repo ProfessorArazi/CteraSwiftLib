@@ -25,8 +25,13 @@ public extension BgTaskPayload {
 	}
 	
 	struct SrcDest {
+		public init(source: String, destination: String = "") {
+			self.source = source
+			self.destination = destination
+		}
+		
 		public var source: String
-		public var destination: String = ""
+		public var destination: String
 	}
 }
 
