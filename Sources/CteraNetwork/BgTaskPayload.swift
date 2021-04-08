@@ -24,7 +24,7 @@ public struct BgTaskPayload {
 	public var paths: [SrcDest]
 }
 
-extension BgTaskPayload {
+public extension BgTaskPayload {
 	static func rename(item: ItemInfoDto, to newName: String) -> BgTaskPayload {
 		let newPath = item.parentPath + "/" + newName
 		return BgTaskPayload(action: .move, paths: [.init(source: item.path, destination: newPath)])
