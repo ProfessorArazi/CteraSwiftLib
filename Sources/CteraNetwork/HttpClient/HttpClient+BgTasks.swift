@@ -11,40 +11,31 @@ import CteraUtil
 import CteraModels
 
 extension HttpClient {
-	public static func rename(item: ItemInfoDto, to newName: String, handler: @escaping Handler<(String, SrcDestData)>) {
+	public static func requestBgTask(handler: BackgroundTaskHandler) {
 		Console.log(tag: Self.TAG, msg: #function)
-		let newPath = item.parentPath + "/" + newName
-		let data = SrcDestData(action: "moveResources", pairs: [(src: item.path, dest: newPath)])
-		srcDestRequest(data: data, handler: handler)
+		startBgTask(payload: handler.payload) { result in
+			switch result {
+			case .success(let taskUrl):
+				followServerTask(at: taskUrl, handler: handler)
+			case .failure(let error):
+				Console.log(tag: Self.TAG, msg: "\(#function) error, \(error)")
+				handler.onTaskError(error: error)
+			}
+		}
 	}
 	
-	public static func delete(items: [ItemInfoDto], handler: @escaping Handler<(String, SrcDestData)>) {
-		Console.log(tag: TAG, msg: #function)
-		let paths = items.map { item in (src: item.path, dest: "") }
-		let data = SrcDestData(action: "deleteResources", pairs: paths)
-		srcDestRequest(data: data, handler: handler)
+	public static func resolveConflict(taskJson: JsonObject, handler: BackgroundTaskHandler) {
+		Console.log(tag: Self.TAG, msg: #function)
+		startBgTask(payload: handler.payload, taskJson: taskJson) { result in
+			switch result {
+			case .success(let taskUrl):
+				followServerTask(at: taskUrl, handler: handler)
+			case .failure(let error):
+				Console.log(tag: Self.TAG, msg: "\(#function) error, \(error)")
+				handler.onTaskError(error: error)
+			}
+		}
 	}
-	
-	public static func restore(items: [ItemInfoDto], handler: @escaping Handler<(String, SrcDestData)>) {
-		Console.log(tag: TAG, msg: #function)
-		let paths = items.map { item in (src: item.path, dest: item.parentPath) }
-		let data = SrcDestData(action: "restoreResources", pairs: paths)
-		srcDestRequest(data: data, handler: handler)
-	}
-	
-	public static func restoreVersionedItem(item: ItemInfoDto, handler: @escaping Handler<(String, SrcDestData)>) {
-		Console.log(tag: TAG, msg: #function)
-		let data = SrcDestData(action: "restoreResources", pairs: [(src: item.path, dest: "")])
-		srcDestRequest(data: data, handler: handler)
-	}
-	
-	public static func copyMove(isCopy: Bool, items: [ItemInfoDto], folderPath: String, handler: @escaping Handler<(String, SrcDestData)>) {
-		Console.log(tag: TAG, msg: #function)
-		let paths = items.map { item in (src: item.path, dest: folderPath + "/" + item.name) }
-		let data = SrcDestData(action: (isCopy ? "copyResources" : "moveResources"), pairs: paths)
-		srcDestRequest(data: data, handler: handler)
-	}
-	
 	/// follows the status of a background task on the portal, until an error, conflict or success achived.
 	/// - Parameters:
 	///   - taskUrl: unique ID of the task to check
@@ -98,35 +89,25 @@ extension HttpClient {
 		
 		handle(request: req, JsonObject.init(data:), handler: handler)
 	}
-	
-	public static func resolveConflict(_ srcDestData: SrcDestData, handler: BackgroundTaskHandler) {
-		Console.log(tag: Self.TAG, msg: #function)
-		srcDestRequest(data: srcDestData) { result in
-			switch result {
-			case .success(let (taskUrl, _)):
-				followServerTask(at: taskUrl, handler: handler)
-			case .failure(let error):
-				Console.log(tag: Self.TAG, msg: "\(#function) error, \(error)")
-				handler.onTaskError(error: error)
-			}
-		}
-	}
-	
-	private static func srcDestRequest(data payload: SrcDestData, handler: @escaping Handler<(String, SrcDestData)>) {
+}
+
+fileprivate extension HttpClient {
+	static func startBgTask(payload: BgTaskPayload, taskJson: JsonObject? = nil, handler: @escaping Handler<String>) {
 		Console.log(tag: Self.TAG, msg: #function)
 		let req = URLRequest(to: serverAddress, SERVICES_PORTAL_API)
 			.set(method: .POST)
 			.set(contentType: .xml)
-			.set(body: StringFormatter.sourceDestCommand(with: payload))
+			.set(body: StringFormatter.bgTaskCommand(with: payload, taskJson: taskJson))
 		
-		func middleware(data: Data) -> (String, SrcDestData) {
+		func middleware(data: Data) -> String {
 			let taskUrl = String(decoding: data, as: UTF8.self)
 				.replacingOccurrences(of: "\\", with: "")
 				.replacingOccurrences(of: "\"", with: "")
 			
-			return (taskUrl, payload)
+			return taskUrl
 		}
 		
 		handle(request: req, middleware, handler: handler)
 	}
+	
 }
