@@ -12,19 +12,9 @@ import CteraModels
 
 public typealias Handler<Res> = (Result<Res, Error>)->()
 
-public struct SrcDestData {
-	public var action: String
-	public var pairs: [(src: String, dest: String)]
-	public var taskJson: JsonObject?
-	
-	public init(action: String, pairs: [(src: String, dest: String)], taskJson: JsonObject? = nil) {
-		self.action = action
-		self.pairs = pairs
-		self.taskJson = taskJson
-	}
-}
-
 public protocol BackgroundTaskHandler {
+	var payload: BgTaskPayload { get }
+	
 	func onTaskStart()
 	
 	func onTaskConflict(task: JsonObject)

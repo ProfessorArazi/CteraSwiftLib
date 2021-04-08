@@ -16,28 +16,69 @@ import CteraUtil
 final class BackgroundTaskTests: BaseNetworkTest {
 	
 	func testMove() {
+		let targetFolder = "moveTestTarget"
+		let destFolder = "moveTestDest"
+		
+		createFolder(name: targetFolder)
+		createFolder(name: destFolder)
+
 		let e = XCTestExpectation(description: "Waiting for requests")
-		HttpClient.createFolder(at: HttpClient.SERVICE_WEBDAV, name: "Bubu") { response in
-			switch response {
-			case .success:
-				let item = ItemInfoDto(path: HttpClient.SERVICE_WEBDAV + "/Bubu")
-				HttpClient.copyMove(isCopy: false, items: [item], folderPath: HttpClient.SERVICE_WEBDAV + "/a") { response in
-					switch response {
-					case .success((let taskUrl, let payload)):
-						HttpClient.followServerTask(at: taskUrl, handler: TestHandler(e, expectedResult: .conflict(.Override), payload))
-					case .failure(let error):
-						XCTFail("error: \(error)")
-					}
-				}
-				
-			case .failure(let error):
-				XCTFail("error: \(error)")
+		let item = ItemInfoDto(path: HttpClient.SERVICE_WEBDAV + "/" + destFolder)
+		let payload: BgTaskPayload = .move(items: [item], to: HttpClient.SERVICE_WEBDAV + "/" + targetFolder)
+		let handler = TestHandler(e, expectedResult: .conflict(.Override), payload)
+		
+		HttpClient.requestBgTask(handler: handler)
+		wait(for: [e], timeout: 60)
+		
+		delete(items: [item])
+	}
+	
+	func testDeleteRestore() {
+		let target = "testRestoreFolder"
+		let item = ItemInfoDto(path: HttpClient.SERVICE_WEBDAV + "/" + target, isFolder: true)
+		
+		createFolder(name: target)
+		
+		let deletePayload: BgTaskPayload = .delete(items: [item])
+		let e1 = XCTestExpectation(description: "Waiting for delete")
+		HttpClient.requestBgTask(handler: TestHandler(e1, deletePayload))
+		wait(for: [e1], timeout: 60)
+		
+		let restorePayload: BgTaskPayload = .undelete(items: [item])
+		let e2 = XCTestExpectation(description: "Waiting for undelete")
+		HttpClient.requestBgTask(handler: TestHandler(e2, restorePayload))
+		wait(for: [e2], timeout: 60)
+		
+		delete(items: [item])
+	}
+	
+	private func delete(items: [ItemInfoDto]) {
+		let payload: BgTaskPayload = .delete(items: items)
+		HttpClient.requestBgTask(handler: IgnoringHandler(payload: payload))
+	}
+	
+	private func createFolder(at parent: String = HttpClient.SERVICE_WEBDAV, name: String) {
+		let e = XCTestExpectation(description: "Waiting for requests")
+		HttpClient.createFolder(at: parent, name: name) { response in
+			if case .failure(let error) = response {
+				XCTFail(error.localizedDescription)
 			}
+			
+			e.fulfill()
 		}
-		wait(for: [e], timeout: 60 * 60)
+		wait(for: [e], timeout: 10)
 	}
 }
 
+struct IgnoringHandler: BackgroundTaskHandler {
+	var payload: BgTaskPayload
+	
+	func onTaskStart() { }
+	func onTaskConflict(task: JsonObject) { }
+	func onTaskError(error: Error) { }
+	func onTaskProgress(task: JsonObject) { }
+	func onTaskDone() { }
+}
 
 class TestHandler: BackgroundTaskHandler {
 	enum ConflictHandler: String {
@@ -56,9 +97,9 @@ class TestHandler: BackgroundTaskHandler {
 	
 	let e: XCTestExpectation
 	let expected: ExpectedResult
-	var payload: SrcDestData
+	var payload: BgTaskPayload
 	
-	internal init(_ e: XCTestExpectation, expectedResult result: ExpectedResult = .done, _ payload: SrcDestData) {
+	internal init(_ e: XCTestExpectation, expectedResult result: ExpectedResult = .done, _ payload: BgTaskPayload) {
 		self.e = e
 		self.expected = result
 		self.payload = payload
@@ -71,16 +112,16 @@ class TestHandler: BackgroundTaskHandler {
 	func onTaskConflict(task: JsonObject) {
 		print(#function)
 		guard case .conflict(.some(let handler)) = expected else {
-			check(result: .conflict(nil))
+			check(result: .conflict(.none))
 			e.fulfill()
 			return
 		}
 		
-		payload.taskJson = task.with(key: "cursor", task.jsonObject(key: "cursor")!.with(key: "handler", handler.rawValue))
+		let taskJson = task.with(key: "cursor", task.jsonObject(key: "cursor")!.with(key: "handler", handler.rawValue))
 		
 		resolved = true
 		
-		HttpClient.resolveConflict(payload, handler: self)
+		HttpClient.resolveConflict(taskJson: taskJson, handler: self)
 	}
 	
 	func onTaskError(error: Error) {

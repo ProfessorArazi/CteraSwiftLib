@@ -80,18 +80,18 @@ enum StringFormatter {
 			"Content-Type: application/octet-stream\(line)\(line)"
 	}
 	
-	static func sourceDestCommand(with payload: SrcDestData) -> String {
-		let urls = payload.pairs.map { pair in
+	static func bgTaskCommand(with payload: BgTaskPayload, taskJson: JsonObject? = nil) -> String {
+		let urls = payload.paths.map { pair in
 			JsonObject()
 				.with(key: "$class", "SrcDstParam")
-				.with(key: "src", pair.src)
-				.with(key: "dest", pair.dest)
+				.with(key: "src", pair.source)
+				.with(key: "dest", pair.destination)
 		}
 		var param = JsonObject()
 			.with(key: "$class", "ActionResourcesParam")
 			.with(key: "urls", urls)
 		
-		if let taskJson = payload.taskJson {
+		if let taskJson = taskJson {
 			var cursor = taskJson.jsonObject(key: "cursor")!
 			let handler = cursor.string(key: "handler")!
 			
@@ -114,7 +114,7 @@ enum StringFormatter {
 		
 		return JsonObject()
 			.with(key: "type", "user-defined")
-			.with(key: "name", payload.action)
+			.with(key: "name", payload.action.rawValue)
 			.with(key: "param", param)
 			.xmlString
 	}

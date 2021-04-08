@@ -51,7 +51,7 @@ public struct ItemInfoDto: Codable, Equatable, Hashable {
 	}
 	
 	public var parentPath: String {
-		String(path.prefix(upTo: path.lastIndex(of: "/")!))
+		NSString(string: path).deletingLastPathComponent
 	}
 }
 
