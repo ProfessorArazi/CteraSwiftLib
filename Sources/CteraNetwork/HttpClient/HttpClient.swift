@@ -143,6 +143,7 @@ extension HttpClient {
 			
 			renewSession { response in
 				if case .failure(let error) = response {
+					Console.log(tag: Self.TAG, msg: "\(#function), Could not renew session - user should fully relogin")
 					handler(.error(error))
 				} else {
 					send(request: request, handler: handler)

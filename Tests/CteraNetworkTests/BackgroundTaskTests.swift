@@ -25,12 +25,13 @@ final class BackgroundTaskTests: BaseNetworkTest {
 		let e = XCTestExpectation(description: "Waiting for requests")
 		let item = ItemInfoDto(path: HttpClient.SERVICE_WEBDAV + "/" + destFolder)
 		let payload: BgTaskPayload = .move(items: [item], to: HttpClient.SERVICE_WEBDAV + "/" + targetFolder)
-		let handler = TestHandler(e, expectedResult: .conflict(.Override), payload)
+		let handler = TestHandler(e, expectedResult: .done, payload)
 		
 		HttpClient.requestBgTask(handler: handler)
 		wait(for: [e], timeout: 60)
 		
-		delete(items: [item])
+		let targetItem = ItemInfoDto(path: HttpClient.SERVICE_WEBDAV + "/" + targetFolder, isFolder: true)
+		delete(items: [targetItem])
 	}
 	
 	func testDeleteRestore() {
@@ -53,6 +54,7 @@ final class BackgroundTaskTests: BaseNetworkTest {
 	}
 	
 	private func delete(items: [ItemInfoDto]) {
+		print("Clean ups test items")
 		let payload: BgTaskPayload = .delete(items: items)
 		HttpClient.requestBgTask(handler: IgnoringHandler(payload: payload))
 	}

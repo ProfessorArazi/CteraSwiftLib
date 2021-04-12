@@ -12,8 +12,9 @@ import CteraModels
 
 extension HttpClient {
 	public static func requestBgTask(handler: BackgroundTaskHandler) {
-		Console.log(tag: Self.TAG, msg: #function)
-		startBgTask(payload: handler.payload) { result in
+		let payload = handler.payload
+		Console.log(tag: Self.TAG, msg: "\(#function), \(payload.action) (count: \(payload.paths.count))")
+		startBgTask(payload: payload) { result in
 			switch result {
 			case .success(let taskUrl):
 				followServerTask(at: taskUrl, handler: handler)
