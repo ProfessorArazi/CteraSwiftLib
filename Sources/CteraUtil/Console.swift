@@ -13,11 +13,12 @@ public enum Console {
 	private static let TAG = String(describing: Console.self)
 	private static let queue = DispatchQueue(label: "Console Queue", qos: .background)
 	private static let fm = FileManager.default
-	private static let MAX_LOG_SIZE = 5 * 1024
-	private static let ROLLING_COUNT = 10
 	
 	private static var logs: String = ""
 	private static var currentLog = getLogFile() //lazy
+	
+	public static var MAX_LOG_SIZE = 10 * 1024
+	public static var ROLLING_COUNT = 10
 	
 	public static func log(tag: String, msg: String) {
 		#if DEBUG
