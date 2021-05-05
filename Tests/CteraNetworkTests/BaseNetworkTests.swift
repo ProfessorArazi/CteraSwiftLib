@@ -16,8 +16,8 @@ class BaseNetworkTest: XCTestCase {
 	}
 	
 	override class func tearDown() {
-		try? FileSystem.delete(file: .prefs)
-		try? FileSystem.delete(folder: .logs)
+		try? Filer.delete(file: .prefs)
+		try? Filer.delete(folder: .logs)
 	}
 	
 	private static var loggedIn = false

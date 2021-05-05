@@ -23,7 +23,7 @@ public class DownloadDelegate {
 	private var handlers: [Int: Handler<URL>] = [:]
 	
 	init() {
-		if let items: [Int: ItemInfoDto] = try? FileSystem.load(json: .downloadTasks) {
+		if let items: [Int: ItemInfoDto] = try? Filer.load(json: .downloadTasks) {
 			self.items = items
 		}
 	}
@@ -73,8 +73,8 @@ public class DownloadDelegate {
 		tasks = [:]
 		handlers = [:]
 		
-		try? FileSystem.delete(file: .downloadTasks)
-		try? FileSystem.delete(folder: .downloads)
+		try? Filer.delete(file: .downloadTasks)
+		try? Filer.delete(folder: .downloads)
 	}
 	
 	func onStart(_ task: DownloadTask, _ item: ItemInfoDto, _ handler: @escaping Handler<URL>) {
@@ -112,8 +112,8 @@ public class DownloadDelegate {
 			return
 		}
 		
-		try! FileSystem.create(folder: .downloads)
-		let destUrl = FileSystem.url(of: .downloads).appendingPathComponent(item.name)
+		try! Filer.create(folder: .downloads)
+		let destUrl = Filer.url(of: .downloads).appendingPathComponent(item.name)
 		if fm.fileExists(atPath: destUrl.path) {
 			try! fm.removeItem(at: destUrl)
 		}
@@ -128,7 +128,7 @@ public class DownloadDelegate {
 	private func updateJson() {
 		let copy = items
 		Self.queue.async {
-			try! FileSystem.write(data: copy.json(), to: .downloadTasks)
+			try! Filer.write(data: copy.json(), to: .downloadTasks)
 		}
 	}
 }

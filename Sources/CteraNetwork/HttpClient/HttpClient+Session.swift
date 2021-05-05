@@ -112,27 +112,33 @@ extension HttpClient {
 		}
 	}
 	
-	public static func renewSession(handler: @escaping Handler<Any?>) {
+	public static func renewSession(handler: @escaping Handler<Void>) {
 		Console.log(tag: Self.TAG, msg: #function)
 		let req = URLRequest(to: serverAddress, "ServicesPortal/api/login?format=jsonext")
 			.set(method: .POST)
 			.set(body: StringFormatter.login(with: credentials))
 			.set(contentType: .urlEncoded)
 		
-		session.dataTask(with: req) { result in
-			post {
-				switch result {
-				case .success:
-					let newCookie = HTTPCookieStorage.shared.cookies!.first { $0.name == "JSESSIONID" }!
-					auth.renew(with: newCookie)
-					handler(.success(nil))
-				case .failure(let status, let data):
-					Console.log(tag: TAG, msg: "Failure - status: \(status), msg:" + String(decoding: data, as: UTF8.self))
-					handler(.failure(parseXml(error: data)))
-				case .error(let error):
-					handler(.failure(error))
-				}
+		session.dataTask(with: req) { d, r, e in
+			if let error = e {
+				handler(.failure(error))
+				return
 			}
+			
+			guard let response = r as? HTTPURLResponse, let data = d else {
+				handler(.failure(URLError(.badServerResponse)))
+				return
+			}
+			
+			guard response.statusCode / 100 == 2 else {
+				Console.log(tag: TAG, msg: "Failure - status: \(response.statusCode), msg:" + String(decoding: data, as: UTF8.self))
+				handler(.failure(parseXml(error: data)))
+				return
+			}
+			
+			let newCookie = HTTPCookieStorage.shared.cookies!.first { $0.name == "JSESSIONID" }!
+			auth.renew(with: newCookie)
+			handler(.success(()))
 		}.resume()
 	}
 	
