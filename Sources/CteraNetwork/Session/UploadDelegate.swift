@@ -21,7 +21,7 @@ public class UploadDelegate {
 	
 	private static let TAG = String(describing: UploadDelegate.self)
 	private let queue = DispatchQueue(label: "UploadDelegate")
-	private let uploadFolder = FileSystem.url(of: .uploads)
+	private let uploadFolder = Filer.url(of: .uploads)
 	private let fm = FileManager.default
 	
 	public private(set) var tasks: [String: UploadTask] = [:]
@@ -30,7 +30,7 @@ public class UploadDelegate {
 	private var ids: [Int: String] = [:] //links from task ID to upload file
 	
 	init() {
-		guard let ud: UploadData = try? FileSystem.load(json: .uploadTasks) else { return }
+		guard let ud: UploadData = try? Filer.load(json: .uploadTasks) else { return }
 		
 		items = ud.items
 		ids = ud.ids
@@ -84,8 +84,8 @@ public class UploadDelegate {
 		tasks = [:]
 		handlers = [:]
 		
-		try? FileSystem.delete(file: .uploadTasks)
-		try? FileSystem.delete(folder: .uploads)
+		try? Filer.delete(file: .uploadTasks)
+		try? Filer.delete(folder: .uploads)
 	}
 	
 	func multipartDataFile(_ contentUrl: URL, boundary: String, for path: String) -> URL {
@@ -178,7 +178,7 @@ public class UploadDelegate {
 	private func updateJson() {
 		let ud = UploadData(items: items, ids: ids)
 		queue.async {
-			try! FileSystem.write(data: ud.json(), to: .uploadTasks)
+			try! Filer.write(data: ud.json(), to: .uploadTasks)
 		}
 	}
 }

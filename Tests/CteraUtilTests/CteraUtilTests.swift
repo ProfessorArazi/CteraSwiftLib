@@ -4,11 +4,11 @@ import CteraUtil
 
 final class CteraUtilTests: XCTestCase {
 	override func setUpWithError() throws {
-		try FileSystem.delete(folder: .logs)
+		try Filer.delete(folder: .logs)
 	}
 	
 	override func tearDownWithError() throws {
-		try FileSystem.delete(folder: .logs)
+		try Filer.delete(folder: .logs)
 	}
 	
 	func testGetLogs() throws {
@@ -32,7 +32,7 @@ final class CteraUtilTests: XCTestCase {
 		}
 		
 		Console.sync()
-		try FileSystem.delete(folder: .logs)
+		try Filer.delete(folder: .logs)
 		Console.log(tag: #function, msg: "After Delete")
 		
 		getLogs { (str) in

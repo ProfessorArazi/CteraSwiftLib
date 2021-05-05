@@ -86,21 +86,24 @@ extension HttpClient {
 			guard let handler = handler else { return }
 			
 			switch response {
-			case .success(let data):
+			case .success(let (response, data)):
+				guard response.statusCode / 100 == 2 else {
+					Console.log(tag: TAG, msg: "Failure - status: \(response.statusCode), msg:" + String(decoding: data, as: UTF8.self))
+					do {
+						onError(try errorParser(data))
+					} catch {
+						onError(error)
+					}
+					return
+				}
+				
 				do {
-					let result2 = try middleware(data)
-					post { handler(.success(result2)) }
+					let result = try middleware(data)
+					post { handler(.success(result)) }
 				} catch {
 					onError(error)
 				}
-			case .failure(let status, let data):
-				Console.log(tag: TAG, msg: "Failure - status: \(status), msg:" + String(decoding: data, as: UTF8.self))
-				do {
-					onError(try errorParser(data))
-				} catch {
-					onError(error)
-				}
-			case .error(let error): onError(error)
+			case .failure(let error): onError(error)
 			}
 		}
 	}
@@ -118,17 +121,29 @@ extension HttpClient {
 		return .text(msg)
 	}
 	
-	private static func send(request: URLRequest,  handler: @escaping (NetResponse<Data, Data>)->()) {
+	private static func send(request: URLRequest,  handler: @escaping (Result<(HTTPURLResponse, Data), Error>)->()) {
 		let requestTime = Date()
-		session.dataTask(with: request) { response in
-			if case let .failure(status, _) = response, status == 302 && credentials != nil {
+		session.dataTask(with: request) { d, r, e in
+			if let error = e {
+				handler(.failure(error))
+				return
+			}
+			
+			guard let response = r as? HTTPURLResponse, let data = d else {
+				handler(.failure(URLError(.badServerResponse)))
+				return
+			}
+			
+			if response.statusCode == 302 && credentials != nil {
 				Console.log(tag: Self.TAG, msg: "received 302, sent at: \(requestTime.timeIntervalSince1970)")
 				handle302(at: requestTime, with: request, and: handler)
-			} else { handler(response) }
+			} else {
+				handler(.success((response, data)))
+			}
 		}.resume()
 	}
 	
-	private static func handle302(at time: Date, with request: URLRequest, and handler: @escaping (NetResponse<Data, Data>)->()) {
+	private static func handle302(at time: Date, with request: URLRequest, and handler: @escaping (Result<(HTTPURLResponse, Data), Error>)->()) {
 		Console.log(tag: Self.TAG, msg: #function)
 		async {
 			auth.semaphore.wait()
@@ -144,7 +159,7 @@ extension HttpClient {
 			renewSession { response in
 				if case .failure(let error) = response {
 					Console.log(tag: Self.TAG, msg: "\(#function), Could not renew session - user should fully relogin")
-					handler(.error(error))
+					handler(.failure(error))
 				} else {
 					send(request: request, handler: handler)
 				}

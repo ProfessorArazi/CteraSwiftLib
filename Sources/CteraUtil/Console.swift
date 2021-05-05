@@ -27,9 +27,9 @@ public enum Console {
 		
 		let queueLabel = String(validatingUTF8: __dispatch_queue_get_label(nil))
 		queue.async {
-			if !fm.fileExists(atPath: FileSystem.url(of: .logs).path) {
+			if !fm.fileExists(atPath: Filer.url(of: .logs).path) {
 				do {
-					try FileSystem.create(folder: .logs)
+					try Filer.create(folder: .logs)
 				} catch {
 					return
 				}
@@ -41,7 +41,7 @@ public enum Console {
 			logs += "\(tag) - \(msg)\n"
 			
 			let logData = Data(logs.utf8)
-			try? FileSystem.write(data: logData, to: currentLog)
+			try? Filer.write(data: logData, to: currentLog)
 			
 			if logData.count > MAX_LOG_SIZE { //switch logs file
 				logs = ""
@@ -65,8 +65,8 @@ public enum Console {
 		Console.log(tag: Self.TAG, msg: #function)
 		queue.async {
 			do {
-				try FileSystem.create(folder: .logs)
-				let clearLogURL = FileSystem.url(of: .logs).appendingPathComponent(name)
+				try Filer.create(folder: .logs)
+				let clearLogURL = Filer.url(of: .logs).appendingPathComponent(name)
 				if fm.fileExists(atPath: clearLogURL.path) {
 					try fm.removeItem(at: clearLogURL)
 				}
@@ -82,7 +82,7 @@ public enum Console {
 					autoreleasepool {
 						do {
 							let encryptedData = try Data(contentsOf: log)
-							let clearLogsData = try FileSystem.encryptor.decrypt(data: encryptedData)
+							let clearLogsData = try Filer.encryptor.decrypt(data: encryptedData)
 							
 							handle.write(clearLogsData)
 						} catch {
@@ -109,11 +109,11 @@ public enum Console {
 	}
 	
 	private static func getLogFile() -> URL {
-		try! FileSystem.create(folder: .logs)
+		try! Filer.create(folder: .logs)
 		
 		if let lastLog = logFiles().last,
 		   let lastLogSize = lastLog.fileSize, lastLogSize < MAX_LOG_SIZE, //use old log file
-		   let data = try? FileSystem.encryptor.decrypt(data: Data(contentsOf: lastLog)) {
+		   let data = try? Filer.encryptor.decrypt(data: Data(contentsOf: lastLog)) {
 			logs = String(decoding: data, as: UTF8.self)
 			return lastLog
 		} else { //new log file
@@ -122,11 +122,11 @@ public enum Console {
 	}
 	
 	private static func newLogUrl() -> URL {
-		FileSystem.url(of: .logs).appendingPathComponent("\(Date().timeIntervalSince1970)")
+		Filer.url(of: .logs).appendingPathComponent("\(Date().timeIntervalSince1970)")
 	}
 	
 	private static func logFiles() -> [URL] {
-		guard let urls = try? fm.contentsOfDirectory(at: FileSystem.url(of: .logs), includingPropertiesForKeys: nil) else { return [] }
+		guard let urls = try? fm.contentsOfDirectory(at: Filer.url(of: .logs), includingPropertiesForKeys: nil) else { return [] }
 		
 		return urls.sorted(by: { $0.path < $1.path })
 	}

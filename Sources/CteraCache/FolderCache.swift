@@ -14,7 +14,7 @@ public enum FolderCache {
 	private static var cache: [String: FolderDto] = [:]
 	
 	public static func initialize() {
-		if let cache: [String: FolderDto] = try? FileSystem.load(json: .folderCache) {
+		if let cache: [String: FolderDto] = try? Filer.load(json: .folderCache) {
 			Self.cache = cache
 		}
 	}
@@ -36,7 +36,7 @@ public enum FolderCache {
 	private static func update() {
 		let copy = cache //using copy to avoid manipulation while queue is busy
 		queue.async {
-			try! FileSystem.write(data: copy.json(), to: .folderCache)
+			try! Filer.write(data: copy.json(), to: .folderCache)
 		}
 	}
 }
