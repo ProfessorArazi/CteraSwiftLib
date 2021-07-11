@@ -18,6 +18,7 @@ public struct AllowedActionsDto: Codable, Equatable, Hashable {
 	public var allowShowDeleted: Bool = false
 	public var versioning: Bool = false
 	public var undelete: Bool = false
+	public var allowUpload: Bool = false
 	
 	public var invitePermissions: InvitePermissionDto?
 	public var previewStatus: PreviewStatusDto?
@@ -37,6 +38,7 @@ public struct AllowedActionsDto: Codable, Equatable, Hashable {
 		case allowShowDeleted
 		case versioning
 		case undelete
+		case allowUpload = "mobileUploadsEnabled"
 		
 		case invitePermissions
 		case previewStatus
