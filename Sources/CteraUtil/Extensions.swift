@@ -17,10 +17,16 @@ public extension URLRequest {
 }
 
 public extension DateFormatter {
-	static let standardFormat = DateFormatter(format: "yyyy-MM-dd'T'HH:mm:ss")
-	static let hourFormat = DateFormatter(format: "HH:mm")
-	static let dayFormat = DateFormatter(format: "d MMM HH:mm")
-	static let dateOnlyFormat = DateFormatter(format: "yyyy-MM-dd")
+	static let standardFormat = initFormatter(as: "yyyy-MM-dd'T'HH:mm:ss")
+	static let hourFormat = initFormatter(as: "HH:mm")
+	static let dayFormat = initFormatter(as: "d MMM HH:mm")
+	static let dateOnlyFormat = initFormatter(as: "yyyy-MM-dd")
+	
+	static func initFormatter(as format: String) -> DateFormatter {
+		let formatter = DateFormatter(format: format)
+		formatter.locale = Locale(identifier: "en_US")
+		return formatter
+	}
 }
 
 public extension JSONDecoder.DateDecodingStrategy {
