@@ -111,6 +111,7 @@ public class UploadDelegate {
 	}
 	
 	func onStart(_ task: UploadTask, path: String, filename id: String, _ handler: @escaping Handler<Void>) {
+		Console.log(tag: Self.TAG, msg: "Upload started for \(path)")
 		tasks[path] = task
 		items[task.taskIdentifier] = path
 		ids[task.taskIdentifier] = id
@@ -148,12 +149,14 @@ public class UploadDelegate {
 		}
 		
 		guard let responseData = responseData else {
+			Console.log(tag: Self.TAG, msg: "Did not received Response")
 			handle(error: "Did not received Response")
 			return
 		}
 		
 		if let status = (task.response as? HTTPURLResponse)?.statusCode, status != 200 {
 			let msg = ParserDelegate.parse(data: responseData)?.msg ?? .error
+			Console.log(tag: Self.TAG, msg: "Upload Error. status = \(status), error: \(msg)")
 			handle(error: msg)
 			return
 		}
@@ -166,7 +169,7 @@ public class UploadDelegate {
 		}
 		
 		guard rc == 0 else {
-			Console.log(tag: Self.TAG, msg: "\(#function), Upload Error: \(msg)")
+			Console.log(tag: Self.TAG, msg: "\(#function), Upload Error. rc = \(rc), error: \(msg)")
 			handle(error: msg)
 			return
 		}
