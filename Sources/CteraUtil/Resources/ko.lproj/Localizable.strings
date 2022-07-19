@@ -1,0 +1,38 @@
+//
+//  Localizable.swift
+//
+//
+//  Created by Loren Raz on 19/07/2022.
+
+//MARK: - General
+"on" = "켜기";
+"off" = "끄기";
+"yes" = "예";
+"ok" = "확인";
+"error" = "오류";
+"trust" = "신뢰";
+
+/* MARK: - Pretty Time */
+"lessThanMinuteAgo" = "1분 미만 전";
+"oneMinuteAgo" = "1분 전";
+"minutesAgo" = "%d 몇분 전에";
+"todayAt" = "오늘 %@";
+"yesterdayAt" = "어제 %@";
+
+// MARK: - Permissions
+"permissionPreviewOnly" = "미리보기 전용";
+"permissionReadOnly" = "읽기 전용";
+"permissionReadWrite" = "읽기 쓰기";
+"permissionDenied" = "액세스 없음";
+
+//MARK: - Protection Level
+"publicLink" = "공개 링크";
+"email" = "이메일";
+"sms" = "SMS";
+
+//MARK: - Error Messages
+"noConnectionMsg" = "네트워크 연결이 없습니다. 나중에 다시 시도해 주십시오.";
+"fileNotFoundErrorMsg" = "파일을 찾을 수 없음";
+"previewOnlyError" = "권한이 \"미리보기 전용\"인 파일은 다운로드할 수 없습니다.";
+"cannotDownloadFileError" = "파일을 다운로드할 수 없습니다.";
+"invalidUsernameError" = "잘못된 사용자 이름입니다. 사용자 이름을 다시 입력하십시오.";
