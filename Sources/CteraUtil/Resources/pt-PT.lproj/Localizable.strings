@@ -1,0 +1,38 @@
+//
+//  Localizable.swift
+//
+//
+//  Created by Loren Raz on 19/07/2022.
+
+//MARK: - General
+"on" = "em";
+"off" = "inativo";
+"yes" = "SIM";
+"ok" = "OK";
+"error" = "erro";
+"trust" = "Confiar";
+
+/* MARK: - Pretty Time */
+"lessThanMinuteAgo" = "a menos de um minuto atras";
+"oneMinuteAgo" = "um minuto atrás";
+"minutesAgo" = "%d minutos atrás";
+"todayAt" = "Hoje às %@";
+"yesterdayAt" = "Ontem às %@";
+
+// MARK: - Permissions
+"permissionPreviewOnly" = "Apenas Pré-visualização";
+"permissionReadOnly" = "Apenas leitura";
+"permissionReadWrite" = "Ler escrever";
+"permissionDenied" = "Permissão Negada";
+
+//MARK: - Protection Level
+"publicLink" = "Ligação Pública";
+"email" = "Email";
+"sms" = "SMS";
+
+//MARK: - Error Messages
+"noConnectionMsg" = "Não existe ligação à rede. Tente novamente mais tarde.";
+"fileNotFoundErrorMsg" = "Arquivo não encontrado";
+"previewOnlyError" = "Não é possível baixar arquivos com permissão 'Somente visualização'";
+"cannotDownloadFileError" = "Não é possível baixar o arquivo";
+"invalidUsernameError" = "O nome de usuário está incorreto";
