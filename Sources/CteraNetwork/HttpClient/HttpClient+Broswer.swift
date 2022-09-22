@@ -168,9 +168,11 @@ extension HttpClient {
 		Console.log(tag: Self.TAG, msg: #function)
 		async {
 			let boundary = "----MobileBoundaryRRD29pvBCUWyLIg"
-			let req = URLRequest(to: serverAddress, "ServicesPortal/upload?")
+			var req = URLRequest(to: serverAddress, "ServicesPortal/upload?")
 				.set(method: .POST)
 				.set(contentType: ContentType(stringLiteral: "multipart/form-data; boundary=\(boundary)"))
+			
+			req.httpShouldHandleCookies = true
 			
 			let uploadFileUrl = uploadDelegate.multipartDataFile(fileUrl, boundary: boundary, for: itemPath)
 			
