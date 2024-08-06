@@ -53,6 +53,15 @@ public enum HttpClient {
 		guard hasConnection != connection else { return } //prevent multiple events for same status
 		
 		hasConnection = connection
+
+		if !hasConnection {
+			let url = URL(string: "https://www.google.com")!
+			let task = URLSession.shared.dataTask(with: url) {(data, response, error) in
+				return
+			}
+			task.resume()
+		}
+
 		Console.log(tag: TAG, msg: "connection changed, hasConnection: \(connection)")
 		for observer in onConnectionChanged { observer(connection) }
 	}
