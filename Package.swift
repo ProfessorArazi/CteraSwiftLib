@@ -12,12 +12,22 @@ let package = Package(
             name: "CteraSwiftLib",
             targets: ["CteraNetwork", "CteraModels", "CteraUtil", "CteraCache"]
         ),
+        // Add export for BasicExtensions and StorageExtensions if needed
+        .library(
+            name: "BasicExtensions",
+            targets: ["BasicExtensions"]
+        ),
+        .library(
+            name: "StorageExtensions",
+            targets: ["StorageExtensions"]
+        ),
     ],
     dependencies: [
         // Reference SwiftExtensions package from local path
         .package(path: "./Dependencies/SwiftExtensions"),
     ],
     targets: [
+        // BasicExtensions and StorageExtensions should be properly added as targets here
         .target(
             name: "CteraUtil",
             dependencies: [
@@ -53,6 +63,16 @@ let package = Package(
                 "CteraCache",
             ]
         ),
+        // Export BasicExtensions and StorageExtensions
+        .target(
+            name: "BasicExtensions",
+            path: "./Dependencies/SwiftExtensions/Sources/BasicExtensions"
+        ),
+        .target(
+            name: "StorageExtensions",
+            dependencies: ["BasicExtensions"],
+            path: "./Dependencies/SwiftExtensions/Sources/StorageExtensions"
+        ),
         .target(
             name: "SwiftExtensions",
             path: "./Dependencies/SwiftExtensions/Sources" // Path to the local SwiftExtensions source files
@@ -64,6 +84,16 @@ let package = Package(
         .testTarget(
             name: "CteraUtilTests",
             dependencies: ["CteraUtil"]
+        ),
+        .testTarget(
+            name: "BasicExtensionsTests",
+            dependencies: ["BasicExtensions"],
+            path: "./Tests/BasicExtensionsTests" // Specify the custom path for BasicExtensionsTests
+        ),
+        .testTarget(
+            name: "StorageExtensionsTests",
+            dependencies: ["StorageExtensions"],
+            path: "./Tests/StorageExtensionsTests" // Specify the custom path for StorageExtensionsTests
         ),
     ]
 )
