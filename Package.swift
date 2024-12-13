@@ -25,16 +25,11 @@ let package = Package(
 
         // Define CBC and SimpleEncryptor as separate local targets
         .target(
-            name: "CBC",
-            path: "Sources/CBC", // Path to the CBC folder
-            sources: ["CBC.swift"] // Ensure the file exists in this folder
-        ),
-        .target(
-            name: "SimpleEncryptor",
-            path: "Sources/SimpleEncryptor", // Path to the SimpleEncryptor folder
-            sources: ["SimpleEncryptor.swift"] // Ensure the file exists in this folder
-        ),
-
+                    name: "CBC",
+                    dependencies: []),
+                .target(
+                    name: "SimpleEncryptor",
+                    dependencies: ["CBC"]),
         // Test targets
         .testTarget(name: "CteraNetworkTests", dependencies: ["CteraNetwork", "CteraCache"]),
         .testTarget(name: "CteraUtilTests", dependencies: ["CteraUtil"]),
