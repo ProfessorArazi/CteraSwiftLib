@@ -4,63 +4,66 @@
 import PackageDescription
 
 let package = Package(
-	name: "CteraSwiftLib",
-	defaultLocalization: "en",
-	platforms: [.iOS(.v14), .macOS(.v11)],
-	products: [
-		// Products define the executables and libraries a package produces, and make them visible to other packages.
-		.library(
-			name: "CteraSwiftLib",
-			targets: ["CteraNetwork", "CteraModels", "CteraUtil", "CteraCache"]),
-	],
-	dependencies: [
-		// Dependencies declare other packages that this package depends on.
-		// .package(url: /* package url */, from: "1.0.0"),
-		.package(url: "https://github.com/gal-yedidovich/SwiftExtensions.git", from: "4.0.0"),
-	],
-	targets: [
-		// Targets are the basic building blocks of a package. A target can define a module or a test suite.
-		// Targets can depend on other targets in this package, and on products in packages this package depends on.
-		.target(
-			name: "CteraUtil",
-			dependencies: [
-				.product(name: "BasicExtensions", package: "SwiftExtensions"),
-				.product(name: "StorageExtensions", package: "SwiftExtensions"),
-			],
-			resources: [.process("Resources/")]
-		),
-		.target(
-			name: "CteraModels",
-			dependencies: [
-				.product(name: "BasicExtensions", package: "SwiftExtensions"),
-				.product(name: "StorageExtensions", package: "SwiftExtensions"),
-				"CteraUtil",
-			]
-		),
-		.target(
-			name: "CteraCache",
-			dependencies: [
-				.product(name: "BasicExtensions", package: "SwiftExtensions"),
-				.product(name: "StorageExtensions", package: "SwiftExtensions"),
-				"CteraUtil",
-				"CteraModels",
-			]
-		),
-		.target(
-			name: "CteraNetwork",
-			dependencies: [
-				.product(name: "BasicExtensions", package: "SwiftExtensions"),
-				.product(name: "StorageExtensions", package: "SwiftExtensions"),
-				"CteraModels",
-				"CteraUtil",
-				"CteraCache",
-			]
-		),
-		.testTarget(
-			name: "CteraNetworkTests",
-			dependencies: ["CteraNetwork", "CteraCache"]),
-		.testTarget(
-			name: "CteraUtilTests",
-			dependencies: ["CteraUtil"]),
-	]
+    name: "CteraSwiftLib",
+    defaultLocalization: "en",
+    platforms: [.iOS(.v14), .macOS(.v11)],
+    products: [
+        .library(
+            name: "CteraSwiftLib",
+            targets: ["CteraNetwork", "CteraModels", "CteraUtil", "CteraCache"]
+        ),
+    ],
+    dependencies: [
+        // Reference SwiftExtensions package from local path
+        .package(path: "./Dependencies/SwiftExtensions"),
+    ],
+    targets: [
+        .target(
+            name: "CteraUtil",
+            dependencies: [
+                .product(name: "BasicExtensions", package: "SwiftExtensions"),
+                .product(name: "StorageExtensions", package: "SwiftExtensions"),
+            ],
+            resources: [.process("Resources/")]
+        ),
+        .target(
+            name: "CteraModels",
+            dependencies: [
+                .product(name: "BasicExtensions", package: "SwiftExtensions"),
+                .product(name: "StorageExtensions", package: "SwiftExtensions"),
+                "CteraUtil",
+            ]
+        ),
+        .target(
+            name: "CteraCache",
+            dependencies: [
+                .product(name: "BasicExtensions", package: "SwiftExtensions"),
+                .product(name: "StorageExtensions", package: "SwiftExtensions"),
+                "CteraUtil",
+                "CteraModels",
+            ]
+        ),
+        .target(
+            name: "CteraNetwork",
+            dependencies: [
+                .product(name: "BasicExtensions", package: "SwiftExtensions"),
+                .product(name: "StorageExtensions", package: "SwiftExtensions"),
+                "CteraModels",
+                "CteraUtil",
+                "CteraCache",
+            ]
+        ),
+        .target(
+            name: "SwiftExtensions",
+            path: "./Dependencies/SwiftExtensions/Sources" // Path to the local SwiftExtensions source files
+        ),
+        .testTarget(
+            name: "CteraNetworkTests",
+            dependencies: ["CteraNetwork", "CteraCache"]
+        ),
+        .testTarget(
+            name: "CteraUtilTests",
+            dependencies: ["CteraUtil"]
+        ),
+    ]
 )
