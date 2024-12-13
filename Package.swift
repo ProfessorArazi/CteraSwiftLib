@@ -9,19 +9,31 @@ let package = Package(
         // Export CteraSwiftLib main library
         .library(name: "CteraSwiftLib", targets: ["CteraNetwork", "CteraModels", "CteraUtil", "CteraCache"]),
         // Export SwiftExtensions library as a product
-        .library(name: "SwiftExtensions", targets: ["StorageExtensions", "BasicExtensions"]),
+        .library(name: "SwiftExtensions", targets: ["StorageExtensions", "BasicExtensions", "CBC", "SimpleEncryptor"]),
     ],
     dependencies: [],
     targets: [
         // Define individual targets for the components
-        .target(name: "CteraUtil", dependencies: ["StorageExtensions", "BasicExtensions"]),
-        .target(name: "CteraModels", dependencies: ["StorageExtensions", "BasicExtensions", "CteraUtil"]),
-        .target(name: "CteraCache", dependencies: ["StorageExtensions", "BasicExtensions", "CteraModels", "CteraUtil"]),
-        .target(name: "CteraNetwork", dependencies: ["StorageExtensions", "BasicExtensions", "CteraCache", "CteraModels", "CteraUtil"]),
+        .target(name: "CteraUtil", dependencies: ["StorageExtensions", "BasicExtensions", "CBC", "SimpleEncryptor"]),
+        .target(name: "CteraModels", dependencies: ["StorageExtensions", "BasicExtensions", "CteraUtil", "CBC", "SimpleEncryptor"]),
+        .target(name: "CteraCache", dependencies: ["StorageExtensions", "BasicExtensions", "CteraModels", "CteraUtil", "CBC", "SimpleEncryptor"]),
+        .target(name: "CteraNetwork", dependencies: ["StorageExtensions", "BasicExtensions", "CteraCache", "CteraModels", "CteraUtil", "CBC", "SimpleEncryptor"]),
 
         // Define SwiftExtensions sub-targets
-        .target(name: "StorageExtensions"),
+        .target(name: "StorageExtensions", dependencies: ["BasicExtensions", "CBC", "SimpleEncryptor"]),
         .target(name: "BasicExtensions"),
+
+        // Define CBC and SimpleEncryptor as separate local targets
+        .target(
+            name: "CBC",
+            path: "Sources/CBC", // Path to the CBC folder
+            sources: ["CBC.swift"] // Ensure the file exists in this folder
+        ),
+        .target(
+            name: "SimpleEncryptor",
+            path: "Sources/SimpleEncryptor", // Path to the SimpleEncryptor folder
+            sources: ["SimpleEncryptor.swift"] // Ensure the file exists in this folder
+        ),
 
         // Test targets
         .testTarget(name: "CteraNetworkTests", dependencies: ["CteraNetwork", "CteraCache"]),
