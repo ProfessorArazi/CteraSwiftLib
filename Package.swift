@@ -1,6 +1,4 @@
 // swift-tools-version:5.3
-// The swift-tools-version declares the minimum version of Swift required to build this package.
-
 import PackageDescription
 
 let package = Package(
@@ -8,26 +6,13 @@ let package = Package(
     defaultLocalization: "en",
     platforms: [.iOS(.v14), .macOS(.v11)],
     products: [
-        .library(
-            name: "CteraSwiftLib",
-            targets: ["CteraNetwork", "CteraModels", "CteraUtil", "CteraCache"]
-        ),
-        // Add export for BasicExtensions and StorageExtensions if needed
-        .library(
-            name: "BasicExtensions",
-            targets: ["BasicExtensions"]
-        ),
-        .library(
-            name: "StorageExtensions",
-            targets: ["StorageExtensions"]
-        ),
+        .library(name: "CteraSwiftLib", targets: ["CteraNetwork", "CteraModels", "CteraUtil", "CteraCache"]),
     ],
     dependencies: [
-        // Reference SwiftExtensions package from local path
+        // Reference the SwiftExtensions package from local path
         .package(path: "./Dependencies/SwiftExtensions"),
     ],
     targets: [
-        // BasicExtensions and StorageExtensions should be properly added as targets here
         .target(
             name: "CteraUtil",
             dependencies: [
@@ -63,19 +48,10 @@ let package = Package(
                 "CteraCache",
             ]
         ),
-        // Export BasicExtensions and StorageExtensions
-        .target(
-            name: "BasicExtensions",
-            path: "./Dependencies/SwiftExtensions/Sources/BasicExtensions"
-        ),
-        .target(
-            name: "StorageExtensions",
-            dependencies: ["BasicExtensions"],
-            path: "./Dependencies/SwiftExtensions/Sources/StorageExtensions"
-        ),
+        // Reference the existing target in SwiftExtensions for StorageExtensions
         .target(
             name: "SwiftExtensions",
-            path: "./Dependencies/SwiftExtensions/Sources" // Path to the local SwiftExtensions source files
+            path: "./Dependencies/SwiftExtensions/Sources"
         ),
         .testTarget(
             name: "CteraNetworkTests",
@@ -84,16 +60,6 @@ let package = Package(
         .testTarget(
             name: "CteraUtilTests",
             dependencies: ["CteraUtil"]
-        ),
-        .testTarget(
-            name: "BasicExtensionsTests",
-            dependencies: ["BasicExtensions"],
-            path: "./Tests/BasicExtensionsTests" // Specify the custom path for BasicExtensionsTests
-        ),
-        .testTarget(
-            name: "StorageExtensionsTests",
-            dependencies: ["StorageExtensions"],
-            path: "./Tests/StorageExtensionsTests" // Specify the custom path for StorageExtensionsTests
         ),
     ]
 )
