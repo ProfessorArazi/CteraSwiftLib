@@ -10,29 +10,51 @@ let package = Package(
         .library(name: "CteraSwiftLib", targets: ["CteraNetwork", "CteraModels", "CteraUtil", "CteraCache"]),
         // Export SwiftExtensions library as a product
         .library(name: "SwiftExtensions", targets: ["StorageExtensions", "BasicExtensions"]),
-        .library(name: "CryptoExtensions", targets: ["CBC", "SimpleEncryptor"])
+        .library(name: "CryptoExtensions", targets: ["CryptoExtensions"])
     ],
     dependencies: [],
     targets: [
         // Define individual targets for the components
-        .target(name: "CteraUtil", dependencies: ["StorageExtensions", "BasicExtensions", "CBC", "SimpleEncryptor"]),
-        .target(name: "CteraModels", dependencies: ["StorageExtensions", "BasicExtensions", "CteraUtil", "CBC", "SimpleEncryptor"]),
-        .target(name: "CteraCache", dependencies: ["StorageExtensions", "BasicExtensions", "CteraModels", "CteraUtil", "CBC", "SimpleEncryptor"]),
-        .target(name: "CteraNetwork", dependencies: ["StorageExtensions", "BasicExtensions", "CteraCache", "CteraModels", "CteraUtil", "CBC", "SimpleEncryptor"]),
+        .target(
+            name: "CteraUtil",
+            dependencies: ["StorageExtensions", "BasicExtensions", "CryptoExtensions"]
+        ),
+        .target(
+            name: "CteraModels",
+            dependencies: ["StorageExtensions", "BasicExtensions", "CteraUtil", "CryptoExtensions"]
+        ),
+        .target(
+            name: "CteraCache",
+            dependencies: ["StorageExtensions", "BasicExtensions", "CteraModels", "CteraUtil", "CryptoExtensions"]
+        ),
+        .target(
+            name: "CteraNetwork",
+            dependencies: ["StorageExtensions", "BasicExtensions", "CteraCache", "CteraModels", "CteraUtil", "CryptoExtensions"]
+        ),
 
         // Define SwiftExtensions sub-targets
-        .target(name: "StorageExtensions", dependencies: ["BasicExtensions", "CBC", "SimpleEncryptor"]),
-        .target(name: "BasicExtensions"),
-
-        // Define CBC and SimpleEncryptor as separate local targets
         .target(
-                    name: "CBC",
-                    dependencies: []),
-                .target(
-                    name: "SimpleEncryptor",
-                    dependencies: ["CBC"]),
+            name: "StorageExtensions",
+            dependencies: ["BasicExtensions", "CryptoExtensions"]
+        ),
+        .target(
+            name: "BasicExtensions"
+        ),
+
+        // Define CryptoExtensions as a single target including its subfolders like CBC
+        .target(
+            name: "CryptoExtensions",
+            dependencies: []
+        ),
+
         // Test targets
-        .testTarget(name: "CteraNetworkTests", dependencies: ["CteraNetwork", "CteraCache"]),
-        .testTarget(name: "CteraUtilTests", dependencies: ["CteraUtil"]),
+        .testTarget(
+            name: "CteraNetworkTests",
+            dependencies: ["CteraNetwork", "CteraCache"]
+        ),
+        .testTarget(
+            name: "CteraUtilTests",
+            dependencies: ["CteraUtil"]
+        ),
     ]
 )

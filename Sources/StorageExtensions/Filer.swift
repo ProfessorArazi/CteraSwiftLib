@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import SimpleEncryptor
+import CryptoExtensions
 
 /// An interface to work with the local storage of the device using a layer of Encryption.
 ///
