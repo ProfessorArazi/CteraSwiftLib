@@ -9,7 +9,8 @@ let package = Package(
         // Export CteraSwiftLib main library
         .library(name: "CteraSwiftLib", targets: ["CteraNetwork", "CteraModels", "CteraUtil", "CteraCache"]),
         // Export SwiftExtensions library as a product
-        .library(name: "SwiftExtensions", targets: ["StorageExtensions", "BasicExtensions", "CBC", "SimpleEncryptor"]),
+        .library(name: "SwiftExtensions", targets: ["StorageExtensions", "BasicExtensions"]),
+        .library(name: "CryptoExtensions", targets: ["CBC", "SimpleEncryptor"])
     ],
     dependencies: [],
     targets: [
