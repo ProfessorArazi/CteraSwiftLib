@@ -38,13 +38,15 @@ let package = Package(
             dependencies: ["BasicExtensions", "CryptoExtensions"]
         ),
         .target(
-            name: "BasicExtensions"
+            name: "BasicExtensions",
+            path: "Sources/BasicExtensions" // Explicitly specify the path to avoid issues
         ),
 
         // Define CryptoExtensions as a single target including its subfolders like CBC
         .target(
             name: "CryptoExtensions",
-            dependencies: []
+            dependencies: ["BasicExtensions"], // Add BasicExtensions as a dependency
+            path: "Sources/CryptoExtensions"  // Explicitly specify the path
         ),
 
         // Test targets

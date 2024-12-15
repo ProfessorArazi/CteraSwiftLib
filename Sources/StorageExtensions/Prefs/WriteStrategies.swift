@@ -33,7 +33,7 @@ public extension Prefs {
 		/// default batch strategy with delay of 0.1 seconds
 		public static let batch = Self.batch(delay: DEFAULT_BATCH_DELAY)
 		
-		internal func createStrategy() -> any WriteStrategy {
+		internal func createStrategy() -> WriteStrategy {
 			switch self {
 			case .immediate:
 				return ImmediateWriteStrategy()
@@ -104,7 +104,7 @@ fileprivate extension Prefs {
 			try Filer.write(data: dict.json(), to: filename)
 			logger.debug("Updated file: '\(self.filename, privacy: .private(mask: .hash))'")
 		} catch {
-			logger.error("Failed to write commit into file '\(self.filename, privacy: .private(mask: .hash))', error: \(error.localizedDescription, privacy: .sensitive(mask: .hash))")
+			logger.error("Failed to write commit into Prefs file '\(self.filename, privacy: .private(mask: .hash))', error: \(error.localizedDescription, privacy: .sensitive(mask: .hash))")
 		}
 	}
 	

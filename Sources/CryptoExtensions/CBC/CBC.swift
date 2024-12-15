@@ -1,13 +1,14 @@
 //
 //  CBC.swift
-//  CBC
+//  
 //
-//  Created by Gal Yedidovich on 01/08/2021.
+//  Created by Gal Yedidovich on 20/02/2021.
 //
 
 import Foundation
 import CryptoKit
 import CommonCrypto
+import BasicExtensions
 
 public extension AES {
 	/// The Advanced Encryption Standard (AES) Cipher Block Chaining (CBC) cipher suite.
@@ -22,7 +23,7 @@ public extension AES {
 		/// - Throws: when fails to encrypt
 		/// - Returns: encrypted data
 		public static func encrypt(_ data: Data, using key: SymmetricKey, iv: Data, options: CCOptions = pkcs7Padding) throws -> Data {
-			try process(data, using: key, iv: iv, operation: .encrypt, options: options)
+			try process(data, using: key, iv: iv, operation: kCCEncrypt, options: options)
 		}
 		
 		/// Decrypts encrypted data with AES-CBC algorithm
@@ -33,11 +34,11 @@ public extension AES {
 		/// - Throws: when fails to decrypt
 		/// - Returns: clear text data after decryption
 		public static func decrypt(_ data: Data, using key: SymmetricKey, iv: Data, options: CCOptions = pkcs7Padding) throws -> Data {
-			try process(data, using: key, iv: iv, operation: .decrypt, options: options)
+			try process(data, using: key, iv: iv, operation: kCCDecrypt, options: options)
 		}
 		
 		/// Process data, either encrypt or decrypt it
-		private static func process(_ data: Data, using key: SymmetricKey, iv: Data, operation: Operation, options: CCOptions) throws -> Data {
+		private static func process(_ data: Data, using key: SymmetricKey, iv: Data, operation: Int, options: CCOptions) throws -> Data {
 			let inputBuffer = data.bytes
 			let keyData = key.dataRepresentation.bytes
 			let ivData = iv.bytes
@@ -46,27 +47,18 @@ public extension AES {
 			var outputBuffer = [UInt8](repeating: 0, count: bufferSize)
 			var numBytesProcessed = 0
 			
-			let result = CCCrypt(
-				operation.operation, CCAlgorithm(kCCAlgorithmAES), options, //params
+			let cryptStatus = CCCrypt(
+				CCOperation(operation), CCAlgorithm(kCCAlgorithmAES), options, //params
 				keyData, keyData.count, ivData, inputBuffer, inputBuffer.count, //input data
 				&outputBuffer, bufferSize, &numBytesProcessed //output data
 			)
 			
-			guard result == CCCryptorStatus(kCCSuccess) else {
-				throw CBCError(message: "Operation Failed", status: result)
+			guard cryptStatus == CCCryptorStatus(kCCSuccess) else {
+				throw CBCError(message: "Operation Failed", status: cryptStatus)
 			}
 			
 			outputBuffer.removeSubrange(numBytesProcessed..<outputBuffer.count) //trim extra padding
 			return Data(outputBuffer)
-		}
-		
-		public enum Operation {
-			case encrypt
-			case decrypt
-			
-			internal var operation: CCOperation {
-				CCOperation(self == .encrypt ? kCCEncrypt : kCCDecrypt)
-			}
 		}
 	}
 }
